@@ -3,7 +3,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { koKR } from "@clerk/localizations";
 
 import Navbar from "@/components/Navbar";
-import ResponsiveNavigation from "@/components/ResponsiveNavigation";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import "./globals.css";
 
@@ -32,8 +31,7 @@ export default function RootLayout({
           <SyncUserProvider>
             <div className="flex flex-col min-h-screen">
               <Navbar />
-              <ResponsiveNavigation />
-              <main className="flex-1 pb-20 md:pb-0">{children}</main>
+              <main className="flex-1">{children}</main>
             </div>
           </SyncUserProvider>
         </body>

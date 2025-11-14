@@ -32,8 +32,8 @@ const ResponsiveNavigation = () => {
   return (
     <>
       {/* 모바일: 하단 탭 바 (< 768px) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden safe-area-inset-bottom">
-        <div className="max-w-7xl mx-auto flex items-center justify-around h-16">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-sm border-t border-gray-200/80 shadow-xl z-50 md:hidden safe-area-inset-bottom">
+        <div className="max-w-7xl mx-auto flex items-center justify-around h-16 relative">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = pathname === tab.href || pathname?.startsWith(tab.href + "/");
@@ -43,19 +43,26 @@ const ResponsiveNavigation = () => {
                 key={tab.href}
                 href={tab.href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors",
+                  "flex flex-col items-center justify-center gap-1.5 flex-1 h-full transition-all duration-200 ease-in-out relative",
                   isActive
-                    ? "text-[#3478F6]"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "text-[#3478F6] bg-[#3478F6]/10"
+                    : "text-[#6E6E73] active:text-[#1C1C1E] active:scale-95"
                 )}
               >
+                {/* 상단 인디케이터 */}
+                {isActive && (
+                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#3478F6]" />
+                )}
                 <Icon
                   className={cn(
-                    "w-6 h-6 transition-all",
-                    isActive && "scale-110"
+                    "transition-all duration-200",
+                    isActive ? "w-7 h-7 scale-110" : "w-6 h-6"
                   )}
                 />
-                <span className="text-xs font-medium">{tab.label}</span>
+                <span className={cn(
+                  "text-xs transition-all duration-200",
+                  isActive ? "font-bold" : "font-medium"
+                )}>{tab.label}</span>
               </Link>
             );
           })}
@@ -63,8 +70,8 @@ const ResponsiveNavigation = () => {
       </nav>
 
       {/* 데스크톱: 상단 네비게이션 (≥ 1024px) */}
-      <nav className="hidden lg:flex items-center gap-1 border-b border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto w-full flex items-center gap-1 px-4">
+      <nav className="hidden lg:flex items-center gap-0 border-b border-gray-200/50 bg-white/95 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto w-full flex items-center gap-0 px-4 sm:px-6 lg:px-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = pathname === tab.href || pathname?.startsWith(tab.href + "/");
@@ -74,13 +81,17 @@ const ResponsiveNavigation = () => {
                 key={tab.href}
                 href={tab.href}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-3 transition-colors border-b-2",
+                  "flex items-center gap-2 px-6 py-4 transition-all duration-200 ease-in-out",
                   isActive
-                    ? "text-[#3478F6] border-[#3478F6] font-semibold"
-                    : "text-gray-600 hover:text-gray-900 border-transparent"
+                    ? "text-[#3478F6] font-bold bg-[#3478F6]/15"
+                    : "text-[#6E6E73] hover:text-[#1C1C1E] hover:bg-[#F2F2F7] font-medium"
                 )}
+                style={isActive ? { borderBottom: '3px solid #3478F6' } : { borderBottom: '3px solid transparent' }}
               >
-                <Icon className="w-5 h-5" />
+                <Icon className={cn(
+                  "w-5 h-5 transition-colors duration-200",
+                  isActive ? "text-[#3478F6]" : "text-[#6E6E73]"
+                )} />
                 <span className="text-sm">{tab.label}</span>
               </Link>
             );
@@ -89,8 +100,8 @@ const ResponsiveNavigation = () => {
       </nav>
 
       {/* 태블릿: 하이브리드 (768px ~ 1023px) - 데스크톱 스타일 사용 */}
-      <nav className="hidden md:flex lg:hidden items-center gap-1 border-b border-gray-200 bg-white">
-        <div className="max-w-7xl mx-auto w-full flex items-center gap-1 px-4">
+      <nav className="hidden md:flex lg:hidden items-center gap-0 border-b border-gray-200/50 bg-white/95 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto w-full flex items-center gap-0 px-4 sm:px-6">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = pathname === tab.href || pathname?.startsWith(tab.href + "/");
@@ -100,13 +111,17 @@ const ResponsiveNavigation = () => {
                 key={tab.href}
                 href={tab.href}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-3 transition-colors border-b-2",
+                  "flex items-center gap-2 px-4 py-3 transition-all duration-200 ease-in-out",
                   isActive
-                    ? "text-[#3478F6] border-[#3478F6] font-semibold"
-                    : "text-gray-600 hover:text-gray-900 border-transparent"
+                    ? "text-[#3478F6] font-bold bg-[#3478F6]/15"
+                    : "text-[#6E6E73] hover:text-[#1C1C1E] hover:bg-[#F2F2F7] font-medium"
                 )}
+                style={isActive ? { borderBottom: '3px solid #3478F6' } : { borderBottom: '3px solid transparent' }}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className={cn(
+                  "w-4 h-4 transition-colors duration-200",
+                  isActive ? "text-[#3478F6]" : "text-[#6E6E73]"
+                )} />
                 <span className="text-sm">{tab.label}</span>
               </Link>
             );

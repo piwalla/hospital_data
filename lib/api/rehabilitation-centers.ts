@@ -1,0 +1,177 @@
+/**
+ * @file rehabilitation-centers.ts
+ * @description 재활기관 데이터 조회 유틸리티
+ *
+ * Supabase에서 캐시된 재활기관 데이터를 조회하는 함수들입니다.
+ *
+ * @dependencies
+ * - lib/supabase/server.ts 또는 lib/supabase/clerk-client.ts
+ */
+
+import { createClerkSupabaseClient } from '@/lib/supabase/server';
+
+export interface RehabilitationCenter {
+  id: string;
+  name: string; // gigwan_nm
+  type: 'rehabilitation'; // 기관 유형
+  address: string;
+  latitude: number;
+  longitude: number;
+  phone: string | null; // tel_no
+  department: string | null; // gigwan_fg_nm (기관구분명)
+  gigwan_fg_nm: string; // 직업훈련기관, 재활스포츠 위탁기관, 심리재활프로그램 위탁기관
+  last_updated: string;
+  distance?: number; // 거리 정보 (km, getRehabilitationCentersNearby에서 추가됨)
+}
+
+/**
+ * 모든 재활기관 데이터 조회
+ */
+export async function getAllRehabilitationCenters(): Promise<RehabilitationCenter[]> {
+  const supabase = await createClerkSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('rehabilitation_centers')
+    .select('*')
+    .order('gigwan_nm', { ascending: true });
+
+  if (error) {
+    console.error('[Rehabilitation Centers] 조회 실패:', error);
+    throw error;
+  }
+
+  // Supabase 데이터를 RehabilitationCenter 인터페이스로 변환
+  return (data || []).map((item) => ({
+    id: item.id,
+    name: item.gigwan_nm,
+    type: 'rehabilitation' as const,
+    address: item.address,
+    latitude: item.latitude,
+    longitude: item.longitude,
+    phone: item.tel_no,
+    department: item.gigwan_fg_nm, // 기관구분명을 department로 매핑
+    gigwan_fg_nm: item.gigwan_fg_nm,
+    last_updated: item.last_updated,
+  }));
+}
+
+/**
+ * 위치 기반 재활기관 검색 (반경 내)
+ * 
+ * Haversine 공식을 사용하여 정확한 거리를 계산하고, 가까운 순으로 정렬합니다.
+ * 
+ * @param latitude 위도
+ * @param longitude 경도
+ * @param radiusKm 반경 (km, 기본값: 5)
+ * @returns 반경 내 재활기관 배열 (가까운 순으로 정렬)
+ */
+export async function getRehabilitationCentersNearby(
+  latitude: number,
+  longitude: number,
+  radiusKm: number = 5
+): Promise<RehabilitationCenter[]> {
+  const supabase = await createClerkSupabaseClient();
+
+  // 먼저 대략적인 범위로 필터링 (성능 최적화)
+  // 1도 ≈ 111km이므로, 반경보다 약간 넓은 범위로 먼저 필터링
+  const roughRadius = radiusKm / 111;
+  
+  console.log('[Rehabilitation Centers] 위치 기반 검색 시작:', { latitude, longitude, radiusKm, roughRadius });
+  
+  const { data, error } = await supabase
+    .from('rehabilitation_centers')
+    .select('*')
+    .gte('latitude', latitude - roughRadius)
+    .lte('latitude', latitude + roughRadius)
+    .gte('longitude', longitude - roughRadius)
+    .lte('longitude', longitude + roughRadius);
+  
+  console.log('[Rehabilitation Centers] 대략적 범위 필터링 결과:', data?.length || 0, '개');
+
+  if (error) {
+    console.error('[Rehabilitation Centers] 위치 검색 실패:', error);
+    throw error;
+  }
+
+  // Haversine 공식으로 정확한 거리 계산 및 필터링
+  const { calculateDistance } = await import('@/lib/utils/distance');
+  
+  const centersWithDistance: (RehabilitationCenter & { distance: number })[] = (data || [])
+    .map((center) => {
+      // 좌표가 유효한 경우에만 거리 계산
+      if (center.latitude === 0 && center.longitude === 0) {
+        return null;
+      }
+
+      const distance = calculateDistance(
+        latitude,
+        longitude,
+        center.latitude,
+        center.longitude
+      );
+
+      return {
+        id: center.id,
+        name: center.gigwan_nm,
+        type: 'rehabilitation' as const,
+        address: center.address,
+        latitude: center.latitude,
+        longitude: center.longitude,
+        phone: center.tel_no,
+        department: center.gigwan_fg_nm,
+        gigwan_fg_nm: center.gigwan_fg_nm,
+        last_updated: center.last_updated,
+        distance, // 거리 정보 추가
+      };
+    })
+    .filter((center): center is RehabilitationCenter & { distance: number } => {
+      // null 제거 및 반경 내만 필터링
+      return center !== null && center.distance <= radiusKm;
+    })
+    .sort((a, b) => a.distance - b.distance); // 가까운 순으로 정렬
+
+  console.log(`[Rehabilitation Centers] 반경 ${radiusKm}km 내 재활기관: ${centersWithDistance.length}개`);
+
+  // distance를 optional로 유지하면서 반환
+  return centersWithDistance.map(({ distance, ...rest }) => ({
+    ...rest,
+    distance,
+  })) as RehabilitationCenter[];
+}
+
+/**
+ * 기관구분으로 필터링
+ * 
+ * @param gigwanFgNm 기관구분명 (직업훈련기관, 재활스포츠 위탁기관, 심리재활프로그램 위탁기관)
+ * @returns 필터링된 재활기관 배열
+ */
+export async function getRehabilitationCentersByType(
+  gigwanFgNm: string
+): Promise<RehabilitationCenter[]> {
+  const supabase = await createClerkSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('rehabilitation_centers')
+    .select('*')
+    .eq('gigwan_fg_nm', gigwanFgNm)
+    .order('gigwan_nm', { ascending: true });
+
+  if (error) {
+    console.error('[Rehabilitation Centers] 기관구분 검색 실패:', error);
+    throw error;
+  }
+
+  return (data || []).map((item) => ({
+    id: item.id,
+    name: item.gigwan_nm,
+    type: 'rehabilitation' as const,
+    address: item.address,
+    latitude: item.latitude,
+    longitude: item.longitude,
+    phone: item.tel_no,
+    department: item.gigwan_fg_nm,
+    gigwan_fg_nm: item.gigwan_fg_nm,
+    last_updated: item.last_updated,
+  }));
+}
+
