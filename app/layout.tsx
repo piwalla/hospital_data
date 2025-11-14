@@ -1,25 +1,15 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { koKR } from "@clerk/localizations";
-import { Geist, Geist_Mono } from "next/font/google";
 
 import Navbar from "@/components/Navbar";
+import ResponsiveNavigation from "@/components/ResponsiveNavigation";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
-  title: "SaaS 템플릿",
-  description: "Next.js + Clerk + Supabase 보일러플레이트",
+  title: "리워크케어(ReWorkCare) - 산재 환자 지원 플랫폼",
+  description: "산재 환자를 위한 통합 지원 플랫폼 - 병원 찾기, 서류 안내",
 };
 
 export default function RootLayout({
@@ -30,12 +20,21 @@ export default function RootLayout({
   return (
     <ClerkProvider localization={koKR}>
       <html lang="ko">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+        <head>
+          <link
+            rel="stylesheet"
+            as="style"
+            crossOrigin="anonymous"
+            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
+          />
+        </head>
+        <body className="antialiased">
           <SyncUserProvider>
-            <Navbar />
-            {children}
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <ResponsiveNavigation />
+              <main className="flex-1 pb-20 md:pb-0">{children}</main>
+            </div>
           </SyncUserProvider>
         </body>
       </html>

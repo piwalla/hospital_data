@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   return (
-    <header className="flex justify-between items-center p-4 gap-4 h-16 max-w-7xl mx-auto">
-      <Link href="/" className="text-2xl font-bold">
-        SaaS Template
+    <header className="flex justify-between items-center p-4 gap-4 h-16 max-w-7xl mx-auto border-b border-gray-200 bg-white">
+      <Link href="/" className="text-xl font-bold text-[#3478F6]">
+        리워크케어
       </Link>
       <div className="flex gap-4 items-center">
         <SignedOut>
