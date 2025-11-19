@@ -22,14 +22,19 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-[#E4E7E7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link 
             href="/" 
-            className="text-2xl font-bold text-[#1C1C1E] hover:text-[#2E7D32] transition-colors duration-200"
+            className="flex items-center gap-2 text-2xl font-bold text-[#1C1C1E] hover:text-[#2F6E4F] transition-colors duration-200"
             style={{ fontFamily: 'Paperozi, sans-serif', fontWeight: 700 }}
           >
+            <img 
+              src="/Generated_Image_November_19__2025_-_4_32PM__1_-removebg-preview.png" 
+              alt="Re 캐릭터" 
+              className="w-8 h-8 object-contain"
+            />
             리워크케어
           </Link>
           
@@ -45,8 +50,8 @@ const Navbar = () => {
                   className={cn(
                     "text-sm transition-colors duration-200 ease-in-out",
                     isActive
-                      ? "text-[#2E7D32] font-semibold"
-                      : "text-[#6E6E73] hover:text-[#1C1C1E]"
+                      ? "text-[#2F6E4F] font-semibold"
+                      : "text-[#555555] hover:text-[#1C1C1E]"
                   )}
                 >
                   {tab.label}

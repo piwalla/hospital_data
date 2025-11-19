@@ -110,7 +110,7 @@ export async function syncHospitalsFromApi(
   maxPages: number = 10,
   useGeocoding: boolean = true
 ): Promise<number> {
-  const { getDataKrClient, fetchAllHospitals } = await import('./data-kr');
+  const { getDataKrClient } = await import('./data-kr');
 
   try {
     console.log('[Sync] 병원 데이터 동기화 시작', { maxPages, useGeocoding });

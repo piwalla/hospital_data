@@ -175,3 +175,142 @@ export async function getRehabilitationCentersByType(
   }));
 }
 
+/**
+ * 지역 기반 재활기관 검색
+ * 
+ * 주소 필드를 기반으로 특정 지역의 재활기관을 검색합니다.
+ * 다양한 주소 형식을 지원합니다 (약자 변환 포함).
+ * 
+ * @param provinceName 시/도 이름 (예: "서울특별시")
+ * @param districtName 시/군/구 이름 (선택, 예: "강남구")
+ * @param subDistrictName 구 이름 (선택, 예: "영통구" - 시의 하위 구)
+ * @returns 필터링된 재활기관 배열
+ */
+export async function getRehabilitationCentersByRegion(
+  provinceName: string,
+  districtName?: string,
+  subDistrictName?: string
+): Promise<RehabilitationCenter[]> {
+  const supabase = await createClerkSupabaseClient();
+
+  console.log('[Rehabilitation Centers] 지역 기반 검색 시작:', { provinceName, districtName, subDistrictName });
+
+  // 주소 검색을 위한 패턴 생성 (약자 변환 지원)
+  // 예: "인천광역시" → ["인천광역시", "인천"]
+  const getProvincePatterns = (name: string): string[] => {
+    const patterns = [name];
+    // 약자 변환
+    const shortName = name
+      .replace(/특별시|광역시|특별자치도|특별자치시/g, '')
+      .replace(/도$/, '');
+    if (shortName !== name) {
+      patterns.push(shortName);
+    }
+    return patterns;
+  };
+
+  const provincePatterns = getProvincePatterns(provinceName);
+
+  // 시/도만 선택한 경우
+  if (!districtName) {
+    // 여러 패턴으로 검색 (OR 조건)
+    const queries = provincePatterns.map(pattern =>
+      supabase
+        .from('rehabilitation_centers')
+        .select('*')
+        .ilike('address', `%${pattern}%`)
+    );
+
+    // 모든 쿼리 실행
+    const results = await Promise.all(queries);
+    
+    // 결과 병합 및 중복 제거
+    const allCenters = new Map<string, any>();
+    for (const result of results) {
+      if (result.error) {
+        console.error('[Rehabilitation Centers] 지역 검색 실패:', result.error);
+        continue;
+      }
+      if (result.data) {
+        for (const center of result.data) {
+          allCenters.set(center.id, center);
+        }
+      }
+    }
+
+    const centers = Array.from(allCenters.values())
+      .map((item) => ({
+        id: item.id,
+        name: item.gigwan_nm,
+        type: 'rehabilitation' as const,
+        address: item.address,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        phone: item.tel_no,
+        department: item.gigwan_fg_nm,
+        gigwan_fg_nm: item.gigwan_fg_nm,
+        last_updated: item.last_updated,
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    console.log(`[Rehabilitation Centers] ${provinceName} 지역 재활기관: ${centers.length}개`);
+    return centers;
+  }
+
+  // 시/군/구까지 선택한 경우
+  // 여러 패턴으로 검색 (OR 조건)
+  const queries = provincePatterns.map(pattern => {
+    let query = supabase
+      .from('rehabilitation_centers')
+      .select('*')
+      .ilike('address', `%${pattern}%`)
+      .ilike('address', `%${districtName}%`);
+
+    // 구까지 선택한 경우 (시의 하위 구)
+    if (subDistrictName) {
+      query = query.ilike('address', `%${subDistrictName}%`);
+    }
+
+    return query;
+  });
+
+  // 모든 쿼리 실행
+  const results = await Promise.all(queries);
+  
+  // 결과 병합 및 중복 제거
+  const allCenters = new Map<string, any>();
+  for (const result of results) {
+    if (result.error) {
+      console.error('[Rehabilitation Centers] 지역 검색 실패:', result.error);
+      continue;
+    }
+    if (result.data) {
+      for (const center of result.data) {
+        allCenters.set(center.id, center);
+      }
+    }
+  }
+
+  const centers = Array.from(allCenters.values())
+    .map((item) => ({
+      id: item.id,
+      name: item.gigwan_nm,
+      type: 'rehabilitation' as const,
+      address: item.address,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      phone: item.tel_no,
+      department: item.gigwan_fg_nm,
+      gigwan_fg_nm: item.gigwan_fg_nm,
+      last_updated: item.last_updated,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const regionName = subDistrictName 
+    ? `${provinceName} ${districtName} ${subDistrictName}`
+    : `${provinceName} ${districtName}`;
+  console.log(`[Rehabilitation Centers] ${regionName} 지역 재활기관: ${centers.length}개`);
+
+  return centers;
+}
+

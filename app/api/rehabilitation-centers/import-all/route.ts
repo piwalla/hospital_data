@@ -86,7 +86,7 @@ async function fetchRehabilitationCenters(pageNo: number, numOfRows: number) {
       });
       
       if (itemsWithoutNameOrAddr.length > 0) {
-        console.log(`[Rehabilitation API] 페이지 ${page}: 기관명/주소 없는 항목 ${itemsWithoutNameOrAddr.length}개 (그래도 저장)`);
+        console.log(`[Rehabilitation API] 페이지 ${pageNo}: 기관명/주소 없는 항목 ${itemsWithoutNameOrAddr.length}개 (그래도 저장)`);
       }
 
       resolve({

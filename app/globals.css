@@ -70,7 +70,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-brand: 'Paperozi', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -106,13 +106,13 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  /* design.md 배경색: #F2F2F7 */
-  --color-background-hex: #F2F2F7;
+  /* design.md 배경색: #F7F9F8 (2025년 개선 버전) */
+  --color-background-hex: #F7F9F8;
 }
 
 :root {
   --radius: 0.625rem;
-  --background: #F2F2F7; /* design.md 기준: 아주 연한 회색 (순백색보다 눈의 피로가 덜함) */
+  --background: #F7F9F8; /* design.md 2025년 개선: 녹색 기운의 연그레이 */
   --foreground: #1C1C1E; /* design.md 기준: 기본 텍스트 색상 (진한 회색) */
   /* 폰트 패밀리 */
   --font-brand: 'Paperozi', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -121,25 +121,28 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  /* PRD 디자인 시스템 색상 */
-  --primary: #2E7D32; /* 신뢰감 있는 진한 초록색 - 신뢰, 안정, 치유, 성장 */
+  /* PRD 디자인 시스템 색상 (2025년 개선 버전) */
+  --primary: #2F6E4F; /* 톤다운 초록 - 기존 #2E7D32에서 채도 낮춤 */
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: #34C759; /* 부드러운 녹색 - 치유, 희망, 긍정 */
+  --secondary: #61C48C; /* 부드러운 서브 초록 - 기존 #34C759에서 더 부드럽게 조정 */
   --secondary-foreground: oklch(1 0 0);
   --alert: #FF9500; /* 부드러운 주황색 - 법적 고지, 주의 사항 */
-  /* Neutral 색상 체계 (design.md 기준) */
+  /* Neutral 색상 체계 (design.md 2025년 개선 기준) */
   --neutral-text: #1C1C1E; /* 기본 텍스트 색상 (진한 회색) */
-  --neutral-text-secondary: #8A8A8E; /* 보조 텍스트 색상 (중간 회색) */
-  --neutral-bg: #F2F2F7; /* 배경 색상 (아주 연한 회색) */
+  --neutral-text-secondary: #555555; /* 보조 텍스트 색상 - 기존 #8A8A8E에서 더 진하게 조정 */
+  --neutral-bg: #F7F9F8; /* 배경 색상 (녹색 기운의 연그레이) */
   --neutral-bg-hover: #E5E5EA; /* 호버 배경 색상 */
+  /* Border 색상 체계 */
+  --border-light: #E4E7E7; /* 연한 테두리 */
+  --border-medium: #D0D5D4; /* 중간 테두리 */
   --muted: oklch(0.97 0 0);
-  --muted-foreground: #8A8A8E; /* Neutral 보조 텍스트 색상으로 통일 */
+  --muted-foreground: #555555; /* Neutral 보조 텍스트 색상으로 통일 */
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: #2E7D32;
+  --border: #E4E7E7; /* Border 중심 구조로 전환 */
+  --input: #E4E7E7;
+  --ring: #2F6E4F; /* Primary 색상과 동일 */
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -194,7 +197,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    background-color: #F2F2F7; /* design.md 기준 배경색 직접 적용 */
+    background-color: #F7F9F8; /* design.md 2025년 개선: 녹색 기운의 연그레이 */
     @apply text-foreground;
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   }
@@ -202,15 +205,19 @@
     @apply max-w-7xl mx-auto pt-16 px-4;
   }
   
-  /* PRD 타이포그래피 스케일 */
+  /* PRD 타이포그래피 스케일 (2025년 개선 버전) */
   h1 {
-    @apply text-[28px] font-bold;
+    @apply text-[30px] font-bold;
+    letter-spacing: -0.5px; /* 대비 강화 */
   }
   h2 {
     @apply text-[22px] font-semibold;
   }
+  h3 {
+    @apply text-[18px] font-semibold;
+  }
   body {
-    @apply text-[17px] font-normal;
+    @apply text-[16px] font-normal; /* 기존 17px에서 조정하여 현대적인 느낌 */
   }
   .caption {
     @apply text-[14px] font-normal;

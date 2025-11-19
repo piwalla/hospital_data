@@ -34,7 +34,9 @@ CREATE TABLE IF NOT EXISTS public.hospitals_pharmacies (
     latitude DOUBLE PRECISION NOT NULL,
     longitude DOUBLE PRECISION NOT NULL,
     phone TEXT,
-    department TEXT, -- 병원 진료과목 (약국은 NULL)
+    department TEXT, -- 병원 진료과목 (약국은 NULL, 원본 데이터)
+    institution_type TEXT, -- 기관 유형 (대학병원, 종합병원, 병원, 의원, 한의원, 요양병원, 기타) - 기관명에서 추출
+    department_extracted TEXT, -- 추출된 진료과목 (여러 과목은 쉼표로 구분) - 기관명에서 추출
     last_updated TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
 
     -- 공간 검색을 위한 제약조건
@@ -61,6 +63,12 @@ ON public.hospitals_pharmacies USING gist (point(longitude, latitude));
 
 CREATE INDEX IF NOT EXISTS idx_hospitals_pharmacies_type
 ON public.hospitals_pharmacies (type);
+
+CREATE INDEX IF NOT EXISTS idx_hospitals_pharmacies_institution_type
+ON public.hospitals_pharmacies (institution_type);
+
+CREATE INDEX IF NOT EXISTS idx_hospitals_pharmacies_department_extracted
+ON public.hospitals_pharmacies (department_extracted);
 
 CREATE INDEX IF NOT EXISTS idx_hospitals_pharmacies_last_updated
 ON public.hospitals_pharmacies (last_updated);

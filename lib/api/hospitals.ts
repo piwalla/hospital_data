@@ -19,6 +19,8 @@ export interface Hospital {
   longitude: number;
   phone: string | null;
   department: string | null;
+  institution_type: string | null; // 기관 유형 (대학병원, 종합병원, 병원, 의원, 한의원, 요양병원, 기타)
+  department_extracted: string | null; // 추출된 진료과목 (여러 과목은 쉼표로 구분)
   last_updated: string;
   distance?: number; // 거리 정보 (km, getHospitalsNearby에서 추가됨)
 }
@@ -138,5 +140,122 @@ export async function getHospitalsByDepartment(
   }
 
   return data || [];
+}
+
+/**
+ * 지역 기반 병원 검색
+ * 
+ * 주소 필드를 기반으로 특정 지역의 병원을 검색합니다.
+ * 다양한 주소 형식을 지원합니다 (약자 변환 포함).
+ * 
+ * @param provinceName 시/도 이름 (예: "서울특별시")
+ * @param districtName 시/군/구 이름 (선택, 예: "강남구")
+ * @param subDistrictName 구 이름 (선택, 예: "영통구" - 시의 하위 구)
+ * @returns 필터링된 병원 배열
+ */
+export async function getHospitalsByRegion(
+  provinceName: string,
+  districtName?: string,
+  subDistrictName?: string
+): Promise<Hospital[]> {
+  const supabase = await createClerkSupabaseClient();
+
+  console.log('[Hospitals] 지역 기반 검색 시작:', { provinceName, districtName, subDistrictName });
+
+  // 주소 검색을 위한 패턴 생성 (약자 변환 지원)
+  // 예: "인천광역시" → ["인천광역시", "인천"]
+  const getProvincePatterns = (name: string): string[] => {
+    const patterns = [name];
+    // 약자 변환
+    const shortName = name
+      .replace(/특별시|광역시|특별자치도|특별자치시/g, '')
+      .replace(/도$/, '');
+    if (shortName !== name) {
+      patterns.push(shortName);
+    }
+    return patterns;
+  };
+
+  const provincePatterns = getProvincePatterns(provinceName);
+
+  // 시/도만 선택한 경우
+  if (!districtName) {
+    // 여러 패턴으로 검색 (OR 조건)
+    const queries = provincePatterns.map(pattern =>
+      supabase
+        .from('hospitals_pharmacies')
+        .select('*')
+        .ilike('address', `%${pattern}%`)
+    );
+
+    // 모든 쿼리 실행
+    const results = await Promise.all(queries);
+    
+    // 결과 병합 및 중복 제거
+    const allHospitals = new Map<string, Hospital>();
+    for (const result of results) {
+      if (result.error) {
+        console.error('[Hospitals] 지역 검색 실패:', result.error);
+        continue;
+      }
+      if (result.data) {
+        for (const hospital of result.data) {
+          allHospitals.set(hospital.id, hospital);
+        }
+      }
+    }
+
+    const hospitals = Array.from(allHospitals.values()).sort((a, b) => 
+      a.name.localeCompare(b.name)
+    );
+
+    console.log(`[Hospitals] ${provinceName} 지역 병원: ${hospitals.length}개`);
+    return hospitals;
+  }
+
+  // 시/군/구까지 선택한 경우
+  // 여러 패턴으로 검색 (OR 조건)
+  const queries = provincePatterns.map(pattern => {
+    let query = supabase
+      .from('hospitals_pharmacies')
+      .select('*')
+      .ilike('address', `%${pattern}%`)
+      .ilike('address', `%${districtName}%`);
+
+    // 구까지 선택한 경우 (시의 하위 구)
+    if (subDistrictName) {
+      query = query.ilike('address', `%${subDistrictName}%`);
+    }
+
+    return query;
+  });
+
+  // 모든 쿼리 실행
+  const results = await Promise.all(queries);
+  
+  // 결과 병합 및 중복 제거
+  const allHospitals = new Map<string, Hospital>();
+  for (const result of results) {
+    if (result.error) {
+      console.error('[Hospitals] 지역 검색 실패:', result.error);
+      continue;
+    }
+    if (result.data) {
+      for (const hospital of result.data) {
+        allHospitals.set(hospital.id, hospital);
+      }
+    }
+  }
+
+  const hospitals = Array.from(allHospitals.values()).sort((a, b) => 
+    a.name.localeCompare(b.name)
+  );
+
+  const regionName = subDistrictName 
+    ? `${provinceName} ${districtName} ${subDistrictName}`
+    : `${provinceName} ${districtName}`;
+  console.log(`[Hospitals] ${regionName} 지역 병원: ${hospitals.length}개`);
+
+  return hospitals;
 }
 

@@ -25,6 +25,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import type { RehabilitationCenter } from "@/lib/api/rehabilitation-centers";
 
 export interface Hospital {
   id: string;
@@ -35,37 +36,48 @@ export interface Hospital {
   longitude: number;
   phone: string | null;
   department: string | null;
+  institution_type: string | null; // 기관 유형 (대학병원, 종합병원, 병원, 의원, 한의원, 요양병원, 기타)
+  department_extracted: string | null; // 추출된 진료과목 (여러 과목은 쉼표로 구분)
 }
 
 interface HospitalDetailSheetProps {
   hospital: Hospital | null;
+  rehabilitationCenter?: RehabilitationCenter | null; // 재활기관 추가
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
   hospital,
+  rehabilitationCenter,
   open,
   onOpenChange,
 }) => {
-  if (!hospital) return null;
+  // 병원 또는 재활기관 중 하나는 반드시 있어야 함
+  if (!hospital && !rehabilitationCenter) return null;
+
+  // 재활기관인지 병원인지 확인
+  const isRehabilitationCenter = !!rehabilitationCenter;
+  const displayData = isRehabilitationCenter ? rehabilitationCenter : hospital;
+
+  if (!displayData) return null;
 
   // 전화 걸기 핸들러
   const handleCall = () => {
-    if (hospital.phone) {
-      window.location.href = `tel:${hospital.phone}`;
+    if (displayData.phone) {
+      window.location.href = `tel:${displayData.phone}`;
     }
   };
 
   // 길찾기 핸들러 (네이버 지도 앱 또는 웹)
   const handleDirections = () => {
     // 네이버 지도 웹 링크
-    const naverMapUrl = `https://map.naver.com/search/${encodeURIComponent(hospital.address)}`;
+    const naverMapUrl = `https://map.naver.com/search/${encodeURIComponent(displayData.address)}`;
     
     // 모바일에서는 앱 링크 시도, 데스크톱에서는 웹 링크
     if (typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       // 모바일: 네이버 지도 앱 링크 시도
-      const naverMapAppUrl = `nmap://search?query=${encodeURIComponent(hospital.address)}`;
+      const naverMapAppUrl = `nmap://search?query=${encodeURIComponent(displayData.address)}`;
       window.location.href = naverMapAppUrl;
       
       // 앱이 없으면 웹으로 폴백
@@ -85,59 +97,76 @@ const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <SheetTitle className="text-2xl font-bold text-foreground mb-2">
-                {hospital.name}
+                {displayData.name}
               </SheetTitle>
-              {hospital.department && (
-                <SheetDescription className="text-base text-muted-foreground">
-                  {hospital.department}
+              <div className="flex flex-wrap gap-2 mt-2">
+                {isRehabilitationCenter ? (
+                  // 재활기관인 경우 기관구분명 표시
+                  rehabilitationCenter?.gigwan_fg_nm && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#9333EA]/10 text-[#9333EA]">
+                      {rehabilitationCenter.gigwan_fg_nm}
+                    </span>
+                  )
+                ) : (
+                  // 병원/약국인 경우 기관 유형 및 타입 표시
+                  <>
+                    {hospital?.institution_type && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#2F6E4F]/10 text-[#2F6E4F]">
+                        {hospital.institution_type}
+                      </span>
+                    )}
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      hospital?.type === 'hospital' 
+                        ? 'bg-[#2F6E4F]/10 text-[#2F6E4F]' 
+                        : 'bg-[#61C48C]/10 text-[#61C48C]'
+                    }`}>
+                      {hospital?.type === 'hospital' ? '병원' : '약국'}
+                    </span>
+                  </>
+                )}
+              </div>
+              {!isRehabilitationCenter && (hospital?.department_extracted || hospital?.department) && (
+                <SheetDescription className="text-base text-muted-foreground mt-2">
+                  진료과목: {hospital.department_extracted || hospital.department}
                 </SheetDescription>
               )}
-              <div className="mt-2">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  hospital.type === 'hospital' 
-                    ? 'bg-blue-100 text-blue-800' 
-                    : 'bg-green-100 text-green-800'
-                }`}>
-                  {hospital.type === 'hospital' ? '병원' : '약국'}
-                </span>
-              </div>
             </div>
           </div>
         </SheetHeader>
 
         <div className="mt-6 space-y-4">
           {/* 주소 정보 */}
-          <div className="flex items-start gap-3">
-            <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-3 border-b border-[#E4E7E7] pb-4">
+            <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" strokeWidth={1.75} />
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">주소</p>
               <p className="text-sm text-muted-foreground mt-1">
-                {hospital.address}
+                {displayData.address}
               </p>
             </div>
           </div>
 
           {/* 전화번호 정보 */}
-          {hospital.phone && (
-            <div className="flex items-start gap-3">
-              <Phone className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+          {displayData.phone && (
+            <div className="flex items-start gap-3 border-b border-[#E4E7E7] pb-4">
+              <Phone className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" strokeWidth={1.75} />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">전화번호</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {hospital.phone}
+                  {displayData.phone}
                 </p>
               </div>
             </div>
           )}
 
           {/* 좌표 정보 (개발용, 나중에 제거 가능) */}
-          {hospital.latitude !== 0 && hospital.longitude !== 0 && (
+          {displayData.latitude !== 0 && displayData.longitude !== 0 && (
             <div className="flex items-start gap-3">
-              <Building2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+              <Building2 className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" strokeWidth={1.75} />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">위치</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {hospital.latitude.toFixed(6)}, {hospital.longitude.toFixed(6)}
+                  {displayData.latitude.toFixed(6)}, {displayData.longitude.toFixed(6)}
                 </p>
               </div>
             </div>
@@ -145,15 +174,15 @@ const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
         </div>
 
         {/* 액션 버튼 */}
-        <div className="mt-8 space-y-3">
+        <div className="mt-8 grid grid-cols-2 gap-3">
           {/* Primary CTA: 전화 걸기 */}
-          {hospital.phone && (
+          {displayData.phone && (
             <Button
               onClick={handleCall}
-              className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90"
+              className="w-full h-12 text-base font-semibold"
               size="lg"
             >
-              <Phone className="w-5 h-5 mr-2" />
+              <Phone className="w-5 h-5 mr-2" strokeWidth={1.75} />
               전화 걸기
             </Button>
           )}
@@ -162,10 +191,10 @@ const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
           <Button
             onClick={handleDirections}
             variant="outline"
-            className="w-full h-12 text-base font-semibold border-2"
+            className="w-full h-12 text-base font-semibold"
             size="lg"
           >
-            <MapPin className="w-5 h-5 mr-2" />
+            <MapPin className="w-5 h-5 mr-2" strokeWidth={1.75} />
             길찾기
           </Button>
         </div>

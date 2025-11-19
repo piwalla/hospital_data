@@ -32,7 +32,7 @@ const ResponsiveNavigation = () => {
   return (
     <>
       {/* 모바일: 하단 탭 바 (< 768px) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-sm border-t border-gray-200/80 shadow-xl z-50 md:hidden safe-area-inset-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-sm border-t border-[#E4E7E7] z-50 md:hidden safe-area-inset-bottom">
         <div className="max-w-7xl mx-auto flex items-center justify-around h-16 relative">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -45,13 +45,13 @@ const ResponsiveNavigation = () => {
                 className={cn(
                   "flex flex-col items-center justify-center gap-1.5 flex-1 h-full transition-all duration-200 ease-in-out relative",
                   isActive
-                    ? "text-[#3478F6] bg-[#3478F6]/10"
-                    : "text-[#6E6E73] active:text-[#1C1C1E] active:scale-95"
+                    ? "text-[#2F6E4F] bg-[#2F6E4F]/10"
+                    : "text-[#555555] active:text-[#1C1C1E] active:scale-95"
                 )}
               >
                 {/* 상단 인디케이터 */}
                 {isActive && (
-                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#3478F6]" />
+                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#2F6E4F]" />
                 )}
                 <Icon
                   className={cn(
@@ -83,15 +83,15 @@ const ResponsiveNavigation = () => {
                 className={cn(
                   "flex items-center gap-2 px-6 py-4 transition-all duration-200 ease-in-out",
                   isActive
-                    ? "text-[#3478F6] font-bold bg-[#3478F6]/15"
-                    : "text-[#6E6E73] hover:text-[#1C1C1E] hover:bg-[#F2F2F7] font-medium"
+                    ? "text-[#2F6E4F] font-bold bg-[#2F6E4F]/15"
+                    : "text-[#555555] hover:text-[#1C1C1E] hover:bg-[#F7F9F8] font-medium"
                 )}
-                style={isActive ? { borderBottom: '3px solid #3478F6' } : { borderBottom: '3px solid transparent' }}
+                style={isActive ? { borderBottom: '3px solid #2F6E4F' } : { borderBottom: '3px solid transparent' }}
               >
                 <Icon className={cn(
                   "w-5 h-5 transition-colors duration-200",
-                  isActive ? "text-[#3478F6]" : "text-[#6E6E73]"
-                )} />
+                  isActive ? "text-[#2F6E4F]" : "text-[#555555]"
+                )} strokeWidth={1.75} />
                 <span className="text-sm">{tab.label}</span>
               </Link>
             );
@@ -113,15 +113,15 @@ const ResponsiveNavigation = () => {
                 className={cn(
                   "flex items-center gap-2 px-4 py-3 transition-all duration-200 ease-in-out",
                   isActive
-                    ? "text-[#3478F6] font-bold bg-[#3478F6]/15"
-                    : "text-[#6E6E73] hover:text-[#1C1C1E] hover:bg-[#F2F2F7] font-medium"
+                    ? "text-[#2F6E4F] font-bold bg-[#2F6E4F]/15"
+                    : "text-[#555555] hover:text-[#1C1C1E] hover:bg-[#F7F9F8] font-medium"
                 )}
-                style={isActive ? { borderBottom: '3px solid #3478F6' } : { borderBottom: '3px solid transparent' }}
+                style={isActive ? { borderBottom: '3px solid #2F6E4F' } : { borderBottom: '3px solid transparent' }}
               >
                 <Icon className={cn(
                   "w-4 h-4 transition-colors duration-200",
-                  isActive ? "text-[#3478F6]" : "text-[#6E6E73]"
-                )} />
+                  isActive ? "text-[#2F6E4F]" : "text-[#555555]"
+                )} strokeWidth={1.75} />
                 <span className="text-sm">{tab.label}</span>
               </Link>
             );
