@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Star } from "lucide-react";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -19,10 +20,14 @@ const Navbar = () => {
       href: "/documents",
       label: "서류 안내",
     },
+    {
+      href: "/chatbot",
+      label: "산재 상담",
+    },
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-[#E4E7E7]">
+    <header className="sticky top-0 z-50 bg-[#FFFCF5]/95 backdrop-blur-sm border-b border-[#E8F5E9] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link 
@@ -31,8 +36,8 @@ const Navbar = () => {
             style={{ fontFamily: 'Paperozi, sans-serif', fontWeight: 700 }}
           >
             <img 
-              src="/Generated_Image_November_19__2025_-_4_32PM__1_-removebg-preview.png" 
-              alt="Re 캐릭터" 
+              src="/파이왈라_마크-removebg-preview.png" 
+              alt="파이왈라 마크" 
               className="w-8 h-8 object-contain"
             />
             리워크케어
@@ -67,6 +72,26 @@ const Navbar = () => {
               </SignInButton>
             </SignedOut>
             <SignedIn>
+              <Link
+                href="/favorites"
+                className={cn(
+                  "flex items-center gap-2 text-sm transition-colors duration-200 ease-in-out",
+                  pathname === "/favorites"
+                    ? "text-[#2F6E4F] font-semibold"
+                    : "text-[#555555] hover:text-[#1C1C1E]"
+                )}
+              >
+                <Star
+                  className={cn(
+                    "w-5 h-5",
+                    pathname === "/favorites"
+                      ? "fill-[#FBBF24] text-[#FBBF24]"
+                      : "fill-none"
+                  )}
+                  strokeWidth={pathname === "/favorites" ? 2.5 : 2}
+                />
+                <span className="hidden sm:inline">즐겨찾기</span>
+              </Link>
               <UserButton />
             </SignedIn>
           </div>

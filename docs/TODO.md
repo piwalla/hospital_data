@@ -350,6 +350,95 @@
   - [x] 503/에러 처리 및 사용자 안내 메시지
 - [ ] **참고 문서**: `docs/DOCUMENTS_AI_GUIDE_PLAN.md` (상세 계획)
 
+### Phase 1.3.5: n8n RAG 챗봇 연동 (신규) 🔴
+- [x] **n8n RAG 챗봇 페이지 생성** (Priority 1) 🔴 ✅ 완료 (2025-11-26)
+  - [x] 환경 변수 설정
+    - [x] `.env.local`에 `NEXT_PUBLIC_N8N_WEBHOOK_URL` 추가
+    - [x] `.env.example`에도 동일하게 추가 (주석 포함)
+    - [x] **ngrok URL 업데이트 가이드 문서 작성** (`docs/N8N_WEBHOOK_URL_UPDATE.md`)
+      - [x] ngrok 실행 방법
+      - [x] ngrok URL 확인 방법
+      - [x] `.env.local` 파일에서 `NEXT_PUBLIC_N8N_WEBHOOK_URL` 업데이트 방법
+      - [x] 개발 서버 재시작 필요 안내
+      - [x] 주의사항: ngrok 재시작 시 URL 변경됨
+  - [x] 페이지 생성 (`app/chatbot/page.tsx`)
+    - [x] 서버 컴포넌트로 생성
+    - [x] Clerk `auth()`를 사용하여 로그인 확인
+    - [x] 로그인하지 않은 경우 홈으로 리다이렉트
+    - [x] 로그인한 경우 `RagChatbot` 컴포넌트 렌더링
+    - [x] 페이지 제목 및 레이아웃은 기존 `app/documents/page.tsx` 스타일 참고
+  - [x] 챗봇 컴포넌트 생성 (`components/rag-chatbot/RagChatbot.tsx`)
+    - [x] 클라이언트 컴포넌트 (`'use client'`)
+    - [x] 기존 `components/documents/DocumentAssistant.tsx` 구조 참고
+    - [x] 주요 기능:
+      - [x] 질문 입력 폼 (Textarea)
+      - [x] 메시지 목록 표시 (user/assistant)
+      - [x] 로딩 상태 처리
+      - [x] 에러 처리
+    - [x] n8n 웹훅 호출:
+      - [x] `fetch`를 사용하여 POST 요청
+      - [x] `message`: 사용자 입력
+      - [x] `sessionId`: Clerk `useUser().user?.id` 사용
+      - [x] 응답: `data.result.output`에서 답변 추출
+    - [x] 마크다운 렌더링: 기존 DocumentAssistant의 `markdownToHtml` 함수 재사용 또는 유사한 로직 구현
+  - [x] 타입 정의
+    - [x] `ChatMessage` 인터페이스 정의 (컴포넌트 내부에 포함)
+  - [x] 스타일링
+    - [x] 기존 DocumentAssistant와 동일한 디자인 시스템 사용
+    - [x] Tailwind CSS 클래스 재사용
+    - [x] RiuIcon, RiuLoader 등 기존 UI 컴포넌트 활용
+  - [x] 네비게이션 링크 추가
+    - [x] `components/Navbar.tsx`에 "산재 상담" 탭 추가
+    - [x] `components/ResponsiveNavigation.tsx`에 모바일/태블릿 탭 추가
+  - [x] **테스트 및 검증** (Priority 1) 🔴 ✅ 완료 (2025-11-26)
+    - [x] 챗봇 기본 기능 테스트
+      - [x] 질문 입력 및 답변 수신 확인
+      - [x] 세션 ID 기반 대화 기록 유지 확인
+      - [x] 마크다운 렌더링 확인
+    - [x] 에러 처리 테스트
+      - [x] 웹훅 URL 미설정 시 에러 메시지 표시 확인
+      - [x] 네트워크 오류 시 에러 처리 확인
+      - [x] n8n 워크플로우 오류 시 에러 처리 확인
+    - [x] 로그인 상태 확인
+      - [x] 비로그인 사용자 접근 시 홈으로 리다이렉트 확인
+      - [x] 로그인 사용자만 챗봇 사용 가능 확인
+    - [x] ngrok URL 변경 시 동작 확인
+      - [x] 환경 변수 업데이트 후 서버 재시작 시 정상 작동 확인
+  - [ ] **사용자 경험 개선** (Priority 2) 🟡
+    - [x] 추천 질문 버튼 추가
+      - [x] "요양급여가 뭔가요?", "산업재해 신청은 어떻게 하나요?" 등 자주 묻는 질문 버튼
+      - [x] 클릭 시 자동으로 질문 입력 및 전송
+    - [x] 대화 기록 초기화 버튼 추가
+      - [x] 새로운 세션 시작 기능
+    - [x] 입력 히스토리 기능 (선택사항)
+      - [x] 이전 질문 다시 보기 버튼 (최근 5개)
+    - [ ] 로딩 상태 개선
+      - [ ] 스트리밍 응답 지원 (향후 개선)
+      - [x] 타임아웃 처리 추가
+  - [ ] **반응형 디자인 검증** (Priority 2) 🟡
+    - [ ] 모바일 화면에서 챗봇 UI 확인 (수동 테스트 필요)
+    - [ ] 태블릿 화면에서 챗봇 UI 확인 (수동 테스트 필요)
+    - [ ] 데스크톱 화면에서 챗봇 UI 확인 (수동 테스트 필요)
+    - [ ] 메시지 목록 스크롤 동작 확인
+    - [ ] 입력 폼 반응형 레이아웃 확인
+  - [ ] **접근성 검증** (Priority 3) 🟢
+    - [ ] 키보드 네비게이션 지원 확인
+    - [ ] 스크린 리더 지원 확인 (ARIA 라벨)
+    - [ ] 색상 대비 확인 (WCAG AA)
+    - [ ] 포커스 관리 확인
+  - [ ] **프로덕션 준비** (Priority 2) 🟡
+    - [ ] ngrok 대신 고정 도메인 설정 검토
+      - [ ] n8n 클라우드 사용 검토
+      - [ ] 리버스 프록시 설정 검토
+      - [ ] 도메인 및 SSL 인증서 설정
+    - [ ] 환경 변수 프로덕션 설정
+      - [ ] Vercel 환경 변수 설정 가이드 작성
+    - [ ] 에러 로깅 및 모니터링
+      - [ ] 챗봇 사용 통계 수집 (선택사항)
+      - [ ] 에러 발생 시 알림 설정 (선택사항)
+  - [ ] 예상 소요 시간: 3-4시간 (기본 구현 완료), 추가 개선 2-3시간
+  - [ ] 참고 문서: `docs/N8N_RAG_CHATBOT_WORKFLOW.md` (워크플로우 상세 분석)
+
 ### Phase 1.4: 디자인 시스템 일관성 검증 (Priority 3) 🟢
 - [ ] **PRD 타이포그래피 시스템 검증 및 적용**
   - [ ] 현재 컴포넌트에서 타이포그래피 사용 현황 확인
@@ -471,6 +560,36 @@
   - [x] 예상 소요 시간: 2-3시간
   - [x] 참고: `docs/HEADER_DESIGN_IMPROVEMENT.md` (상세 계획)
   - [x] **전체 헤더 디자인 개선 완료** ✅ (2025-01-14)
+- [ ] **Warm & Rounded 테마 리뉴얼 (신규)** 🔴
+  - [ ] 디자인 토큰 재정의
+    - [ ] `app/globals.css`에서 배경을 `#FFFCF5` / `#F5F9F6` 투톤으로 재구성
+    - [ ] Primary `#2F6E4F`, Secondary `#A5D6A7`, Accent `#FFD54F` 변수 추가
+    - [ ] 기본 letter-spacing을 `tracking-tight (-0.02em)`으로 통일
+    - [ ] radius/ shadow 토큰을 `rounded-2xl` + `shadow-[0_8px_30px_rgba(0,0,0,0.04)]` 계열로 정의
+  - [ ] Tailwind 설정 업데이트
+    - [ ] `tailwind.config.ts` 생성 후 색상·폰트·shadow preset 등록
+    - [ ] Theme 변수를 components 전체에서 사용할 수 있도록 리팩터링
+  - [ ] 공통 UI 컴포넌트 리팩터링
+    - [ ] `components/ui/button.tsx`, `input.tsx`, `textarea.tsx`, `dialog.tsx`, `sheet.tsx`에 둥근 모서리와 leaf shadow 적용
+    - [ ] 카드/섹션 공용 Surface 스타일 정의 (rounded-2xl + warm gradient)
+  - [ ] 리우(Riu) 캐릭터 통합
+    - [ ] `components/icons/RiuIcon.tsx`, `RiuLoader` 등 SVG/애니메이션 컴포넌트 생성
+    - [ ] 로딩/빈 상태 및 헤더에 PNG 대신 컴포넌트로 교체
+    - [ ] HospitalMap, Documents 등 주요 섹션에 캐릭터 배치 가이드 반영
+  - [ ] Warm & Rounded 페이지 개편
+    - [ ] 서류 안내 페이지 카드·챗봇·면책 배너 리디자인 (열매 포인트, soft shadow)
+    - [ ] 병원 찾기 필터/리스트/Bottom Sheet에 soft mint 배경과 rounded 적용
+    - [ ] 섹션 구분을 연녹색 배경 대비 또는 `border-green-100`로 대체
+  - [ ] 지도/마커 업데이트
+    - [ ] HospitalMap 마커를 리우 얼굴이 들어간 원형 스타일로 교체 (기관별 색상)
+    - [ ] 사용자 위치·로딩 표시를 Riu 애니메이션으로 대체
+  - [ ] Tree motif 디테일 추가
+    - [ ] 중요 카드에 warm yellow (#FFD54F) 포인트와 leaf shadow 적용
+    - [ ] 배경 전반에 은은한 leaf pattern 또는 gradient 적용 (LCP 영향 검증)
+- [ ] **로딩/Empty 상태 애니메이션 일원화** 🟡
+  - [ ] `components/ui/riu-loader.tsx` 제작 (점프/잎사귀 애니메이션)
+  - [ ] DocumentSummary, DocumentAssistant, HospitalsPageClient 빈 상태에서 공통 컴포넌트 사용
+  - [ ] 상태별 접근성 텍스트 및 console.log 로깅 추가
 - [x] **네비게이션 디자인 개선 (Priority 1)** 🔴 ✅ 완료 (2025-01-14)
   - [x] **Phase 1: 데스크톱 네비게이션 개선** (1시간) ✅
     - [x] 활성 탭 시각적 강화 (배경색 bg-[#3478F6]/15, 하단 인디케이터 3px, font-bold)

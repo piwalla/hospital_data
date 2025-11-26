@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MapPin, FileText } from "lucide-react";
+import { MapPin, FileText, MessageSquareText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -27,12 +27,17 @@ const ResponsiveNavigation = () => {
       label: "서류 안내",
       icon: FileText,
     },
+    {
+      href: "/chatbot",
+      label: "산재 상담",
+      icon: MessageSquareText,
+    },
   ];
 
   return (
     <>
       {/* 모바일: 하단 탭 바 (< 768px) */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/98 backdrop-blur-sm border-t border-[#E4E7E7] z-50 md:hidden safe-area-inset-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 bg-[#FFFCF5]/98 backdrop-blur-sm border-t border-[#E8F5E9] z-50 md:hidden safe-area-inset-bottom shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <div className="max-w-7xl mx-auto flex items-center justify-around h-16 relative">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -70,7 +75,7 @@ const ResponsiveNavigation = () => {
       </nav>
 
       {/* 데스크톱: 상단 네비게이션 (≥ 1024px) */}
-      <nav className="hidden lg:flex items-center gap-0 border-b border-gray-200/50 bg-white/95 backdrop-blur-sm">
+      <nav className="hidden lg:flex items-center gap-0 border-b border-[#E8F5E9] bg-[#FFFCF5]/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto w-full flex items-center gap-0 px-4 sm:px-6 lg:px-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -84,7 +89,7 @@ const ResponsiveNavigation = () => {
                   "flex items-center gap-2 px-6 py-4 transition-all duration-200 ease-in-out",
                   isActive
                     ? "text-[#2F6E4F] font-bold bg-[#2F6E4F]/15"
-                    : "text-[#555555] hover:text-[#1C1C1E] hover:bg-[#F7F9F8] font-medium"
+                    : "text-[#555555] hover:text-[#1C1C1E] hover:bg-[#F5F9F6] font-medium"
                 )}
                 style={isActive ? { borderBottom: '3px solid #2F6E4F' } : { borderBottom: '3px solid transparent' }}
               >
@@ -100,7 +105,7 @@ const ResponsiveNavigation = () => {
       </nav>
 
       {/* 태블릿: 하이브리드 (768px ~ 1023px) - 데스크톱 스타일 사용 */}
-      <nav className="hidden md:flex lg:hidden items-center gap-0 border-b border-gray-200/50 bg-white/95 backdrop-blur-sm">
+      <nav className="hidden md:flex lg:hidden items-center gap-0 border-b border-[#E8F5E9] bg-[#FFFCF5]/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto w-full flex items-center gap-0 px-4 sm:px-6">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -114,7 +119,7 @@ const ResponsiveNavigation = () => {
                   "flex items-center gap-2 px-4 py-3 transition-all duration-200 ease-in-out",
                   isActive
                     ? "text-[#2F6E4F] font-bold bg-[#2F6E4F]/15"
-                    : "text-[#555555] hover:text-[#1C1C1E] hover:bg-[#F7F9F8] font-medium"
+                    : "text-[#555555] hover:text-[#1C1C1E] hover:bg-[#F5F9F6] font-medium"
                 )}
                 style={isActive ? { borderBottom: '3px solid #2F6E4F' } : { borderBottom: '3px solid transparent' }}
               >
