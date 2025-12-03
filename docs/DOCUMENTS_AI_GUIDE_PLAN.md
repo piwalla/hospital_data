@@ -708,3 +708,11 @@ GRANT ALL ON TABLE public.document_summaries TO service_role;
 
 
 
+
+
+
+
+
+
+
+

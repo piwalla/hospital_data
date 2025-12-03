@@ -13,6 +13,10 @@ const Navbar = () => {
 
   const tabs = [
     {
+      href: "/timeline",
+      label: "진행 과정",
+    },
+    {
       href: "/hospitals",
       label: "병원 찾기",
     },
@@ -27,12 +31,12 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#FFFCF5]/95 backdrop-blur-sm border-b border-[#E8F5E9] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+    <header className="sticky top-0 z-50 bg-[var(--background)]/95 backdrop-blur-sm border-b border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link 
             href="/" 
-            className="flex items-center gap-2 text-2xl font-bold text-[#1C1C1E] hover:text-[#2F6E4F] transition-colors duration-200"
+            className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-primary transition-colors duration-200"
             style={{ fontFamily: 'Paperozi, sans-serif', fontWeight: 700 }}
           >
             <img 
@@ -55,7 +59,7 @@ const Navbar = () => {
                   className={cn(
                     "text-sm transition-colors duration-200 ease-in-out",
                     isActive
-                      ? "text-[#2F6E4F] font-semibold"
+                      ? "text-primary font-semibold font-brand"
                       : "text-[#555555] hover:text-[#1C1C1E]"
                   )}
                 >

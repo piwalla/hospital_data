@@ -31,3 +31,11 @@ COMMENT ON COLUMN public.hospitals_pharmacies.department_extracted IS '기관명
 
 
 
+
+
+
+
+
+
+
+

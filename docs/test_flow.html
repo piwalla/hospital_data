@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>산재 환자 지원 여정</title>
+    <style>
+        :root {
+            --color-primary: #2180a0;
+            --color-secondary: #50b3d8;
+            --color-success: #4CAF50;
+            --color-warning: #ff9800;
+            --color-danger: #f44336;
+            --color-info: #2196F3;
+            --color-bg: #f5f5f5;
+            --color-text: #333;
+            --color-border: #ddd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--color-primary);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .journey-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+        }
+
+        .journey-container::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 60px;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--color-primary), var(--color-success));
+            z-index: 0;
+        }
+
+        .stage {
+            position: relative;
+            margin-left: 40px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .stage-header {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--color-primary);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stage:hover .stage-header {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(10px);
+        }
+
+        .stage-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .stage.stage-1 .stage-number { background: #FF6B6B; }
+        .stage.stage-2 .stage-number { background: #4ECDC4; }
+        .stage.stage-3 .stage-number { background: #95E1D3; }
+        .stage.stage-4 .stage-number { background: #F38181; }
+        .stage.stage-5 .stage-number { background: #AA96DA; }
+        .stage.stage-6 .stage-number { background: #FCBAD3; }
+        .stage.stage-7 .stage-number { background: #A8D8EA; }
+
+        .stage-info {
+            flex: 1;
+        }
+
+        .stage-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--color-text);
+        }
+
+        .stage-timing {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stage-timing::before {
+            content: '⏱';
+        }
+
+        .stage-details {
+            display: none;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid var(--color-border);
+            animation: slideDown 0.3s ease;
+        }
+
+        .stage.active .stage-details {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .detail-section {
+            margin-bottom: 15px;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--color-primary);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .detail-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .service-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .service-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            border-left: 3px solid var(--color-secondary);
+            line-height: 1.4;
+        }
+
+        .decision-box {
+            background: #fff3cd;
+            border-left: 4px solid var(--color-warning);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .financial-highlight {
+            background: #e8f5e9;
+            border-left: 4px solid var(--color-success);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        .grade-info {
+            background: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        .path-indicator {
+            display: inline-block;
+            background: var(--color-info);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid var(--color-border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .toggle-all {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1a6f8f;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: var(--color-border);
+            color: var(--color-text);
+        }
+
+        .btn-secondary:hover {
+            background: #ccc;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .stage-header {
+                padding: 15px;
+            }
+
+            .stage-number {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                margin-right: 15px;
+            }
+
+            .stage-title {
+                font-size: 16px;
+            }
+
+            .service-list {
+                grid-template-columns: 1fr;
+            }
+
+            .journey-container::before {
+                left: 20px;
+            }
+
+            .stage-header {
+                margin-left: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏥 산재 환자 지원 여정</h1>
+            <p class="subtitle">
+                산업재해 발생부터 직장 복귀 또는 재취업까지<br/>
+                모든 과정을 단계별로 안내해드립니다
+            </p>
+        </header>
+
+        <div class="toggle-all">
+            <button class="btn-primary" onclick="expandAll()">📖 모두 펼치기</button>
+            <button class="btn-secondary" onclick="collapseAll()">📕 모두 접기</button>
+        </div>
+
+        <div class="journey-container">
+            <!-- Stage 1: Application -->
+            <div class="stage stage-1" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">1</div>
+                    <div class="stage-info">
+                        <div class="stage-title">산재 신청 (산재 인정)</div>
+                        <div class="stage-timing">3일 이내에 신청 필수</div>
+                    </div>
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <div class="detail-label">📋 주요 절차</div>
+                        <div class="service-list">
+                            <div class="service-item">재해 사실 입증</div>
+                            <div class="service-item">의사 진단서 제출</div>
+                            <div class="service-item">산재 신청서 제출</div>
+                            <div class="service-item">근로복지공단 심사</div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">⏰ 소요 기간</div>
+                        <div class="detail-content">약 1-2주</div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">✅ 결과</div>
+                        <div class="detail-content">산재 승인 / 거절</div>
+                    </div>
+                    <div class="decision-box">
+                        <strong>⚠️ 중요:</strong> 재해 발생 후 최대한 빨리 근로복지공단에 신청하세요. 시간 경과 시 증명이 어려워집니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 2: Treatment -->
+            <div class="stage stage-2" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">2</div>
+                    <div class="stage-info">
+                        <div class="stage-title">치료 단계</div>
+                        <div class="stage-timing">수개월 ~ 1년 이상</div>
+                    </div>
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <div class="detail-label">🏥 의료 재활</div>
+                        <div class="detail-content">전문 병원에서 신체 치료 및 수술, 약물 치료 등 제공</div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">💭 심리 재활 서비스</div>
+                        <div class="service-list">
+                            <div class="service-item">개인 심리상담</div>
+                            <div class="service-item">희망찾기 프로그램</div>
+                            <div class="service-item">가족화합 프로그램</div>
+                            <div class="service-item">멘토링 프로그램</div>
+                        </div>
+                    </div>
+                    <div class="financial-highlight">
+                        <strong>💰 재정 지원:</strong><br/>
+                        • 치료비: 100% 지원<br/>
+                        • 휴업급여: 평균임금의 70% (최대 3년)<br/>
+                        • 입원식 식대, 교통비 등 추가 지원
+                    </div>
+                    <div class="financial-highlight">
+                        <strong>🏢 사업주 지원:</strong><br/>
+                        • 대체인력 지원금: 월 60만원 (최대 6개월)<br/>
+                        • 직장복귀지원금 연계
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 3: Rehabilitation -->
+            <div class="stage stage-3" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">3</div>
+                    <div class="stage-info">
+                        <div class="stage-title">재활 단계 (회복 기간)</div>
+                        <div class="stage-timing">치료 진행 중 ~ 종료 후</div>
+                    </div>
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <div class="detail-label">🎯 주요 활동</div>
+                        <div class="service-list">
+                            <div class="service-item">재활스포츠</div>
+                            <div class="service-item">사회적응 프로그램</div>
+                            <div class="service-item">직장동료화합 프로그램</div>
+                            <div class="service-item">취미활동 지원</div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">📝 주요 목표</div>
+                        <div class="detail-content">
+                            신체 기능 회복 강화 및 사회 복귀 적응력 강화. 직장복귀에 대한 심리적 준비와 신체적 능력 향상에 중점을 두고 진행됩니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 4: Disability Assessment -->
+            <div class="stage stage-4" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">4</div>
+                    <div class="stage-info">
+                        <div class="stage-title">장해등급 판정</div>
+                        <div class="stage-timing">4~12주 (평균 4-6주)</div>
+                    </div>
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <div class="detail-label">🔔 신청 조건</div>
+                        <div class="service-list">
+                            <div class="service-item">산재 승인 완료</div>
+                            <div class="service-item">치료 완전 종료</div>
+                            <div class="service-item">영구적 후유증 존재</div>
+                            <div class="service-item">장해진단서 발급 가능</div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">📋 판정 절차</div>
+                        <div class="detail-content">
+                            <strong>1단계:</strong> 장해진단서 발급 (1-2주)<br/>
+                            <strong>2단계:</strong> 신청서 제출 (즉시)<br/>
+                            <strong>3단계:</strong> 공단 심사 및 일정 지정 (1-2주)<br/>
+                            <strong>4단계:</strong> 장해심사 실시 (1일)<br/>
+                            <strong>5단계:</strong> 의학적 자문 및 등급 결정 (2-4주)<br/>
+                            <strong>6단계:</strong> 결과 통보 (3-5일)
+                        </div>
+                    </div>
+                    <div class="grade-info">
+                        <strong>📊 등급별 보상:</strong><br/>
+                        <strong>1~3급:</strong> 노동능력 상실 100~82% → 생활비 성격의 연금 (평생)<br/>
+                        <strong>4~7급:</strong> 노동능력 상실 73~56% → 연금 또는 일시금 선택<br/>
+                        <strong>8~14급:</strong> 노동능력 상실 45~5% → 일시금 지급
+                    </div>
+                    <div class="decision-box">
+                        <strong>⚠️ 중요:</strong> 치료 종료 후 가능하면 빨리 신청하세요. 시간 경과 시 산재와의 인과관계 입증이 어려워집니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 5: Return Preparation -->
+            <div class="stage stage-5" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">5</div>
+                    <div class="stage-info">
+                        <div class="stage-title">직장 복귀 준비</div>
+                        <div class="stage-timing">2~4주</div>
+                    </div>
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <div class="detail-label">🎓 직장복귀 지원 프로그램</div>
+                        <div class="service-list">
+                            <div class="service-item">직무분석</div>
+                            <div class="service-item">직업능력 평가</div>
+                            <div class="service-item">작업능력 강화훈련</div>
+                            <div class="service-item">복귀 소견서 작성</div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">📍 지원 기관</div>
+                        <div class="detail-content">
+                            근로복지공단 병원 및 의료기관<br/>
+                            (인천, 안산, 창원, 대구, 순천, 대전, 동해 등)
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">🏢 사업주 직장복귀계획서</div>
+                        <div class="detail-content">
+                            사업주가 복귀 직무를 미리 공단에 제출하면, 공단이 근로자에게 맞춤형 재활서비스를 제공하고 사업주에게는 지원제도를 연계해드립니다.
+                        </div>
+                    </div>
+                    <span class="path-indicator">🔀 다음: 두 가지 경로 중 선택</span>
+                </div>
+            </div>
+
+            <!-- Stage 6: Original Job Return -->
+            <div class="stage stage-6" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">6A</div>
+                    <div class="stage-info">
+                        <div class="stage-title">원직장 복귀</div>
+                        <div class="stage-timing">복귀 후 12개월 지원</div>
+                    </div>
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <div class="detail-label">✅ 복귀 방식</div>
+                        <div class="detail-content">
+                            기존 직무로 복귀 (원칙)<br/>
+                            의료 소견에 따라 직무 전환 가능 (사업주 협의)
+                        </div>
+                    </div>
+                    <div class="financial-highlight">
+                        <strong>💰 복귀 후 지원:</strong><br/>
+                        • 직장복귀지원금: 월 40~80만원 (최대 12개월)<br/>
+                        • 직장적응훈련비: 월 최대 45만원 (3개월)<br/>
+                        • 재활운동비: 월 15만원 (3개월)<br/>
+                        • 직장동료화합프로그램 제공
+                    </div>
+                    <div class="decision-box">
+                        <strong>ℹ️ 참고:</strong> 복귀 후에도 합병증 등 문제 발생 시 재요양 신청 가능합니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 7: Reemployment -->
+            <div class="stage stage-7" onclick="toggleStage(this)">
+                <div class="stage-header">
+                    <div class="stage-number">6B</div>
+                    <div class="stage-info">
+                        <div class="stage-title">재취업 (새로운 일자리)</div>
+                        <div class="stage-timing">최대 3년간 지원</div>
+                    </div>
+                </div>
+                <div class="stage-details">
+                    <div class="detail-section">
+                        <div class="detail-label">🎯 지원 대상</div>
+                        <div class="detail-content">
+                            장해등급 1~12급 판정자<br/>
+                            (장해등급 판정일로부터 3년 이내)
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">📚 직업훈련 지원</div>
+                        <div class="service-list">
+                            <div class="service-item">최대 12개월</div>
+                            <div class="service-item">최대 2회 지원</div>
+                            <div class="service-item">훈련비용 지원</div>
+                            <div class="service-item">훈련수당 지급</div>
+                        </div>
+                    </div>
+                    <div class="detail-section">
+                        <div class="detail-label">🔗 취업 서비스</div>
+                        <div class="service-list">
+                            <div class="service-item">워크넷 등록</div>
+                            <div class="service-item">취업알선</div>
+                            <div class="service-item">취업성공패키지</div>
+                            <div class="service-item">보조기구 지원</div>
+                        </div>
+                    </div>
+                    <div class="financial-highlight">
+                        <strong>💰 훈련 지원 내용:</strong><br/>
+                        • 훈련비용: 600만원 이내 (정부 지원 훈련은 전액)<br/>
+                        • 훈련수당: 최저임금 내에서 차등 지급 (출석률 80% 이상)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FF6B6B;"></div>
+                <span>신청 단계</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4ECDC4;"></div>
+                <span>치료 단계</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #95E1D3;"></div>
+                <span>재활 단계</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #F38181;"></div>
+                <span>판정 단계</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #AA96DA;"></div>
+                <span>준비 단계</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FCBAD3;"></div>
+                <span>원직장 복귀</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #A8D8EA;"></div>
+                <span>재취업 지원</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleStage(element) {
+            element.classList.toggle('active');
+        }
+
+        function expandAll() {
+            const stages = document.querySelectorAll('.stage');
+            stages.forEach(stage => {
+                stage.classList.add('active');
+            });
+        }
+
+        function collapseAll() {
+            const stages = document.querySelectorAll('.stage');
+            stages.forEach(stage => {
+                stage.classList.remove('active');
+            });
+        }
+
+        // Open first stage by default
+        window.addEventListener('load', function() {
+            const firstStage = document.querySelector('.stage');
+            if (firstStage) {
+                firstStage.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -103,7 +103,7 @@ const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
                 {isRehabilitationCenter ? (
                   // 재활기관인 경우 기관구분명 표시
                   rehabilitationCenter?.gigwan_fg_nm && (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#9333EA]/10 text-[#9333EA]">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-rehabilitation)]/10 text-[var(--color-rehabilitation)]">
                       {rehabilitationCenter.gigwan_fg_nm}
                     </span>
                   )
@@ -111,7 +111,7 @@ const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
                   // 병원/약국인 경우 기관 유형 및 타입 표시
                   <>
                     {hospital?.institution_type && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#2F6E4F]/10 text-[#2F6E4F]">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                         {hospital.institution_type}
                       </span>
                     )}
@@ -136,7 +136,7 @@ const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
 
         <div className="mt-6 space-y-4">
           {/* 주소 정보 */}
-          <div className="flex items-start gap-3 border-b border-[#E4E7E7] pb-4">
+          <div className="flex items-start gap-3 border-b border-[#E8F5E9] pb-4">
             <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" strokeWidth={1.75} />
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">주소</p>
@@ -148,7 +148,7 @@ const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
 
           {/* 전화번호 정보 */}
           {displayData.phone && (
-            <div className="flex items-start gap-3 border-b border-[#E4E7E7] pb-4">
+            <div className="flex items-start gap-3 border-b border-[#E8F5E9] pb-4">
               <Phone className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" strokeWidth={1.75} />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">전화번호</p>

@@ -18,6 +18,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import type { RehabilitationCenter } from '@/lib/api/rehabilitation-centers';
+import { COLORS } from '@/lib/constants/colors';
 
 // 네이버 지도 타입 정의
 declare global {
@@ -254,10 +255,10 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
               map: mapInstance,
               title: hospital.name,
               icon: {
-                content: `<div style="width:24px;height:24px;background:${
-                  hospital.type === 'hospital' ? '#2F6E4F' : '#61C48C'
+                content: `<div style="width:18px;height:18px;background:${
+                  hospital.type === 'hospital' ? COLORS.primary : COLORS.pharmacy
                 };border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
-                anchor: createNaverPoint(12, 12),
+                anchor: createNaverPoint(9, 9),
               },
             });
 
@@ -265,23 +266,23 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
             const infoWindowId = `infoWindow_${hospital.id}`;
             // 기관 유형 및 진료과목 정보 표시
             const institutionTypeBadge = hospital.institution_type 
-              ? `<span style="display:inline-block;padding:2px 8px;background:#2F6E4F;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
+              ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.primary};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
               : '';
             const departmentBadge = hospital.department_extracted && hospital.department_extracted !== '기타'
-              ? `<span style="display:inline-block;padding:2px 8px;background:#9333EA;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
+              ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.rehabilitation};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
               : '';
             
             const infoWindow = new window.naver.maps.InfoWindow({
               content: `
-                <div style="padding:12px;min-width:200px;max-width:300px;position:relative;">
-                  <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#f0f0f0;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#666;padding:0;" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'">×</button>
-                  <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;">${hospital.name}</h4>
+                <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
+                  <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
+                  <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${hospital.name}</h4>
                   ${institutionTypeBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${departmentBadge}</div>` : ''}
-                  <p style="margin:0 0 8px 0;font-size:12px;color:#666;">${hospital.address}</p>
-                  ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;">📞 ${hospital.phone}</p>` : ''}
+                  <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${hospital.address}</p>
+                  ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${hospital.phone}</p>` : ''}
                   <div style="display:flex;gap:8px;margin-top:8px;">
-                    ${hospital.phone ? `<button onclick="window.open('tel:${hospital.phone}')" style="padding:6px 12px;background:#2F6E4F;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">전화</button>` : ''}
-                    <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(hospital.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">길찾기</button>
+                    ${hospital.phone ? `<button onclick="window.open('tel:${hospital.phone}')" style="padding:6px 12px;background:${COLORS.primary};color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
+                    <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(hospital.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
                   </div>
                 </div>
               `,
@@ -333,8 +334,8 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
               map: mapInstance,
               title: center.name,
               icon: {
-                content: `<div style="width:24px;height:24px;background:#9333EA;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
-                anchor: createNaverPoint(12, 12),
+                content: `<div style="width:18px;height:18px;background:${COLORS.rehabilitation};border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
+                anchor: createNaverPoint(9, 9),
               },
             });
 
@@ -342,15 +343,15 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
             const infoWindowId = `infoWindow_rehab_${center.id}`;
             const infoWindow = new window.naver.maps.InfoWindow({
               content: `
-                <div style="padding:12px;min-width:200px;max-width:300px;position:relative;">
-                  <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#f0f0f0;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#666;padding:0;" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'">×</button>
-                  <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;">${center.name}</h4>
-                  <p style="margin:0 0 4px 0;font-size:11px;color:#9333EA;font-weight:500;">🏥 ${center.gigwan_fg_nm || '재활기관'}</p>
-                  <p style="margin:0 0 8px 0;font-size:12px;color:#666;">${center.address}</p>
-                  ${center.phone ? `<p style="margin:0 0 8px 0;font-size:12px;">📞 ${center.phone}</p>` : ''}
+                <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
+                  <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
+                  <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${center.name}</h4>
+                  <p style="margin:0 0 4px 0;font-size:11px;color:${COLORS.rehabilitation};font-weight:500;">🏥 ${center.gigwan_fg_nm || '재활기관'}</p>
+                  <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${center.address}</p>
+                  ${center.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${center.phone}</p>` : ''}
                   <div style="display:flex;gap:8px;margin-top:8px;">
-                    ${center.phone ? `<button onclick="window.open('tel:${center.phone}')" style="padding:6px 12px;background:#9333EA;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">전화</button>` : ''}
-                    <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(center.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">길찾기</button>
+                    ${center.phone ? `<button onclick="window.open('tel:${center.phone}')" style="padding:6px 12px;background:${COLORS.rehabilitation};color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
+                    <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(center.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
                   </div>
                 </div>
               `,
@@ -473,7 +474,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
           title: hospital.name,
             icon: {
               content: `<div style="width:24px;height:24px;background:${
-                hospital.type === 'hospital' ? '#2E7D32' : '#34C759'
+                hospital.type === 'hospital' ? COLORS.primaryAlt : COLORS.pharmacy
               };border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
               anchor: createNaverPoint(12, 12),
             },
@@ -483,23 +484,23 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         const infoWindowId = `infoWindow_${hospital.id}`;
         // 기관 유형 및 진료과목 정보 표시
         const institutionTypeBadge = hospital.institution_type 
-          ? `<span style="display:inline-block;padding:2px 8px;background:#2F6E4F;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
+          ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.primary};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
           : '';
         const departmentBadge = hospital.department_extracted && hospital.department_extracted !== '기타'
-          ? `<span style="display:inline-block;padding:2px 8px;background:#9333EA;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
+          ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.rehabilitation};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
           : '';
         
         const infoWindow = new window.naver.maps.InfoWindow({
           content: `
-            <div style="padding:12px;min-width:200px;max-width:300px;position:relative;">
-              <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#f0f0f0;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#666;padding:0;" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'">×</button>
-              <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;">${hospital.name}</h4>
+            <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
+              <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
+              <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${hospital.name}</h4>
               ${institutionTypeBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${departmentBadge}</div>` : ''}
-              <p style="margin:0 0 8px 0;font-size:12px;color:#666;">${hospital.address}</p>
-              ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;">📞 ${hospital.phone}</p>` : ''}
+              <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${hospital.address}</p>
+              ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${hospital.phone}</p>` : ''}
               <div style="display:flex;gap:8px;margin-top:8px;">
-                ${hospital.phone ? `<button onclick="window.open('tel:${hospital.phone}')" style="padding:6px 12px;background:#2F6E4F;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">전화</button>` : ''}
-                <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(hospital.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">길찾기</button>
+                ${hospital.phone ? `<button onclick="window.open('tel:${hospital.phone}')" style="padding:6px 12px;background:#2F6E4F;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
+                <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(hospital.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
               </div>
             </div>
           `,
@@ -549,7 +550,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
           map: mapInstanceRef.current,
           title: center.name,
               icon: {
-                content: `<div style="width:24px;height:24px;background:#9333EA;border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
+                content: `<div style="width:24px;height:24px;background:${COLORS.rehabilitation};border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
                 anchor: createNaverPoint(12, 12),
               },
         });
@@ -558,15 +559,15 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         const infoWindowId = `infoWindow_rehab_${center.id}`;
         const infoWindow = new window.naver.maps.InfoWindow({
           content: `
-            <div style="padding:12px;min-width:200px;max-width:300px;position:relative;">
-              <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#f0f0f0;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#666;padding:0;" onmouseover="this.style.background='#e0e0e0'" onmouseout="this.style.background='#f0f0f0'">×</button>
-              <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;">${center.name}</h4>
-              <p style="margin:0 0 4px 0;font-size:11px;color:#9333EA;font-weight:500;">🏥 ${center.gigwan_fg_nm || '재활기관'}</p>
-              <p style="margin:0 0 8px 0;font-size:12px;color:#666;">${center.address}</p>
-              ${center.phone ? `<p style="margin:0 0 8px 0;font-size:12px;">📞 ${center.phone}</p>` : ''}
+            <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
+              <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
+              <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${center.name}</h4>
+              <p style="margin:0 0 4px 0;font-size:11px;color:${COLORS.rehabilitation};font-weight:500;">🏥 ${center.gigwan_fg_nm || '재활기관'}</p>
+              <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${center.address}</p>
+              ${center.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${center.phone}</p>` : ''}
               <div style="display:flex;gap:8px;margin-top:8px;">
-                ${center.phone ? `<button onclick="window.open('tel:${center.phone}')" style="padding:6px 12px;background:#9333EA;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">전화</button>` : ''}
-                <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(center.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;">길찾기</button>
+                ${center.phone ? `<button onclick="window.open('tel:${center.phone}')" style="padding:6px 12px;background:#9333EA;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
+                <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(center.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
               </div>
             </div>
           `,
@@ -660,7 +661,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
     return (
       <div className="flex items-center justify-center h-full min-h-[400px] bg-gray-100 rounded-lg">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2F6E4F] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600">지도를 불러오는 중...</p>
         </div>
       </div>
@@ -670,7 +671,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   return (
     <div
       ref={mapRef}
-      className="w-full h-full min-h-[400px] rounded-lg border border-gray-200"
+      className="w-full rounded-lg border border-gray-200"
       style={{ height: '500px' }}
     />
   );

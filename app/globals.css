@@ -102,47 +102,68 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  /* design.md 배경색: #F7F9F8 (2025년 개선 버전) */
-  --color-background-hex: #F7F9F8;
+  --radius-sm: 0.75rem; /* 12px */
+  --radius-md: 1rem; /* 16px (rounded-2xl) */
+  --radius-lg: 1.25rem; /* 20px */
+  --radius-xl: 1.5rem; /* 24px */
+  /* Warm & Rounded 배경색 */
+  --color-background-hex: #FFFCF5;
+  --color-background-alt: #F5F9F6;
+  /* 기관별 색상 (Tailwind에서 사용 가능) */
+  --color-hospital: var(--color-hospital);
+  --color-pharmacy: var(--color-pharmacy);
+  --color-rehabilitation: var(--color-rehabilitation);
+  --color-hospital-alt: var(--color-hospital-alt);
+  /* Border 색상 */
+  --color-border-light: var(--border-light);
+  --color-border-medium: var(--border-medium);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: #F7F9F8; /* design.md 2025년 개선: 녹색 기운의 연그레이 */
-  --foreground: #1C1C1E; /* design.md 기준: 기본 텍스트 색상 (진한 회색) */
+  /* Warm & Rounded 테마: 따뜻한 힐링 케어 서비스 */
+  --radius: 1rem; /* rounded-2xl (16px) - 리우 캐릭터의 둥근 형태와 통일감 */
+  --background: #FFFCF5; /* Warm Cream - 눈이 편안한 따뜻한 크림색 */
+  --background-alt: #F5F9F6; /* Soft Mint - 보조 배경색 */
+  --foreground: #1C1C1E; /* 기본 텍스트 색상 (진한 회색) */
   /* 폰트 패밀리 */
   --font-brand: 'Paperozi', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  /* PRD 디자인 시스템 색상 (2025년 개선 버전) */
-  --primary: #2F6E4F; /* 톤다운 초록 - 기존 #2E7D32에서 채도 낮춤 */
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: #61C48C; /* 부드러운 서브 초록 - 기존 #34C759에서 더 부드럽게 조정 */
-  --secondary-foreground: oklch(1 0 0);
+  --card: #FFFFFF; /* 카드 배경: 순백색 */
+  --card-foreground: #1C1C1E;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1C1E;
+  /* Warm & Rounded 색상 팔레트 */
+  --primary: #2F6E4F; /* Deep Green - 메인 포인트 컬러 유지 */
+  --primary-foreground: #FFFFFF;
+  --secondary: #A5D6A7; /* Soft Green - 보조 색상 */
+  --secondary-foreground: #1C1C1E;
+  --accent: #FFD54F; /* Warm Yellow - 리우 캐릭터 볼터치 색, 강조 요소 */
+  --accent-foreground: #1C1C1E;
   --alert: #FF9500; /* 부드러운 주황색 - 법적 고지, 주의 사항 */
-  /* Neutral 색상 체계 (design.md 2025년 개선 기준) */
-  --neutral-text: #1C1C1E; /* 기본 텍스트 색상 (진한 회색) */
-  --neutral-text-secondary: #555555; /* 보조 텍스트 색상 - 기존 #8A8A8E에서 더 진하게 조정 */
-  --neutral-bg: #F7F9F8; /* 배경 색상 (녹색 기운의 연그레이) */
-  --neutral-bg-hover: #E5E5EA; /* 호버 배경 색상 */
-  /* Border 색상 체계 */
-  --border-light: #E4E7E7; /* 연한 테두리 */
-  --border-medium: #D0D5D4; /* 중간 테두리 */
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: #555555; /* Neutral 보조 텍스트 색상으로 통일 */
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* 기관별 색상 */
+  --color-hospital: #2F6E4F; /* 병원 색상 (Primary와 동일) */
+  --color-pharmacy: #34C759; /* 약국 색상 (Success Green) */
+  --color-rehabilitation: #9333EA; /* 재활기관 색상 (Purple) */
+  --color-hospital-alt: #2E7D32; /* 병원 마커 대체 색상 */
+  /* Neutral 색상 체계 */
+  --neutral-text: #1C1C1E; /* 기본 텍스트 색상 */
+  --neutral-text-secondary: #555555; /* 보조 텍스트 색상 */
+  --neutral-bg: #FFFCF5; /* Warm Cream 배경 */
+  --neutral-bg-hover: #F5F9F6; /* Soft Mint 호버 배경 */
+  /* Border 색상 체계 - 나무 컨셉에 맞게 연한 녹색 */
+  --border-light: #E8F5E9; /* 연한 녹색 테두리 (border-green-100) */
+  --border-medium: #C8E6C9; /* 중간 녹색 테두리 */
+  --muted: #F5F9F6; /* Soft Mint */
+  --muted-foreground: #555555;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #E4E7E7; /* Border 중심 구조로 전환 */
-  --input: #E4E7E7;
+  --border: #E8F5E9; /* 연한 녹색 테두리 */
+  --input: #E8F5E9;
   --ring: #2F6E4F; /* Primary 색상과 동일 */
+  
+  /* Shadow 시스템 - 나뭇잎처럼 가볍게 떠 있는 느낌 */
+  --shadow-leaf: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-branch: 0 4px 16px rgba(0, 0, 0, 0.04);
+  --shadow-canopy: 0 8px 30px rgba(0, 0, 0, 0.04);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -197,29 +218,178 @@
     @apply border-border outline-ring/50;
   }
   body {
-    background-color: #F7F9F8; /* design.md 2025년 개선: 녹색 기운의 연그레이 */
+    background-color: #FFFCF5; /* Warm Cream - 따뜻한 크림색 배경 */
     @apply text-foreground;
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    letter-spacing: -0.02em; /* tracking-tight - 단단한 느낌 */
   }
   main {
     @apply max-w-7xl mx-auto pt-16 px-4;
   }
   
-  /* PRD 타이포그래피 스케일 (2025년 개선 버전) */
+  /* Warm & Rounded 타이포그래피 스케일 */
   h1 {
     @apply text-[30px] font-bold;
-    letter-spacing: -0.5px; /* 대비 강화 */
+    font-family: var(--font-brand);
+    letter-spacing: -0.02em; /* tracking-tight */
   }
   h2 {
     @apply text-[22px] font-semibold;
+    font-family: var(--font-brand);
+    letter-spacing: -0.02em;
   }
   h3 {
     @apply text-[18px] font-semibold;
+    font-family: var(--font-brand);
+    letter-spacing: -0.02em;
   }
   body {
-    @apply text-[16px] font-normal; /* 기존 17px에서 조정하여 현대적인 느낌 */
+    @apply text-[17px] font-normal;
+    letter-spacing: -0.02em; /* tracking-tight - 전체적으로 적용 */
   }
   .caption {
     @apply text-[14px] font-normal;
+    letter-spacing: -0.02em;
+  }
+  
+  /* 커스텀 스크롤바 스타일 */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #F5F9F6;
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #A5D6A7;
+    border-radius: 10px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #2F6E4F;
+  }
+
+  /* 포커스 링 스타일 (접근성 개선) */
+  *:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  /* 버튼 포커스 링 개선 */
+  button:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  @keyframes riu-bounce {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    40% {
+      transform: translateY(-6px) scale(1.03);
+    }
+    60% {
+      transform: translateY(0) scale(0.98);
+    }
+  }
+
+  @keyframes leaf-sway {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(3deg);
+    }
+  }
+
+  .animate-riu-bounce {
+    animation: riu-bounce 1.6s ease-in-out infinite;
+  }
+
+  .animate-leaf-sway {
+    animation: leaf-sway 2.4s ease-in-out infinite;
+  }
+
+  /* 스크린 리더 전용 텍스트 (접근성) */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* 페이퍼로지 폰트 유틸리티 클래스 */
+  .font-brand {
+    font-family: var(--font-brand);
+  }
+
+  /* 강조 텍스트용 페이퍼로지 폰트 */
+  .text-brand {
+    font-family: var(--font-brand);
+    font-weight: 600; /* SemiBold - 강조에 적합 */
+  }
+
+  /* 버튼 강조 텍스트 */
+  button.font-brand,
+  .font-brand button {
+    font-family: var(--font-brand);
+  }
+}
+
+@layer components {
+  /* Warm gradient 배경 유틸리티 */
+  .bg-warm-gradient {
+    background: linear-gradient(135deg, rgba(255, 213, 79, 0.08), rgba(165, 214, 167, 0.12));
+  }
+
+  /* Warm surface 스타일 - 카드 및 섹션용 */
+  .warm-surface {
+    background: linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-canopy);
+  }
+
+  /* Leaf section - 은은한 그라데이션 배경 */
+  .leaf-section {
+    background-image:
+      radial-gradient(circle at top left, rgba(165, 214, 167, 0.15), transparent 45%),
+      radial-gradient(circle at bottom right, rgba(255, 213, 79, 0.12), transparent 40%);
+  }
+
+  /* Leaf section 강화 버전 - 더 진한 그라데이션 */
+  .leaf-section-strong {
+    background-image:
+      radial-gradient(circle at top left, rgba(165, 214, 167, 0.25), transparent 50%),
+      radial-gradient(circle at bottom right, rgba(255, 213, 79, 0.20), transparent 45%);
+  }
+
+  /* Leaf section 상단 accent */
+  .leaf-section-top {
+    background-image:
+      radial-gradient(circle at top center, rgba(165, 214, 167, 0.20), transparent 60%);
+  }
+
+  /* Leaf section 하단 accent */
+  .leaf-section-bottom {
+    background-image:
+      radial-gradient(circle at bottom center, rgba(255, 213, 79, 0.18), transparent 60%);
+  }
+
+  /* Berry card - 면책 조항 및 중요 정보용 */
+  .berry-card {
+    background: linear-gradient(135deg, rgba(255, 213, 79, 0.25), rgba(255, 252, 245, 0.9));
+    box-shadow: var(--shadow-canopy);
   }
 }

@@ -9,10 +9,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, AlertCircle, ExternalLink, Sparkles } from 'lucide-react';
+import { AlertCircle, ExternalLink, Sparkles } from 'lucide-react';
 import type { Document, DocumentSummary } from '@/lib/types/document';
 import { Button } from '@/components/ui/button';
 import { getDisclaimer } from '@/lib/utils/disclaimer';
+import RiuIcon from '@/components/icons/riu-icon';
+import RiuLoader from '@/components/ui/riu-loader';
 
 interface DocumentSummaryProps {
   document: Document;
@@ -63,53 +65,58 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
   if (!predefinedSummary) {
     // 기존 로직 유지 (AI 요약만 표시)
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-6 h-6 animate-spin text-[#2F6E4F]" strokeWidth={1.75} />
-        <span className="ml-3 text-[16px] text-[#555555]">
-          서류 정보를 불러오는 중...
-        </span>
+      <div className="flex items-center justify-center py-8 sm:py-12" role="status" aria-live="polite" aria-label="서류 정보를 불러오는 중">
+        <RiuLoader 
+          message="서류 정보를 불러오는 중..." 
+          iconVariants={['question', 'smile', 'cheer']}
+          logId="DocumentSummary:initial-load"
+        />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="space-y-4 sm:space-y-6 py-2 sm:py-4" role="region" aria-label="서류 요약 정보">
       {/* 기본 설명 섹션 */}
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* 서류 목적 */}
-        <div className="bg-white rounded-xl border border-[#E4E7E7] p-6">
-          <h3 className="font-semibold mb-3 text-[#1C1C1E]">
+        <div className="bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-foreground">
             이 서류는 무엇인가요?
           </h3>
           <div
-            className="text-[16px] text-[#1C1C1E] prose prose-sm max-w-none"
+            className="text-sm sm:text-base text-foreground prose prose-sm max-w-none"
             dangerouslySetInnerHTML={{
               __html: predefinedSummary.summary
                 .replace(/\n/g, '<br />')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
             }}
+            role="article"
+            aria-label="서류 목적 설명"
           />
         </div>
 
         {/* 주요 항목별 작성 방법 */}
         {predefinedSummary.sections && predefinedSummary.sections.length > 0 && (
-          <div className="bg-white rounded-xl border border-[#E4E7E7] p-6">
-            <h3 className="font-semibold mb-4 text-[#1C1C1E]">
+          <div className="bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">
               주요 항목별 작성 방법
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {predefinedSummary.sections
                 .sort((a, b) => a.order - b.order)
                 .map((section, index) => (
                   <div
                     key={index}
-                    className="border-l-4 border-[#2F6E4F] pl-4 py-2"
+                    className="border-l-4 border-primary pl-3 sm:pl-4 py-2"
+                    role="article"
+                    aria-label={`${section.title} 작성 방법`}
                   >
-                    <h4 className="text-[18px] font-semibold text-[#1C1C1E] mb-2">
+                    <h4 className="text-base sm:text-lg font-semibold text-foreground mb-2">
                       {section.title}
                     </h4>
                     <div
-                      className="text-[16px] text-[#1C1C1E] prose prose-sm max-w-none"
+                      className="text-sm sm:text-base text-foreground prose prose-sm max-w-none"
                       dangerouslySetInnerHTML={{
                         __html: section.content
                           .replace(/\n/g, '<br />')
@@ -125,17 +132,18 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
         {/* 주의사항 */}
         {predefinedSummary.importantNotes &&
           predefinedSummary.importantNotes.length > 0 && (
-            <div className="bg-[#FF9500]/10 border border-[#FF9500]/30 rounded-lg p-6">
-              <h3 className="font-semibold mb-3 text-[#FF9500]">
+            <div className="bg-[var(--alert)]/10 border border-[var(--alert)]/30 rounded-lg p-4 sm:p-6" role="alert" aria-label="주의사항">
+              <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-[var(--alert)]">
                 주의사항
               </h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2" role="list">
                 {predefinedSummary.importantNotes.map((note, index) => (
                   <li
                     key={index}
-                    className="text-[16px] text-[#1C1C1E] flex items-start"
+                    className="text-sm sm:text-base text-foreground flex items-start"
+                    role="listitem"
                   >
-                    <span className="mr-2 text-[#FF9500]">•</span>
+                    <span className="mr-2 text-[var(--alert)]" aria-hidden="true">•</span>
                     <span>{note}</span>
                   </li>
                 ))}
@@ -149,10 +157,11 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
             <Button
               onClick={fetchAiSummary}
               disabled={loading}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              aria-label="더 자세한 AI 설명 보기"
             >
-              <Sparkles className="w-4 h-4" strokeWidth={1.75} />
-              더 자세한 AI 설명 보기
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.75} aria-hidden="true" />
+              <span className="text-xs sm:text-sm">더 자세한 AI 설명 보기</span>
             </Button>
           </div>
         )}
@@ -160,92 +169,87 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
 
       {/* AI 요약 섹션 (선택적 표시) */}
       {showAiSummary && (
-        <div className="space-y-6 border-t border-gray-200 pt-6">
+        <div className="space-y-4 sm:space-y-6 border-t border-gray-200 pt-4 sm:pt-6" role="region" aria-label="AI 추가 설명">
           {loading && (
-            <div className="flex flex-col items-center justify-center py-12">
-              <img 
-                src="/Generated_Image_November_19__2025_-_4_31PM-removebg-preview.png" 
-                alt="Re 캐릭터들" 
-                className="w-24 h-24 object-contain mb-4 animate-pulse"
+            <div className="py-8 sm:py-12" role="status" aria-live="polite" aria-label="AI가 서류를 분석 중입니다.">
+              <RiuLoader 
+                message="AI가 서류를 분석 중입니다..." 
+                iconVariants={['question', 'smile', 'cheer']}
+                logId="DocumentSummary:ai-analysis"
               />
-              <div className="flex items-center gap-3">
-                <Loader2 className="w-6 h-6 animate-spin text-[#2F6E4F]" strokeWidth={1.75} />
-                <span className="text-[16px] text-[#555555]">
-                  AI가 서류를 분석 중입니다...
-                </span>
-              </div>
             </div>
           )}
 
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive">
               <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="w-5 h-5 text-red-600" />
-                <h3 className="font-semibold text-red-600">
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" aria-hidden="true" />
+                <h3 className="text-sm sm:text-base font-semibold text-red-600">
                   오류 발생
                 </h3>
               </div>
-              <p className="text-[17px] text-red-600 mb-4">{error}</p>
+              <p className="text-sm sm:text-base text-red-600 mb-3 sm:mb-4">{error}</p>
               <Button
                 onClick={fetchAiSummary}
                 variant="outline"
-                className="mt-4"
+                className="mt-3 sm:mt-4 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                aria-label="다시 시도"
               >
-                다시 시도
+                <span className="text-xs sm:text-sm">다시 시도</span>
               </Button>
             </div>
           )}
 
           {aiSummary && !loading && !error && (
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 mb-4">
-                <img 
-                  src="/Generated_Image_November_19__2025_-_4_40PM__3_-removebg-preview.png" 
-                  alt="Re 캐릭터 (성공)" 
-                  className="w-10 h-10 object-contain flex-shrink-0"
-                />
+            <div className="space-y-4 sm:space-y-6">
+              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                <RiuIcon variant="success" size={32} className="sm:w-10 sm:h-10" aria-hidden="true" />
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-[#2F6E4F]" strokeWidth={1.75} />
-                  <h3 className="font-semibold text-[#1C1C1E]">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" strokeWidth={1.75} aria-hidden="true" />
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground">
                     AI 추가 설명
                   </h3>
                 </div>
               </div>
 
               {/* AI 요약 내용 */}
-              <div className="bg-white rounded-xl border border-[#E4E7E7] p-6">
-                <h4 className="text-[20px] font-semibold mb-3 text-[#1C1C1E]">
+              <div className="bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+                <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-foreground">
                   이 서류는 무엇인가요? (AI 설명)
                 </h4>
                 <div
-                  className="text-[16px] text-[#1C1C1E] prose prose-sm max-w-none"
+                  className="text-sm sm:text-base text-foreground prose prose-sm max-w-none"
                   dangerouslySetInnerHTML={{
                     __html: aiSummary.summary
                       .replace(/\n/g, '<br />')
                       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
                   }}
+                  role="article"
+                  aria-label="AI 서류 목적 설명"
                 />
               </div>
 
               {/* AI 주요 항목별 작성 방법 */}
               {aiSummary.sections && aiSummary.sections.length > 0 && (
-                <div className="bg-white rounded-xl border border-[#E4E7E7] p-6">
-                  <h4 className="text-[20px] font-semibold mb-4 text-[#1C1C1E]">
+                <div className="bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+                  <h4 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-foreground">
                     주요 항목별 작성 방법 (AI 설명)
                   </h4>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {aiSummary.sections
                       .sort((a, b) => a.order - b.order)
                       .map((section, index) => (
                         <div
                           key={index}
-                          className="border-l-4 border-[#2F6E4F] pl-4 py-2"
+                          className="border-l-4 border-primary pl-3 sm:pl-4 py-2"
+                          role="article"
+                          aria-label={`${section.title} 작성 방법 (AI 설명)`}
                         >
-                          <h5 className="text-[18px] font-semibold text-[#1C1C1E] mb-2">
+                          <h5 className="text-base sm:text-lg font-semibold text-foreground mb-2">
                             {section.title}
                           </h5>
                           <div
-                            className="text-[16px] text-[#1C1C1E] prose prose-sm max-w-none"
+                            className="text-sm sm:text-base text-foreground prose prose-sm max-w-none"
                             dangerouslySetInnerHTML={{
                               __html: section.content
                                 .replace(/\n/g, '<br />')
@@ -261,17 +265,18 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
               {/* AI 주의사항 */}
               {aiSummary.importantNotes &&
                 aiSummary.importantNotes.length > 0 && (
-                  <div className="bg-[#FF9500]/10 border border-[#FF9500]/30 rounded-lg p-6">
-                    <h4 className="text-[20px] font-semibold mb-3 text-[#FF9500]">
+                  <div className="bg-[var(--alert)]/10 border border-[var(--alert)]/30 rounded-lg p-4 sm:p-6" role="alert" aria-label="주의사항 (AI 설명)">
+                    <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-[var(--alert)]">
                       주의사항 (AI 설명)
                     </h4>
-                    <ul className="space-y-2">
+                    <ul className="space-y-2" role="list">
                       {aiSummary.importantNotes.map((note, index) => (
                         <li
                           key={index}
-                          className="text-[16px] text-[#1C1C1E] flex items-start"
+                          className="text-sm sm:text-base text-foreground flex items-start"
+                          role="listitem"
                         >
-                          <span className="mr-2 text-[#FF9500]">•</span>
+                          <span className="mr-2 text-[var(--alert)]" aria-hidden="true">•</span>
                           <span>{note}</span>
                         </li>
                       ))}
@@ -281,7 +286,7 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
 
               {/* 캐시 표시 (개발용) */}
               {fromCache && (
-                <p className="text-[12px] text-[#555555] text-center">
+                <p className="text-[12px] text-muted-foreground text-center">
                   캐시된 결과입니다
                 </p>
               )}
@@ -291,45 +296,54 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
       )}
 
       {/* 다운로드 링크 */}
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-2 sm:gap-4" role="group" aria-label="서류 다운로드 및 예시 링크">
         {document.officialDownloadUrl && (
           <Button
             asChild
+            aria-label="공식 서류 보기 (새 창에서 열림)"
           >
             <a
-              href={document.officialDownloadUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={
+                document.officialDownloadUrl.endsWith('.pdf')
+                  ? `/view-pdf?file=${encodeURIComponent(document.officialDownloadUrl)}`
+                  : document.officialDownloadUrl
+              }
+              target={document.officialDownloadUrl.endsWith('.pdf') ? undefined : '_blank'}
+              rel={document.officialDownloadUrl.endsWith('.pdf') ? undefined : 'noopener noreferrer'}
               className="flex items-center gap-2"
             >
-              공식 서류 다운로드
-              <ExternalLink className="w-4 h-4" strokeWidth={1.75} />
+              <span className="text-xs sm:text-sm">공식 서류 보기</span>
+              <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.75} aria-hidden="true" />
             </a>
           </Button>
         )}
         {document.exampleUrl && (
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild aria-label="작성 예시 보기 (새 창에서 열림)">
             <a
-              href={document.exampleUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={
+                document.exampleUrl.endsWith('.pdf')
+                  ? `/view-pdf?file=${encodeURIComponent(document.exampleUrl)}`
+                  : document.exampleUrl
+              }
+              target={document.exampleUrl.endsWith('.pdf') ? undefined : '_blank'}
+              rel={document.exampleUrl.endsWith('.pdf') ? undefined : 'noopener noreferrer'}
               className="flex items-center gap-2"
             >
-              작성 예시 보기
-              <ExternalLink className="w-4 h-4" strokeWidth={1.75} />
+              <span className="text-xs sm:text-sm">작성 예시 보기</span>
+              <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.75} aria-hidden="true" />
             </a>
           </Button>
         )}
       </div>
 
       {/* 면책 조항 */}
-      <div className="mt-6 p-4 bg-[#F7F9F8] border border-[#E4E7E7] rounded-xl">
-        <p className="text-[14px] text-[#555555]">{getDisclaimer()}</p>
+      <div className="berry-card mt-4 sm:mt-6 p-3 sm:p-4 border border-[var(--border-light)] rounded-2xl" role="note" aria-label="면책 조항">
+        <p className="text-xs sm:text-sm text-muted-foreground">{getDisclaimer()}</p>
       </div>
 
       {/* 캐시 표시 (개발용) */}
       {fromCache && (
-        <p className="text-[12px] text-[#555555] text-center">
+        <p className="text-xs sm:text-sm text-muted-foreground text-center">
           캐시된 결과입니다
         </p>
       )}

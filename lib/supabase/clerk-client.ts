@@ -39,7 +39,19 @@ export function useClerkSupabaseClient() {
 
     return createClient(supabaseUrl, supabaseKey, {
       async accessToken() {
-        return (await getToken()) ?? null;
+        try {
+          // getToken이 함수인지 확인하고 안전하게 호출
+          if (typeof getToken === 'function') {
+            const token = await getToken();
+            return token ?? null;
+          }
+          // getToken이 함수가 아니거나 준비되지 않은 경우 null 반환
+          return null;
+        } catch (error) {
+          // Realtime 초기화 시 에러가 발생해도 앱이 중단되지 않도록 처리
+          console.warn('Failed to get access token for Supabase Realtime:', error);
+          return null;
+        }
       },
     });
   }, [getToken]);

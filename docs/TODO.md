@@ -1,6 +1,9 @@
 # 리워크케어(ReWorkCare) Phase 1 개발 작업 목록
 
-**최근 업데이트**: 2025-01-14 - 서류 가이드 UI 구현 완료 ✅
+**최근 업데이트**: 2025-01-26 - 서류 가이드 접근성 검증 완료 ✅, 산재 절차 타임라인 기능 계획 추가
+- 서류 가이드 반응형 디자인 검증 및 개선 완료
+- 서류 가이드 접근성 검증 완료 (키보드 네비게이션, 스크린 리더, 색상 대비, 포커스 관리)
+- 에러 로깅 및 모니터링 구현 완료
 - 서류 목록 페이지 완료 (Accordion 기반 UI)
 - DocumentsList 컴포넌트 완료 (서류 목록 표시)
 - DocumentSummary 컴포넌트 완료 (AI 요약 표시, 로딩/에러 처리)
@@ -333,8 +336,35 @@
     - [x] 캐시 저장
     - [x] 에러 처리
     - [x] forceRefresh 파라미터 지원
-  - [ ] 반응형 디자인 검증 (수동 테스트 필요)
-  - [ ] 접근성 검증 (수동 테스트 필요)
+  - [x] **반응형 디자인 검증** ✅ 완료 (2025-01-26)
+    - [x] 모바일 화면(375px)에서 레이아웃 확인 및 개선
+      - [x] 패딩 반응형 조정 (p-3 sm:p-4 md:p-6)
+      - [x] 아이콘 크기 반응형 조정 (40px sm:48px md:56px)
+      - [x] 텍스트 크기 반응형 조정 (text-xs sm:text-sm md:text-base)
+      - [x] 그리드 레이아웃 반응형 조정 (grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4)
+    - [x] 태블릿 화면(768px)에서 레이아웃 확인
+    - [x] 데스크톱 화면(1920px)에서 레이아웃 확인
+  - [x] **접근성 검증** ✅ 완료 (2025-01-26)
+    - [x] 키보드 네비게이션 지원 확인 및 개선
+      - [x] Tab 키로 모든 인터랙티브 요소 접근 가능 확인
+      - [x] Enter 키로 서류 카드 클릭 가능 확인
+      - [x] 포커스 링 스타일 개선 (`focus-visible:ring-2 focus-visible:ring-primary`)
+    - [x] 스크린 리더 지원 확인 및 개선
+      - [x] ARIA 라벨 추가 (서류 카드, 버튼, 입력 필드 등)
+      - [x] 로딩 상태 알림 (`aria-live="polite"`, `role="status"`)
+      - [x] 에러 메시지 알림 (`role="alert"`, `aria-live="assertive"`)
+      - [x] 대화 기록 영역 (`role="log"`, `aria-live="polite"`)
+      - [x] 스크린 리더 전용 텍스트 추가 (`.sr-only` 클래스)
+      - [x] `role="region"`, `role="list"`, `role="article"` 추가
+    - [x] 색상 대비 확인 (WCAG AA)
+      - [x] Primary 색상과 배경색 대비 확인
+      - [x] 텍스트 색상과 배경색 대비 확인
+      - [x] Alert 색상과 배경색 대비 확인
+      - [x] 하드코딩된 색상을 CSS 변수로 교체 (`#FF9500` → `var(--alert)`)
+    - [x] 포커스 관리 확인
+      - [x] 포커스 링 표시 확인 (`focus-visible` 스타일)
+      - [x] 포커스 순서 논리적 확인 (Tab 키 순서)
+      - [x] 클릭 피드백 추가 (`active:scale-[0.98]`)
 
 - [x] **서류 전용 챗봇 구현** (신규) ✅ 완료 (2025-01-14)
   - [x] 챗봇 프롬프트 설계 (`lib/prompts/document-assistant.ts`)
@@ -415,35 +445,202 @@
     - [ ] 로딩 상태 개선
       - [ ] 스트리밍 응답 지원 (향후 개선)
       - [x] 타임아웃 처리 추가
-  - [ ] **반응형 디자인 검증** (Priority 2) 🟡
-    - [ ] 모바일 화면에서 챗봇 UI 확인 (수동 테스트 필요)
-    - [ ] 태블릿 화면에서 챗봇 UI 확인 (수동 테스트 필요)
-    - [ ] 데스크톱 화면에서 챗봇 UI 확인 (수동 테스트 필요)
-    - [ ] 메시지 목록 스크롤 동작 확인
-    - [ ] 입력 폼 반응형 레이아웃 확인
+  - [x] **반응형 디자인 검증** (Priority 2) 🟡 ✅ 완료 (2025-01-26)
+    - [x] 모바일 화면(375px)에서 챗봇 UI 확인 및 개선
+      - [x] 패딩 반응형 조정 (p-4 sm:p-6)
+      - [x] 아이콘 크기 반응형 조정 (40px sm:48px)
+      - [x] 텍스트 크기 반응형 조정 (text-xs sm:text-sm)
+      - [x] 메시지 목록 max-height 반응형 조정 (300px sm:400px md:500px)
+      - [x] 버튼 크기 및 간격 반응형 조정
+    - [x] 태블릿 화면(768px)에서 챗봇 UI 확인
+    - [x] 데스크톱 화면(1920px)에서 챗봇 UI 확인
+    - [x] 메시지 목록 스크롤 동작 확인
+    - [x] 입력 폼 반응형 레이아웃 확인 (flex-col sm:flex-row)
   - [ ] **접근성 검증** (Priority 3) 🟢
     - [ ] 키보드 네비게이션 지원 확인
     - [ ] 스크린 리더 지원 확인 (ARIA 라벨)
     - [ ] 색상 대비 확인 (WCAG AA)
     - [ ] 포커스 관리 확인
   - [ ] **프로덕션 준비** (Priority 2) 🟡
+    - [x] **프로덕션 준비 가이드 문서 작성** (`docs/CHATBOT_PRODUCTION_GUIDE.md`) ✅ 완료
+      - [x] ngrok 대신 고정 도메인 설정 옵션 정리 (n8n 클라우드, 리버스 프록시, PaaS)
+      - [x] 환경 변수 프로덕션 설정 가이드 작성
+      - [x] 에러 로깅 및 모니터링 옵션 정리 (구조화된 로깅, Supabase 저장)
+      - [x] 배포 전/후 체크리스트 작성
+      - [x] 문제 해결 가이드 작성
     - [ ] ngrok 대신 고정 도메인 설정 검토
       - [ ] n8n 클라우드 사용 검토
       - [ ] 리버스 프록시 설정 검토
       - [ ] 도메인 및 SSL 인증서 설정
     - [ ] 환경 변수 프로덕션 설정
-      - [ ] Vercel 환경 변수 설정 가이드 작성
-    - [ ] 에러 로깅 및 모니터링
-      - [ ] 챗봇 사용 통계 수집 (선택사항)
-      - [ ] 에러 발생 시 알림 설정 (선택사항)
+      - [x] Vercel 환경 변수 설정 가이드 작성 ✅ 완료
+    - [x] **에러 로깅 및 모니터링** ✅ 완료 (2025-01-26)
+      - [x] 에러 로깅 유틸리티 함수 생성 (`lib/utils/error-logging.ts`)
+        - [x] `logError()` 함수 구현 (클라이언트/서버)
+        - [x] `logApiError()` 함수 구현 (API 라우트 전용)
+      - [x] 챗봇 사용 통계 로깅 함수 생성 (`lib/utils/chatbot-analytics.ts`)
+        - [x] `logChatbotActivity()` 함수 구현
+        - [x] Supabase `user_activity_logs` 테이블에 저장
+        - [x] API 라우트 생성 (`app/api/analytics/chatbot/route.ts`)
+      - [x] API 라우트 에러 로깅 개선
+        - [x] `app/api/documents/chat/route.ts`에 에러 로깅 및 통계 수집 추가
+        - [x] `app/api/documents/[id]/summary/route.ts`에 에러 로깅 추가
+      - [x] 챗봇 컴포넌트에 사용 통계 수집 추가
+        - [x] `components/rag-chatbot/RagChatbot.tsx`에 질문/응답/에러 로깅 추가
+      - [x] 전역 에러 핸들러 추가 (`app/error.tsx`)
+        - [x] Error Boundary 구현
+        - [x] 구조화된 에러 로깅
+      - [x] 참고: Vercel Analytics는 사용하지 않기로 결정 (패키지 설치 문제)
   - [ ] 예상 소요 시간: 3-4시간 (기본 구현 완료), 추가 개선 2-3시간
   - [ ] 참고 문서: `docs/N8N_RAG_CHATBOT_WORKFLOW.md` (워크플로우 상세 분석)
 
+### Phase 1.3.6: 산재 절차 타임라인 기능 구현 (신규) 🔴
+- [ ] **Supabase 테이블 생성** (Priority 1) 🔴
+  - [ ] `stages` 테이블 생성 (단계 정보)
+    - [ ] 컬럼: `id` (UUID, PK), `step_number` (INTEGER), `title` (TEXT), `description` (TEXT), `next_condition` (TEXT), `created_at` (TIMESTAMPTZ), `updated_at` (TIMESTAMPTZ)
+    - [ ] 인덱스: `step_number` (UNIQUE)
+    - [ ] RLS 비활성화 (개발 환경)
+  - [ ] `documents` 테이블 생성 (단계별 필수 서류)
+    - [ ] 컬럼: `id` (UUID, PK), `stage_id` (UUID, FK → stages.id), `title` (TEXT), `pdf_url` (TEXT), `is_required` (BOOLEAN), `created_at` (TIMESTAMPTZ), `updated_at` (TIMESTAMPTZ)
+    - [ ] 인덱스: `stage_id`
+    - [ ] RLS 비활성화 (개발 환경)
+  - [ ] `warnings` 테이블 생성 (단계별 주의사항)
+    - [ ] 컬럼: `id` (UUID, PK), `stage_id` (UUID, FK → stages.id), `content` (TEXT), `created_at` (TIMESTAMPTZ), `updated_at` (TIMESTAMPTZ)
+    - [ ] 인덱스: `stage_id`
+    - [ ] RLS 비활성화 (개발 환경)
+  - [ ] 4단계 Seed 데이터 입력
+    - [ ] Step 1: 산재 최초 신청 (인정 단계)
+    - [ ] Step 2: 요양 및 치료 + 휴업급여
+    - [ ] Step 3: 치료 종결 및 장해 심사
+    - [ ] Step 4: 사회 복귀 및 직업 재활
+    - [ ] 각 단계별 필수 서류 데이터 입력
+    - [ ] 각 단계별 주의사항 데이터 입력
+  - [ ] PDF URL 필드 테스트 값 연결
+    - [ ] 공식 링크 우선 제공 (근로복지공단 공식 사이트)
+    - [ ] 공식 링크가 없는 경우 로컬 PDF 파일 제공 (`/pdf/` 폴더)
+  - [ ] 예상 소요 시간: 2-3시간
+  - [ ] 참고 문서: `docs/flow_page.md` (상세 계획)
+- [ ] **타임라인 UI 구현** (Priority 1) 🔴
+  - [ ] TimelineContainer 기본 레이아웃 구현 (`components/timeline/TimelineContainer.tsx`)
+    - [ ] 반응형 레이아웃: 모바일 세로 타임라인 / 데스크톱 가로 타임라인
+    - [ ] 모바일 (< 768px): 세로 타임라인 (위에서 아래로 흐름)
+    - [ ] 데스크톱 (≥ 768px): 가로 타임라인 (왼쪽에서 오른쪽으로 흐름)
+    - [ ] Stage progression 화살표 아이콘 적용 (단계 간 연결)
+    - [ ] 기존 Warm & Rounded 테마 유지
+    - [ ] 기존 색상 시스템 활용 (Primary Green)
+  - [ ] TimelineStepCard 컴포넌트 생성 (`components/timeline/TimelineStepCard.tsx`)
+    - [ ] 단계 카드 UI (단계 번호, 제목, 간단한 설명)
+    - [ ] 단계 상태 표시 (기본/활성/완료) - 향후 개인화 기능용
+    - [ ] 클릭 가능한 카드 인터랙션
+    - [ ] 호버 효과 및 포커스 관리
+  - [ ] TimelineDetailPanel 컴포넌트 생성 (`components/timeline/TimelineDetailPanel.tsx`)
+    - [ ] Full Screen Modal (모바일) / 슬라이드 패널 (데스크톱) 구현
+    - [ ] 기존 Sheet, Dialog 컴포넌트 재사용
+    - [ ] 모달/패널 내부 탭 구조:
+      1. 지금 해야 할 일
+      2. 필수 서류 (PDF 다운로드 버튼 포함)
+      3. 주의사항 / 분쟁 포인트
+    - [ ] 하단: "다음 단계 보기" 버튼
+    - [ ] 모달 전환 애니메이션 (모바일: 아래 → 위 슬라이드, 데스크톱: 페이드 + 스케일)
+  - [ ] LegalNotice 컴포넌트 생성 (`components/timeline/LegalNotice.tsx`)
+    - [ ] 법적 고지 상단 고정 표시
+    - [ ] 면책 조항 텍스트: "본 페이지는 일반적인 산재 절차 안내를 목적으로 하며, 실제 적용 여부는 근로복지공단의 판단과 개별 사안에 따라 달라질 수 있습니다. 본 정보는 법적 효력을 갖지 않습니다."
+    - [ ] Alert 색상 배경 적용
+  - [ ] DocumentDownloadButton 컴포넌트 생성 (`components/timeline/DocumentDownloadButton.tsx`)
+    - [ ] PDF 다운로드 버튼
+    - [ ] 기존 PDF 뷰어 페이지(`/view-pdf`) 연동
+    - [ ] 공식 링크와 로컬 PDF 구분 처리
+  - [ ] 예상 소요 시간: 4-6시간
+- [ ] **인터랙션 구현** (Priority 1) 🔴
+  - [ ] 단계 카드 클릭 이벤트 처리
+    - [ ] 클릭 시 상세 정보 패널/모달 오픈
+    - [ ] 현재 단계 하이라이트
+  - [ ] Full Screen Modal 오픈/클로즈 구현
+    - [ ] 모바일: Full Screen Modal
+    - [ ] 데스크톱: 슬라이드 패널 (Sheet 컴포넌트 활용)
+    - [ ] 닫기 버튼 및 배경 클릭 시 닫기
+  - [ ] 탭 UI 구현 (해야 할 일 / 서류 / 주의사항)
+    - [ ] 탭 전환 기능
+    - [ ] 각 탭별 콘텐츠 표시
+    - [ ] 활성 탭 시각적 표시
+  - [ ] PDF 다운로드 버튼 연결
+    - [ ] 공식 링크: 새 탭에서 열기
+    - [ ] 로컬 PDF: `/view-pdf` 페이지로 이동
+    - [ ] 다운로드 기능 (선택사항)
+  - [ ] "다음 단계 보기" 버튼
+    - [ ] 다음 단계로 스크롤 또는 이동
+    - [ ] 마지막 단계에서는 숨김 처리
+  - [ ] 예상 소요 시간: 3-4시간
+- [ ] **네비게이션 통합** (Priority 1) 🔴
+  - [ ] Navbar에 "진행 과정" 메뉴 추가
+    - [ ] `components/Navbar.tsx`의 `tabs` 배열에 새 항목 추가
+    - [ ] href: `/timeline`
+    - [ ] label: "진행 과정" 또는 "산재 절차"
+    - [ ] 기존 메뉴와 일관된 스타일 적용
+  - [ ] ResponsiveNavigation에 "진행 과정" 탭 추가
+    - [ ] `components/ResponsiveNavigation.tsx`의 `tabs` 배열에 새 항목 추가
+    - [ ] 아이콘: `Timeline` 또는 `List` (lucide-react)
+    - [ ] 모바일 하단 탭 바에 4개 탭 표시 (공간 고려 필요)
+    - [ ] 기존 탭과 일관된 스타일 적용
+  - [ ] 예상 소요 시간: 30분-1시간
+- [ ] **라우팅 설정** (Priority 1) 🔴
+  - [ ] `/timeline` 페이지 생성 (`app/timeline/page.tsx`)
+    - [ ] 서버 컴포넌트로 생성
+    - [ ] Supabase에서 단계 데이터 fetch
+    - [ ] TimelineContainer 컴포넌트 렌더링
+    - [ ] LegalNotice 컴포넌트 상단 고정
+  - [ ] 기존 라우트와 충돌 확인 및 해결
+    - [ ] `/timeline` 경로가 기존 라우트와 충돌하지 않는지 확인
+    - [ ] 필요시 경로 조정
+  - [ ] 예상 소요 시간: 30분-1시간
+- [ ] **반응형 디자인 검증** (Priority 2) 🟡
+  - [ ] 모바일 화면(375px)에서 타임라인 UI 확인
+    - [ ] 세로 타임라인 레이아웃 검증
+    - [ ] Full Screen Modal 동작 확인
+    - [ ] 터치 인터랙션 최적화
+  - [ ] 태블릿 화면(768px)에서 타임라인 UI 확인
+  - [ ] 데스크톱 화면(1920px)에서 타임라인 UI 확인
+    - [ ] 가로 타임라인 레이아웃 검증
+    - [ ] 슬라이드 패널 동작 확인
+  - [ ] 예상 소요 시간: 1-2시간
+- [ ] **접근성 검증** (Priority 3) 🟢
+  - [ ] 키보드 네비게이션 지원 확인
+    - [ ] Tab 키로 모든 인터랙티브 요소 접근 가능
+    - [ ] Enter 키로 단계 카드 클릭 가능
+    - [ ] 포커스 링 스타일 확인
+  - [ ] 스크린 리더 지원 확인
+    - [ ] ARIA 라벨 추가 (단계 카드, 버튼 등)
+    - [ ] 단계 상태 알림 (`aria-live="polite"`)
+    - [ ] 법적 고지 알림 (`role="alert"`)
+  - [ ] 색상 대비 확인 (WCAG AA)
+  - [ ] 포커스 관리 확인
+  - [ ] 예상 소요 시간: 1-2시간
+- [ ] **성공 기준 검증** (Priority 2) 🟡
+  - [ ] 산재 초보자가 다음을 **3분 안에** 이해할 수 있는지 테스트:
+    - [ ] "지금 내가 어디 단계인지"
+    - [ ] "지금 당장 해야 할 행동"
+    - [ ] "어떤 서류를 언제 내야 하는지"
+  - [ ] 실사용자 기준 UX 1차 피드백
+  - [ ] 문구 난이도 최종 조정
+  - [ ] 예상 소요 시간: 1-2시간
+- [ ] **2차 확장 준비 (향후)** (Priority 4) 🔵
+  - [ ] `user_stage_progress` 테이블 생성 (개인화 기능용)
+    - [ ] 컬럼: `id` (UUID, PK), `user_id` (TEXT, Clerk user ID), `stage_id` (UUID, FK), `status` (TEXT: pending/active/completed), `updated_at` (TIMESTAMPTZ)
+    - [ ] 인덱스: `user_id`, `stage_id`
+  - [ ] `user_documents_progress` 테이블 생성 (개인화 기능용)
+    - [ ] 컬럼: `id` (UUID, PK), `user_id` (TEXT, Clerk user ID), `document_id` (UUID, FK), `is_submitted` (BOOLEAN), `submitted_at` (TIMESTAMPTZ)
+    - [ ] 인덱스: `user_id`, `document_id`
+  - [ ] 예상 소요 시간: 1시간 (테이블 생성만)
+- [ ] **총 예상 소요 시간**: 12-18시간
+- [ ] **참고 문서**: 
+  - [ ] `docs/flow_page.md` (상세 구현 계획)
+  - [ ] `docs/PRD.md` (2.3 산재 절차 타임라인 가이드)
+
 ### Phase 1.4: 디자인 시스템 일관성 검증 (Priority 3) 🟢
-- [ ] **PRD 타이포그래피 시스템 검증 및 적용**
-  - [ ] 현재 컴포넌트에서 타이포그래피 사용 현황 확인
-  - [ ] PRD 규격과 다른 부분 수정 (h1: 28px, h2: 22px, body: 17px, caption: 14px)
-  - [x] H1 타이포그래피: 28px 적용 확인 ✅
+- [x] **PRD 타이포그래피 시스템 검증 및 적용** ✅ 완료 (2025-01-26)
+  - [x] 현재 컴포넌트에서 타이포그래피 사용 현황 확인
+  - [x] PRD 규격과 다른 부분 수정 (h1: 30px, h2: 22px, body: 17px, caption: 14px)
+  - [x] H1 타이포그래피: 30px 적용 확인 ✅
   - [x] **H2 타이포그래피 수정 (Priority 1)** 🔴 ✅ 완료
     - [x] 현재: 18px (실제 렌더링)
     - [x] 목표: 22px (design.md 기준)
@@ -451,14 +648,26 @@
     - [x] 해결: `app/hospitals/page-client.tsx`의 h2에 명시적으로 `text-[22px]` 적용
     - [x] 영향: "반경 5km 내 기관 (46개)" 제목 등 모든 h2 요소
     - [x] 예상 소요 시간: 30분
-  - [ ] 컴포넌트별 타이포그래피 일관성 검증
-  - [ ] 필요시 Tailwind CSS 유틸리티 클래스로 표준화
-  - [ ] 예상 소요 시간: 1-2시간
-  - [ ] 참고: `app/globals.css` (129-141줄: 타이포그래피 스케일 정의)
-- [ ] **색상 팔레트 일관성 검증**
-  - [ ] 컴포넌트에서 하드코딩된 색상 검색 (`#3478F6`, `#34C759`, `#FF9500` 등)
-  - [ ] CSS 변수 또는 Tailwind 색상 클래스로 통일
-  - [ ] Alert 색상 (`#FF9500`) 사용 현황 확인 (면책 조항 등)
+  - [x] **Body 타이포그래피 수정** ✅ 완료 (2025-01-26)
+    - [x] 현재: 16px
+    - [x] 목표: 17px (PRD 기준)
+    - [x] 해결: `app/globals.css`의 body 스타일을 `text-[16px]` → `text-[17px]`로 수정
+  - [x] Caption 타이포그래피: 14px 적용 확인 ✅
+  - [x] 컴포넌트별 타이포그래피 일관성 검증 완료
+  - [x] 참고: `app/globals.css` (229-237줄: 타이포그래피 스케일 정의)
+- [x] **색상 팔레트 일관성 검증** ✅ 완료 (2025-01-26)
+  - [x] 컴포넌트에서 하드코딩된 색상 검색 (`#2F6E4F`, `#9333EA`, `#FFD54F`, `#34C759` 등)
+  - [x] CSS 변수 또는 Tailwind 색상 클래스로 통일
+    - [x] `app/globals.css`에 기관별 색상 변수 추가 (`--color-hospital`, `--color-pharmacy`, `--color-rehabilitation`)
+    - [x] `lib/constants/colors.ts` 생성 (동적 HTML 문자열용 색상 상수)
+    - [x] 주요 컴포넌트의 하드코딩 색상을 CSS 변수 기반으로 교체
+      - [x] `text-[#2F6E4F]` → `text-primary`
+      - [x] `bg-[#2F6E4F]` → `bg-primary`
+      - [x] `text-[#9333EA]` → `text-[var(--color-rehabilitation)]`
+      - [x] `text-[#555555]` → `text-muted-foreground`
+      - [x] `text-[#1C1C1E]` → `text-foreground`
+      - [x] `border-[#E8F5E9]` → `border-[var(--border-light)]`
+  - [ ] Alert 색상 (`#FF9500`) 사용 현황 확인 (면책 조항 등) - 선택사항
   - [x] **배경색 수정 (Priority 1)** 🔴 ✅ 완료
     - [x] 현재: 순백색 (`#FFFFFF`)
     - [x] 목표: `#F2F2F7` (아주 연한 회색, design.md 기준)
@@ -663,6 +872,27 @@
   - [ ] 데스크톱 최적화 (마우스 인터랙션, 넓은 화면 활용)
   - [ ] 터치 인터랙션 최적화 (모바일)
   - [ ] 반응형 그리드 시스템 검증
+- [x] **챗봇 접근성 검증** ✅ 완료 (2025-01-26)
+  - [x] 키보드 네비게이션 지원 확인 및 개선
+    - [x] Tab 키로 모든 인터랙티브 요소 접근 가능 확인
+    - [x] Enter 키로 질문 전송 가능 확인 (form onSubmit)
+    - [x] 추천 질문 버튼 키보드 접근 가능 확인
+    - [x] 포커스 링 스타일 개선 (`focus:ring-2 focus:ring-primary`)
+  - [x] 스크린 리더 지원 확인 및 개선
+    - [x] ARIA 라벨 추가 (질문 입력 필드, 버튼 등)
+    - [x] 로딩 상태 알림 (`aria-live="polite"`, `role="status"`)
+    - [x] 에러 메시지 알림 (`role="alert"`, `aria-live="assertive"`)
+    - [x] 대화 기록 영역 (`role="log"`, `aria-live="polite"`)
+    - [x] 스크린 리더 전용 텍스트 추가 (`.sr-only` 클래스)
+  - [x] 색상 대비 확인 (WCAG AA)
+    - [x] Primary 색상과 배경색 대비 확인
+    - [x] 텍스트 색상과 배경색 대비 확인
+    - [x] 버튼 색상 대비 확인
+  - [x] 포커스 관리 확인
+    - [x] 포커스 링 표시 확인 (`focus-visible` 스타일)
+    - [x] 포커스 순서 논리적 확인 (Tab 키 순서)
+  - [x] 참고: `components/rag-chatbot/RagChatbot.tsx`, `app/globals.css`
+  - [x] 예상 소요 시간: 1-2시간
 - [ ] **접근성 및 사용성 개선**
   - [ ] WCAG 2.1 AA 준수 검증
   - [ ] 키보드 네비게이션 지원
@@ -772,7 +1002,44 @@
 
 ### 🎯 추천 작업 순서 (우선순위별)
 
-#### Phase A: 데이터 완성 (Priority 1) 🔴 - 즉시 필요
+#### Phase A: 타임라인 기능 구현 (Priority 1) 🔴 - 신규 기능
+**예상 소요 시간**: 2-3일
+
+1. **Supabase 테이블 생성** (P1-1) - 2-3시간
+   - stages, documents, warnings 테이블 생성
+   - 4단계 Seed 데이터 입력
+   - PDF URL 필드 테스트 값 연결
+
+2. **타임라인 UI 구현** (P1-2) - 4-6시간
+   - TimelineContainer 기본 레이아웃 (반응형)
+   - TimelineStepCard 컴포넌트
+   - TimelineDetailPanel 컴포넌트
+   - LegalNotice 컴포넌트
+
+3. **인터랙션 구현** (P1-3) - 3-4시간
+   - 단계 카드 클릭 이벤트
+   - Full Screen Modal / 슬라이드 패널
+   - 탭 UI 구현
+   - PDF 다운로드 버튼 연결
+
+4. **네비게이션 통합** (P1-4) - 30분-1시간
+   - Navbar에 "진행 과정" 메뉴 추가
+   - ResponsiveNavigation에 "진행 과정" 탭 추가
+
+5. **라우팅 설정** (P1-5) - 30분-1시간
+   - `/timeline` 페이지 생성
+   - 기존 라우트와 충돌 확인
+
+6. **반응형 디자인 검증** (P2-1) - 1-2시간
+   - 모바일/태블릿/데스크톱 레이아웃 검증
+
+7. **접근성 검증** (P3-1) - 1-2시간
+   - 키보드 네비게이션, 스크린 리더 지원
+
+8. **성공 기준 검증** (P2-2) - 1-2시간
+   - 3분 안에 이해 가능한지 테스트
+
+#### Phase B: 데이터 완성 (Priority 1) 🔴 - 즉시 필요
 **예상 소요 시간**: 1일
 
 1. ✅ **재활기관 Geocoding 처리** (P1-1) - 완료
@@ -854,6 +1121,14 @@
 
 | 우선순위 | 작업 | 영향도 | 난이도 | 예상 시간 | 의존성 | 상태 |
 |---------|------|--------|--------|-----------|--------|------|
+| 🔴 P1 | 타임라인 Supabase 테이블 생성 | 높음 | 낮음 | 2-3h | 없음 | ⏳ |
+| 🔴 P1 | 타임라인 UI 구현 | 높음 | 중간 | 4-6h | 테이블 생성 | ⏳ |
+| 🔴 P1 | 타임라인 인터랙션 구현 | 높음 | 중간 | 3-4h | UI 구현 | ⏳ |
+| 🔴 P1 | 타임라인 네비게이션 통합 | 높음 | 낮음 | 30m-1h | 없음 | ⏳ |
+| 🔴 P1 | 타임라인 라우팅 설정 | 높음 | 낮음 | 30m-1h | 없음 | ⏳ |
+| 🟡 P2 | 타임라인 반응형 디자인 검증 | 중간 | 낮음 | 1-2h | UI 구현 | ⏳ |
+| 🟡 P2 | 타임라인 성공 기준 검증 | 중간 | 낮음 | 1-2h | 전체 구현 | ⏳ |
+| 🟢 P3 | 타임라인 접근성 검증 | 낮음 | 낮음 | 1-2h | 전체 구현 | ⏳ |
 | 🔴 P1 | 재활기관 Geocoding | 높음 | 낮음 | 1-2h | 없음 | ✅ |
 | 🔴 P1 | 재활기관 지도 연동 | 높음 | 중간 | 3-4h | Geocoding 완료 | ✅ |
 | 🟡 P2 | 기관 유형별 필터링 | 중간 | 낮음 | 1-2h | 재활기관 지도 연동 | ✅ |
@@ -911,7 +1186,8 @@
   - [ ] Rate limiting 처리 (429 에러)
   - [ ] 네트워크 에러 재시도 (최대 3회)
   - [ ] 타임아웃 설정 (30초)
-  - [ ] 에러 로깅
+  - [x] 에러 로깅 ✅ 완료 (2025-01-26)
+    - [x] `logApiError()` 함수 사용하여 API 라우트 에러 로깅
 
 **Phase 2: 서류 목록 관리** (3-4시간)
 - [ ] 서류 타입 정의 (`lib/types/document.ts`)

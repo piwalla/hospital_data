@@ -62,3 +62,11 @@ export type SearchMode = 'location' | 'region'; // 내 위치 주변 vs 지역 �
 
 
 
+
+
+
+
+
+
+
+

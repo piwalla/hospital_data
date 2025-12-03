@@ -1,27 +1,21 @@
 import DocumentsList from '@/components/documents/DocumentsList';
-import DocumentAssistant from '@/components/documents/DocumentAssistant';
+import RiuIcon from '@/components/icons/riu-icon';
 
 export default function DocumentsPage() {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-7xl">
-      <div className="mb-12">
-        <div className="flex items-center gap-3 mb-3">
-          <img 
-            src="/Generated_Image_November_19__2025_-_4_31PM__2_-removebg-preview.png" 
-            alt="Re 캐릭터" 
-            className="w-12 h-12 object-contain flex-shrink-0"
-          />
-          <h1 className="text-[30px] font-bold text-[#1C1C1E]">서류 안내</h1>
+    <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12 max-w-7xl space-y-6 sm:space-y-8 md:space-y-12">
+      <div 
+        className="leaf-section rounded-2xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 sm:p-6"
+        role="region"
+        aria-label="서류 안내"
+      >
+        <div className="flex items-center gap-2 sm:gap-3">
+          <RiuIcon variant="cheer" size={40} className="sm:w-14 sm:h-14" aria-hidden="true" />
+          <h1 className="text-xl sm:text-2xl md:text-[30px] font-bold text-foreground">필요한 산재 서류를 확인하세요</h1>
         </div>
-        <p className="text-[16px] text-[#555555]">
-          산재 관련 서류 작성 가이드를 확인하세요. AI가 서류 작성 방법을 쉽고 간단하게 설명해드립니다.
-        </p>
       </div>
 
-      <div className="space-y-12">
-        <DocumentAssistant />
-        <DocumentsList />
-      </div>
+      <DocumentsList />
     </div>
   );
 }

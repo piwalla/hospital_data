@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 import {
   generateDocumentSummary,
   getCachedDocumentSummary,
@@ -15,12 +16,19 @@ import {
 } from '@/lib/api/document-summary';
 import { findDocumentById } from '@/lib/data/documents';
 import { addDisclaimer } from '@/lib/utils/disclaimer';
+import { logApiError } from '@/lib/utils/error-logging';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  let userId: string | undefined;
+  
   try {
+    // 사용자 ID 가져오기
+    const { userId: clerkUserId } = await auth();
+    userId = clerkUserId;
+
     const { id } = await params;
     const searchParams = request.nextUrl.searchParams;
     const forceRefresh = searchParams.get('forceRefresh') === 'true';
@@ -68,7 +76,18 @@ export async function GET(
       fromCache: false,
     });
   } catch (error: any) {
-    console.error('[Document Summary API] 오류 발생:', error);
+    const { id } = await params;
+    
+    // 에러 로깅
+    logApiError(error, {
+      component: 'DocumentSummaryAPI',
+      action: 'GET',
+      method: 'GET',
+      path: `/api/documents/${id}/summary`,
+      statusCode: error?.status || 500,
+      userId,
+      params: { id },
+    });
 
     // 503 에러 또는 서비스 과부하 확인
     const isServiceOverloaded =
