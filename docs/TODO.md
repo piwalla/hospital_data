@@ -635,6 +635,112 @@
 - [ ] **참고 문서**: 
   - [ ] `docs/flow_page.md` (상세 구현 계획)
   - [ ] `docs/PRD.md` (2.3 산재 절차 타임라인 가이드)
+- [ ] **타임라인 UI/UX 개선 (토스 스타일, 중장년층 친화적)** (Priority 1) 🔴 ⭐ 새로 추가
+  - [x] **1단계: 폰트 크기 및 가독성 개선** (2-3시간) 🔴 ✅ 완료 (2025-01-27)
+    - [x] TimelineStepCard 컴포넌트 개선
+      - [x] 제목 폰트 크기 증가: `text-lg sm:text-xl` → `text-xl sm:text-2xl md:text-3xl`
+      - [x] 설명 텍스트 크기 증가: `text-sm sm:text-base` → `text-base sm:text-lg`
+      - [x] 배지 텍스트 크기 증가: `text-xs sm:text-sm` → `text-sm sm:text-base`
+      - [x] 카드 패딩 증가: `p-4 sm:p-6` → `p-6 sm:p-8`
+      - [x] 카드 간격 증가: `gap-4 sm:gap-6` → `gap-6 sm:gap-8`
+      - [x] 단계 번호 원형 배지 크기 증가: `w-10 h-10 sm:w-12 sm:h-12` → `w-14 h-14 sm:w-16 sm:h-16`
+      - [x] 단계 번호 폰트 크기 증가: `text-lg sm:text-xl` → `text-xl sm:text-2xl`
+      - [x] 화살표 아이콘 크기 증가: `w-5 h-5 sm:w-6 sm:h-6` → `w-6 h-6 sm:w-7 sm:h-7`
+    - [x] TimelineStepContent 컴포넌트 개선
+      - [x] 탭 버튼 크기 증가: 패딩 `px-3 py-2 sm:px-4` → `px-5 py-3 sm:px-6 sm:py-4`
+      - [x] 탭 버튼 폰트: `text-xs sm:text-sm md:text-base` → `text-base sm:text-lg`
+      - [x] 탭 버튼 아이콘: `w-4 h-4` → `w-5 h-5 sm:w-6 sm:h-6`
+      - [x] 탭 버튼 간격 증가: `gap-2 sm:gap-3` → `gap-3 sm:gap-4`
+      - [x] 콘텐츠 카드 패딩 증가: `p-4` → `p-5 sm:p-6`
+      - [x] 콘텐츠 카드 간격 증가: `space-y-3` → `space-y-4 sm:space-y-5`
+      - [x] 아이콘 크기 증가: `w-5 h-5` → `w-6 h-6 sm:w-7 sm:h-7`
+      - [x] 이전/다음 버튼 크기 증가: `size="lg"` 적용
+      - [x] 버튼 텍스트 크기: `text-base sm:text-lg`로 명시
+    - [x] 페이지 헤더 개선
+      - [x] 제목과 설명 간격 증가: `mt-2 sm:mt-3` → `mt-4 sm:mt-6`
+      - [x] 전체 페이지 간격 증가: `space-y-6 sm:space-y-8 md:space-y-12` → `space-y-8 sm:space-y-10 md:space-y-16`
+  - [x] **2단계: 버튼 및 터치 영역 개선** (1-2시간) 🔴 ✅ 완료 (2025-01-27)
+    - [x] DocumentDownloadButton 컴포넌트 개선
+      - [x] 버튼 크기: `size="sm"` → `size="default"`
+      - [x] 아이콘 크기 증가: `w-4 h-4` → `w-5 h-5 sm:w-6 sm:h-6`
+      - [x] 텍스트 표시: 모바일에서도 텍스트 표시 (`hidden sm:inline` → 항상 표시)
+      - [x] 최소 터치 영역: `min-h-[44px]` 보장
+      - [x] 버튼 텍스트 크기: `text-base sm:text-lg`로 명시
+      - [x] PDF 없음 텍스트 크기 증가: `text-xs sm:text-sm` → `text-sm sm:text-base`
+    - [x] 네비게이션 버튼 개선
+      - [x] 버튼 크기: 기본 → `size="lg"` (이미 완료)
+      - [x] 버튼 간격: `gap-3` → `gap-4 sm:gap-6`
+      - [x] 아이콘 크기: `w-4 h-4` → `w-5 h-5 sm:w-6 sm:h-6` (이미 완료)
+      - [x] 버튼 텍스트 크기: `text-base sm:text-lg`로 명시 (이미 완료)
+      - [x] 최소 높이: `min-h-[48px]` 보장
+  - [x] **3단계: 진행 상황 시각화 추가** (2-3시간) 🟡 ✅ 완료 (2025-01-27)
+    - [x] 현재 단계 표시 기능 추가
+      - [x] 현재 단계인지 표시하는 prop 추가 (`isCurrentStep`)
+      - [x] 현재 단계일 경우 배경색 변경: `bg-white` → `bg-primary/20`
+      - [x] 현재 단계일 경우 테두리 강조: `border-[var(--border-medium)]` → `border-2 border-primary`
+      - [x] "현재 단계" 배지 추가 (초록색 배경, 흰색 텍스트)
+      - [x] URL 쿼리 파라미터로 현재 단계 전달 (`?step=N`)
+      - [x] 단계 상세 페이지에서 메인 페이지로 돌아갈 때 현재 단계 전달
+    - [x] 진행률 표시 추가
+      - [x] 상단에 진행률 바 추가 (현재 단계가 있을 때만 표시)
+      - [x] "4단계 중 N단계" 텍스트 표시
+      - [x] 시각적 진행률 바 (프로그레스 바, 애니메이션 효과 포함)
+      - [x] 접근성 개선 (aria-label, role="progressbar" 추가)
+  - [x] **4단계: 초보자 안내 메시지 추가** (2-3시간) 🟡 ✅ 완료 (2025-01-27)
+    - [x] 첫 방문 안내 추가
+      - [x] FirstVisitBanner 컴포넌트 생성
+      - [x] 페이지 상단에 안내 배너 추가
+      - [x] "처음이신가요? 아래 단계를 순서대로 확인해보세요" 메시지
+      - [x] Info 아이콘과 함께 표시
+      - [x] 닫기 버튼 제공 (X 아이콘)
+      - [x] localStorage를 사용한 "다시 보지 않기" 기능
+      - [x] 각 단계 카드에 간단한 안내 텍스트 추가: "이 단계에서는 해야 할 일, 필요한 서류, 주의사항을 확인할 수 있습니다."
+    - [x] 각 탭에 안내 텍스트 추가
+      - [x] "해야 할 일" 탭: "이 단계에서 꼭 해야 하는 일들입니다" (CheckCircle2 아이콘)
+      - [x] "필수 서류" 탭: "이 단계에서 필요한 서류들입니다" (FileText 아이콘)
+      - [x] "주의사항" 탭: "이 단계에서 꼭 알아두어야 할 내용입니다" (AlertTriangle 아이콘)
+      - [x] 각 탭별 색상과 아이콘으로 구분된 안내 박스 표시
+  - [x] **5단계: 색상 및 시각적 개선** (1-2시간) 🔴 ✅ 완료 (2025-01-27)
+    - [x] 색상 대비 강화
+      - [x] 텍스트 색상 대비 확인 및 강화
+      - [x] 제목: `text-[#111827]` (거의 검정) 유지
+      - [x] 본문: `text-muted-foreground` → `text-[#374151]` (더 진한 회색)로 변경 (가독성 향상)
+      - [x] 보조 텍스트: `text-muted-foreground` → `text-[#6B7280]` (중간 회색)로 변경
+      - [x] 배경색과 텍스트 색상 대비율 4.5:1 이상 보장 (WCAG AA 기준 준수)
+      - [x] 활성 상태 색상 강조: `hover:bg-primary/5` → `hover:bg-primary/10`
+      - [x] 탭 버튼 비활성 텍스트: `text-muted-foreground` → `text-[#6B7280]` (더 진한 회색)
+    - [x] 아이콘 및 시각적 요소 개선
+      - [x] 모든 아이콘 크기 일괄 증가 (최소 20px 이상 확인 완료)
+      - [x] 아이콘과 텍스트 간격 증가: `gap-2` → `gap-3 sm:gap-4`
+      - [x] 안내 박스 아이콘 크기 증가: `w-5 h-5 sm:w-6 sm:h-6` → `w-6 h-6 sm:w-7 sm:h-7`
+      - [x] 안내 박스 패딩 증가: `p-4` → `p-4 sm:p-5`
+      - [x] 체크 아이콘, 경고 아이콘 등 시각적 요소 강조 (크기 및 색상 확인)
+  - [x] **6단계: 반응형 디자인 개선** (1-2시간) 🟡 ✅ 완료 (2025-01-27)
+    - [x] 모바일 최적화
+      - [x] 모바일에서도 충분한 터치 영역 보장 (최소 44x44px) - 모든 배지와 버튼에 `min-h-[44px]` 적용
+      - [x] 모바일에서 텍스트가 작아지지 않도록 최소 크기 보장 - `text-sm` → `text-base`로 변경
+      - [x] 가로 스크롤 방지 (탭 버튼은 예외) - 탭 버튼만 `overflow-x-auto` 적용, 다른 요소는 가로 스크롤 없음
+      - [x] 충분한 여백 확보 - 패딩과 간격 확인 완료
+    - [x] 데스크톱 최적화
+      - [x] 데스크톱에서도 큰 폰트와 여백 유지 - `sm:`, `md:` 브레이크포인트로 큰 폰트 유지
+      - [x] 최대 너비 제한으로 가독성 향상 - `max-w-7xl` (메인 페이지), `max-w-4xl` (상세 페이지) 적용
+      - [x] 호버 효과 강화 - `hover:bg-primary/10`, `active:bg-primary/15` 추가
+  - [x] **7단계: 접근성 개선** (2-3시간) 🟢 ✅ 완료 (2025-01-27)
+    - [x] 키보드 네비게이션 개선
+      - [x] 모든 인터랙티브 요소에 키보드 포커스 스타일 추가 - `focus:ring-2 focus:ring-primary focus:ring-offset-2` 적용
+      - [x] Tab 순서 최적화 - `tabIndex` 속성으로 탭 순서 제어
+      - [x] Enter/Space 키로 모든 버튼 작동 보장 - `onKeyDown` 핸들러 추가
+    - [x] 스크린 리더 지원 강화
+      - [x] aria-label 개선 및 추가 - 모든 인터랙티브 요소에 명확한 aria-label 추가
+      - [x] aria-describedby로 추가 설명 제공 - 단계 카드에 설명 연결
+      - [x] role 속성 적절히 사용 - `role="tab"`, `role="tabpanel"`, `role="tablist"`, `role="region"`, `role="list"`, `role="group"`, `role="navigation"` 등 적용
+      - [x] 진행 상황을 스크린 리더로 알릴 수 있도록 개선 - `aria-live="polite"`, `aria-atomic="true"` 추가, 진행률 퍼센트 포함
+      - [x] 탭 패턴 구현 - ARIA 탭 패턴 완전 구현 (role="tab", role="tabpanel", aria-controls, aria-labelledby)
+      - [x] 숨겨진 레이블 추가 - `sr-only` 클래스로 스크린 리더 전용 레이블 추가
+  - [ ] **총 예상 소요 시간**: 11-18시간
+  - [ ] **참고 문서**: 
+    - [ ] `docs/features/timeline-improvement-plan.md` (상세 개선 계획)
+    - [ ] `docs/features/timeline.md` (기능 문서)
 
 ### Phase 1.4: 디자인 시스템 일관성 검증 (Priority 3) 🟢
 - [x] **PRD 타이포그래피 시스템 검증 및 적용** ✅ 완료 (2025-01-26)

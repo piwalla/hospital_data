@@ -58,7 +58,7 @@ export default function TimelineDetailPanel({
         "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200",
         "text-sm sm:text-base font-medium",
         activeTab === tab
-          ? "bg-primary text-primary-foreground shadow-leaf"
+          ? "bg-primary text-primary-foreground"
           : "bg-[var(--background-alt)] text-muted-foreground hover:bg-[var(--background-alt)]/80"
       )}
       aria-pressed={activeTab === tab}
@@ -125,7 +125,7 @@ export default function TimelineDetailPanel({
                 {stage.documents.map((doc) => (
                   <li
                     key={doc.id}
-                    className="flex items-start justify-between gap-3 p-3 rounded-lg border border-[var(--border-light)] bg-[var(--background-alt)]"
+                    className="flex items-start justify-between gap-3 p-3 rounded-lg border border-[var(--border-medium)] bg-[var(--background-alt)]"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -170,7 +170,7 @@ export default function TimelineDetailPanel({
 
       {/* 다음 단계 조건 */}
       {stage.next_condition && (
-        <div className="pt-4 border-t border-[var(--border-light)]">
+        <div className="pt-4 border-t border-[var(--border-medium)]">
           <p className="text-sm sm:text-base text-muted-foreground">
             <strong className="font-semibold text-foreground">다음 단계:</strong>{' '}
             {stage.next_condition}
@@ -180,7 +180,7 @@ export default function TimelineDetailPanel({
 
       {/* 다음 단계 보기 버튼 */}
       {hasNextStage && onNextStage && (
-        <div className="pt-4 border-t border-[var(--border-light)]">
+        <div className="pt-4 border-t border-[var(--border-medium)]">
           <Button
             onClick={onNextStage}
             className="w-full flex items-center justify-center gap-2"
@@ -198,8 +198,8 @@ export default function TimelineDetailPanel({
   if (isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-full h-full max-h-screen rounded-none sm:rounded-2xl flex flex-col p-0">
-          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-[var(--border-light)]">
+        <DialogContent className="max-w-full h-full max-h-screen rounded-none sm:rounded-lg flex flex-col p-0">
+          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-[var(--border-medium)]">
             <DialogTitle className="text-lg sm:text-xl font-bold font-brand">
               {stage.step_number}단계: {stage.title}
             </DialogTitle>
@@ -232,5 +232,6 @@ export default function TimelineDetailPanel({
     </Sheet>
   );
 }
+
 
 

@@ -120,47 +120,47 @@
 }
 
 :root {
-  /* Warm & Rounded 테마: 따뜻한 힐링 케어 서비스 */
-  --radius: 1rem; /* rounded-2xl (16px) - 리우 캐릭터의 둥근 형태와 통일감 */
-  --background: #FFFCF5; /* Warm Cream - 눈이 편안한 따뜻한 크림색 */
-  --background-alt: #F5F9F6; /* Soft Mint - 보조 배경색 */
-  --foreground: #1C1C1E; /* 기본 텍스트 색상 (진한 회색) */
+  /* Premium & High Contrast 테마 (중장년층 가독성 강화) */
+  --radius: 0.5rem; /* 8px - 너무 둥글지 않은 단단한 느낌 */
+  --background: #FFFFFF; /* 순백색 배경 - 텍스트 대비 최대화 */
+  --background-alt: #F3F4F6; /* 섹션 구분용 연회색 배경 */
+  --foreground: #111827; /* Almost Black - 본문 텍스트 */
   /* 폰트 패밀리 */
   --font-brand: 'Paperozi', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --card: #FFFFFF; /* 카드 배경: 순백색 */
-  --card-foreground: #1C1C1E;
+  --card: #FFFFFF; /* 카드 배경 */
+  --card-foreground: #111827;
   --popover: #FFFFFF;
-  --popover-foreground: #1C1C1E;
-  /* Warm & Rounded 색상 팔레트 */
-  --primary: #2F6E4F; /* Deep Green - 메인 포인트 컬러 유지 */
+  --popover-foreground: #111827;
+  /* Signature Deep Green & Accent */
+  --primary: #14532D; /* Deep Forest Green - 브랜드 시그니처 */
   --primary-foreground: #FFFFFF;
-  --secondary: #A5D6A7; /* Soft Green - 보조 색상 */
-  --secondary-foreground: #1C1C1E;
-  --accent: #FFD54F; /* Warm Yellow - 리우 캐릭터 볼터치 색, 강조 요소 */
-  --accent-foreground: #1C1C1E;
-  --alert: #FF9500; /* 부드러운 주황색 - 법적 고지, 주의 사항 */
-  /* 기관별 색상 */
-  --color-hospital: #2F6E4F; /* 병원 색상 (Primary와 동일) */
-  --color-pharmacy: #34C759; /* 약국 색상 (Success Green) */
-  --color-rehabilitation: #9333EA; /* 재활기관 색상 (Purple) */
-  --color-hospital-alt: #2E7D32; /* 병원 마커 대체 색상 */
+  --secondary: #E5F3EB; /* 연한 그린 톤 보조색 (선택적 사용) */
+  --secondary-foreground: #111827;
+  --accent: #D97706; /* Antique Gold - 고급 포인트 */
+  --accent-foreground: #FFFFFF;
+  --alert: #FF9500; /* 주의/법적 고지용 */
+  /* 기관별 색상 (기존 의미 유지) */
+  --color-hospital: #14532D; /* 병원 색상 (Primary 계열로 통일) */
+  --color-pharmacy: #34C759; /* 약국 */
+  --color-rehabilitation: #9333EA; /* 재활기관 */
+  --color-hospital-alt: #166534; /* 병원 마커 대체 색상 */
   /* Neutral 색상 체계 */
-  --neutral-text: #1C1C1E; /* 기본 텍스트 색상 */
-  --neutral-text-secondary: #555555; /* 보조 텍스트 색상 */
-  --neutral-bg: #FFFCF5; /* Warm Cream 배경 */
-  --neutral-bg-hover: #F5F9F6; /* Soft Mint 호버 배경 */
-  /* Border 색상 체계 - 나무 컨셉에 맞게 연한 녹색 */
-  --border-light: #E8F5E9; /* 연한 녹색 테두리 (border-green-100) */
-  --border-medium: #C8E6C9; /* 중간 녹색 테두리 */
-  --muted: #F5F9F6; /* Soft Mint */
-  --muted-foreground: #555555;
+  --neutral-text: #111827;
+  --neutral-text-secondary: #4B5563;
+  --neutral-bg: #FFFFFF;
+  --neutral-bg-hover: #F3F4F6;
+  /* Border & Input 색상 - 회색 기반, 대비 강화 */
+  --border-light: #E5E7EB;
+  --border-medium: #D1D5DB;
+  --muted: #F3F4F6;
+  --muted-foreground: #4B5563;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #E8F5E9; /* 연한 녹색 테두리 */
-  --input: #E8F5E9;
-  --ring: #2F6E4F; /* Primary 색상과 동일 */
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #14532D; /* Primary와 동일 */
   
-  /* Shadow 시스템 - 나뭇잎처럼 가볍게 떠 있는 느낌 */
+  /* Shadow 시스템 - 과하지 않은 깊이감 유지 */
   --shadow-leaf: 0 2px 8px rgba(0, 0, 0, 0.04);
   --shadow-branch: 0 4px 16px rgba(0, 0, 0, 0.04);
   --shadow-canopy: 0 8px 30px rgba(0, 0, 0, 0.04);
@@ -218,37 +218,37 @@
     @apply border-border outline-ring/50;
   }
   body {
-    background-color: #FFFCF5; /* Warm Cream - 따뜻한 크림색 배경 */
+    background-color: #FFFFFF; /* 고대비를 위한 순백색 배경 */
     @apply text-foreground;
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    letter-spacing: -0.02em; /* tracking-tight - 단단한 느낌 */
+    letter-spacing: -0.02em;
   }
   main {
     @apply max-w-7xl mx-auto pt-16 px-4;
   }
   
-  /* Warm & Rounded 타이포그래피 스케일 */
+  /* Premium & Senior-Friendly 타이포그래피 스케일 */
   h1 {
-    @apply text-[30px] font-bold;
-    font-family: var(--font-brand);
-    letter-spacing: -0.02em; /* tracking-tight */
+    @apply text-[32px] font-bold;
+    font-family: var(--font-sans);
+    letter-spacing: -0.02em;
   }
   h2 {
-    @apply text-[22px] font-semibold;
-    font-family: var(--font-brand);
+    @apply text-[26px] font-semibold;
+    font-family: var(--font-sans);
     letter-spacing: -0.02em;
   }
   h3 {
-    @apply text-[18px] font-semibold;
-    font-family: var(--font-brand);
+    @apply text-[20px] font-semibold;
+    font-family: var(--font-sans);
     letter-spacing: -0.02em;
   }
   body {
-    @apply text-[17px] font-normal;
-    letter-spacing: -0.02em; /* tracking-tight - 전체적으로 적용 */
+    @apply text-[18px] font-medium;
+    letter-spacing: -0.02em;
   }
   .caption {
-    @apply text-[14px] font-normal;
+    @apply text-[15px] font-normal;
     letter-spacing: -0.02em;
   }
   
@@ -287,6 +287,19 @@
 }
 
 @layer utilities {
+  /* 중장년층 가독성 강화 유틸리티 */
+  .text-senior-body {
+    @apply text-[18px] leading-[1.6] font-medium text-[#111827];
+  }
+  
+  .text-senior-title {
+    @apply text-[26px] md:text-[32px] font-bold text-[#14532D] tracking-tight;
+  }
+
+  .btn-touch-target {
+    @apply min-h-[56px] px-6 text-lg font-bold;
+  }
+
   @keyframes riu-bounce {
     0%, 100% {
       transform: translateY(0) scale(1);
@@ -358,7 +371,6 @@
     background: linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));
     border: 1px solid var(--border-light);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-canopy);
   }
 
   /* Leaf section - 은은한 그라데이션 배경 */
@@ -390,6 +402,5 @@
   /* Berry card - 면책 조항 및 중요 정보용 */
   .berry-card {
     background: linear-gradient(135deg, rgba(255, 213, 79, 0.25), rgba(255, 252, 245, 0.9));
-    box-shadow: var(--shadow-canopy);
   }
 }

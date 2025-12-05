@@ -6,7 +6,7 @@
 export default function LegalNotice() {
   return (
     <div 
-      className="rounded-2xl border border-[var(--alert)] bg-[var(--alert)]/10 p-4 sm:p-6"
+      className="rounded-lg border border-[var(--alert)] bg-[var(--alert)]/10 p-4 sm:p-6"
       role="alert"
       aria-label="법적 고지"
     >
@@ -18,5 +18,6 @@ export default function LegalNotice() {
     </div>
   );
 }
+
 
 

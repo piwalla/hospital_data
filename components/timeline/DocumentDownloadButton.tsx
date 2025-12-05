@@ -40,7 +40,7 @@ export default function DocumentDownloadButton({ document }: DocumentDownloadBut
 
   if (!document.pdf_url) {
     return (
-      <span className="text-xs sm:text-sm text-muted-foreground">
+      <span className="text-sm sm:text-base text-[#6B7280]">
         PDF 없음
       </span>
     );
@@ -52,23 +52,25 @@ export default function DocumentDownloadButton({ document }: DocumentDownloadBut
     <Button
       onClick={handleClick}
       variant="outline"
-      size="sm"
-      className="flex items-center gap-2"
+      size="default"
+      className="flex items-center gap-2 min-h-[44px] text-base sm:text-lg"
       aria-label={`${document.title} ${isExternalLink ? '열기' : '보기'}`}
     >
       {isExternalLink ? (
         <>
-          <ExternalLink className="w-4 h-4" />
-          <span className="hidden sm:inline">공식 링크</span>
+          <ExternalLink className="w-5 h-5 sm:w-6 sm:h-6" />
+          <span>공식 링크</span>
         </>
       ) : (
         <>
-          <Download className="w-4 h-4" />
-          <span className="hidden sm:inline">PDF 보기</span>
+          <Download className="w-5 h-5 sm:w-6 sm:h-6" />
+          <span>PDF 보기</span>
         </>
       )}
     </Button>
   );
 }
+
+
 
 

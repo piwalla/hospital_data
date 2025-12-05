@@ -1,7 +1,7 @@
 import { getAllStagesWithDetails } from '@/lib/api/timeline';
-import RiuIcon from '@/components/icons/riu-icon';
 import LegalNotice from '@/components/timeline/LegalNotice';
 import TimelineContainer from '@/components/timeline/TimelineContainer';
+import FirstVisitBanner from '@/components/timeline/FirstVisitBanner';
 
 /**
  * @file page.tsx
@@ -16,7 +16,11 @@ import TimelineContainer from '@/components/timeline/TimelineContainer';
 // 동적 렌더링 강제 (Supabase 데이터 조회를 위해)
 export const dynamic = 'force-dynamic';
 
-export default async function TimelinePage() {
+interface TimelinePageProps {
+  searchParams: Promise<{ step?: string }>;
+}
+
+export default async function TimelinePage({ searchParams }: TimelinePageProps) {
   let stages: Awaited<ReturnType<typeof getAllStagesWithDetails>> = [];
 
   try {
@@ -26,30 +30,30 @@ export default async function TimelinePage() {
     // 에러 발생 시 빈 배열로 처리 (UI는 에러 메시지 표시)
   }
 
-  return (
-    <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12 max-w-7xl space-y-6 sm:space-y-8 md:space-y-12">
-      {/* 법적 고지 (상단 고정) */}
-      <LegalNotice />
+  // URL 쿼리 파라미터에서 현재 단계 번호 가져오기
+  const params = await searchParams;
+  const currentStepNumber = params.step ? parseInt(params.step, 10) : undefined;
 
+  return (
+    <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12 max-w-7xl space-y-8 sm:space-y-10 md:space-y-16">
       {/* 페이지 헤더 */}
-      <div 
-        className="leaf-section rounded-2xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-4 sm:p-6"
-        role="region"
-        aria-label="산재 절차 타임라인"
-      >
-        <div className="flex items-center gap-2 sm:gap-3">
-          <RiuIcon variant="cheer" size={40} className="sm:w-14 sm:h-14" aria-hidden="true" />
-          <h1 className="text-xl sm:text-2xl md:text-[30px] font-bold text-foreground font-brand">
-            산재 절차 타임라인
-          </h1>
-        </div>
-        <p className="mt-3 sm:mt-4 text-sm sm:text-base text-muted-foreground">
-          산재 발생부터 사회 복귀까지의 전체 과정을 단계별로 확인하세요.
+      <div>
+        <h1 className="text-senior-title">
+          산재 진행 과정
+        </h1>
+        <p className="mt-4 sm:mt-6 text-senior-body text-muted-foreground">
+          산재 신청 부터 치료, 복귀까지 한번에 살펴보세요
         </p>
       </div>
 
+      {/* 첫 방문 안내 배너 */}
+      <FirstVisitBanner />
+
       {/* 타임라인 컨테이너 */}
-      <TimelineContainer stages={stages} />
+      <TimelineContainer stages={stages} currentStepNumber={currentStepNumber} />
+
+      {/* 법적 고지 (하단) */}
+      <LegalNotice />
     </div>
   );
 }

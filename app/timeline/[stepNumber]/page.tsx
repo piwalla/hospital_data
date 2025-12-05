@@ -52,7 +52,7 @@ export default async function TimelineStepPage({ params }: TimelineStepPageProps
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* 헤더 */}
-      <div className="sticky top-0 z-10 bg-[var(--background)] border-b border-[var(--border-light)] shadow-leaf">
+      <div className="sticky top-0 z-10 bg-[var(--background)] border-b border-[var(--border-medium)]">
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-4xl">
           <div className="flex items-center gap-3 sm:gap-4">
             <Button
@@ -61,7 +61,7 @@ export default async function TimelineStepPage({ params }: TimelineStepPageProps
               size="sm"
               aria-label="타임라인으로 돌아가기"
             >
-              <Link href="/timeline">
+              <Link href={`/timeline?step=${stepNum}`}>
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               </Link>
             </Button>
