@@ -8,8 +8,8 @@
 
 'use client';
 
-import { useState } from 'react';
-import { X, CheckCircle2, FileText, AlertTriangle, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { CheckCircle2, FileText, AlertTriangle, ArrowRight, BookOpen } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -35,7 +35,7 @@ interface TimelineDetailPanelProps {
   hasNextStage?: boolean;
 }
 
-type TabType = 'actions' | 'documents' | 'warnings';
+type TabType = 'guide' | 'actions' | 'documents' | 'warnings';
 
 export default function TimelineDetailPanel({
   stage,
@@ -44,14 +44,42 @@ export default function TimelineDetailPanel({
   onNextStage,
   hasNextStage = false,
 }: TimelineDetailPanelProps) {
+  // 1단계, 2단계, 3단계, 4단계일 때는 기본 탭을 'guide'로 설정
   const [activeTab, setActiveTab] = useState<TabType>('actions');
+
+  // PDF URL 생성 (1단계, 2단계, 3단계, 4단계용) - 툴바 숨김 파라미터 추가
+  const getPdfUrl = () => {
+    if (!stage) return null;
+    if (stage.step_number === 1) {
+      return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/step1.pdf#toolbar=0&navpanes=0&scrollbar=0`;
+    } else if (stage.step_number === 2) {
+      return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/step2.pdf#toolbar=0&navpanes=0&scrollbar=0`;
+    } else if (stage.step_number === 3) {
+      return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/step3.pdf#toolbar=0&navpanes=0&scrollbar=0`;
+    } else if (stage.step_number === 4) {
+      return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/step4.pdf#toolbar=0&navpanes=0&scrollbar=0`;
+    }
+    return null;
+  };
+  const pdfUrl = getPdfUrl();
+
+  // 1단계, 2단계, 3단계, 4단계일 때 기본 탭을 'guide'로 설정 (패널이 열릴 때마다)
+  // useEffect는 early return 전에 호출되어야 함
+  useEffect(() => {
+    if (!stage) return;
+    if (open && (stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl) {
+      setActiveTab('guide');
+    } else if (open && stage.step_number !== 1 && stage.step_number !== 2 && stage.step_number !== 3 && stage.step_number !== 4) {
+      setActiveTab('actions');
+    }
+  }, [open, stage, pdfUrl]);
 
   if (!stage) return null;
 
   // 모바일: Dialog, 데스크톱: Sheet
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
-  const TabButton = ({ tab, label, icon: Icon, count }: { tab: TabType; label: string; icon: typeof CheckCircle2; count?: number }) => (
+  const TabButton = ({ tab, label, icon: Icon, count }: { tab: TabType; label: string; icon: typeof CheckCircle2 | typeof BookOpen; count?: number }) => (
     <button
       onClick={() => setActiveTab(tab)}
       className={cn(
@@ -73,10 +101,69 @@ export default function TimelineDetailPanel({
     </button>
   );
 
+  // 각 단계별 유튜브 영상 ID
+  const getYouTubeVideoId = () => {
+    switch (stage.step_number) {
+      case 1:
+        return 'anLDxaAFQAk';
+      case 2:
+        return 'WOKhzBSA3Ks';
+      case 3:
+        return 'ufCjFjOiJ1Y';
+      case 4:
+        return 'X0YvR1RI08g';
+      default:
+        return null;
+    }
+  };
+
+  const youtubeVideoId = getYouTubeVideoId();
+
   const Content = () => (
     <div className="space-y-6">
+      {/* 유튜브 가이드 영상 (1단계, 2단계, 3단계, 4단계) */}
+      {youtubeVideoId && (
+        <div className="w-full space-y-3 sm:space-y-4">
+          <div className="flex items-center gap-2 sm:gap-3 px-4 sm:px-0">
+            <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
+            <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
+              가이드 영상
+            </h2>
+          </div>
+          <div className="relative w-screen sm:w-full -ml-4 sm:ml-0 rounded-none sm:rounded-xl overflow-hidden border-0 sm:border border-[var(--border-medium)] bg-white shadow-sm" style={{ maxWidth: 'calc(100vw - 0px)' }}>
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={`https://www.youtube.com/embed/${youtubeVideoId}`}
+                title={`${stage.title} 가이드 영상`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          </div>
+          <p className="text-sm sm:text-base text-muted-foreground text-center px-4 sm:px-0">
+            {stage.step_number === 1 
+              ? '산재 신청 과정을 영상으로 확인하세요'
+              : stage.step_number === 2
+              ? '병원에서 치료받고 급여 받는 과정을 영상으로 확인하세요'
+              : stage.step_number === 3
+              ? '치료 끝나고 장해 등급 받는 과정을 영상으로 확인하세요'
+              : '직장 복귀하거나 재취업하는 과정을 영상으로 확인하세요'}
+          </p>
+        </div>
+      )}
+
       {/* 탭 버튼 */}
       <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2">
+        {/* 1단계, 2단계, 3단계, 4단계일 때 "설명 보기" 탭 표시 */}
+        {(stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
+          <TabButton
+            tab="guide"
+            label="설명 보기"
+            icon={BookOpen}
+          />
+        )}
         <TabButton
           tab="actions"
           label="해야 할 일"
@@ -99,6 +186,36 @@ export default function TimelineDetailPanel({
 
       {/* 탭 콘텐츠 */}
       <div className="min-h-[200px]">
+        {/* 설명 보기 탭 (PDF) - 1단계, 2단계, 3단계, 4단계 */}
+        {activeTab === 'guide' && (stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
+          <div className="space-y-3">
+            {/* 안내 텍스트 */}
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+              <BookOpen className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-[#374151] leading-relaxed">
+                {stage.step_number === 1 
+                  ? '산재 신청하기 과정을 자세히 설명하는 가이드입니다.'
+                  : stage.step_number === 2
+                  ? '병원에서 치료받고 급여 받는 과정을 자세히 설명하는 가이드입니다.'
+                  : stage.step_number === 3
+                  ? '치료 끝나고 장해 등급 받는 과정을 자세히 설명하는 가이드입니다.'
+                  : '직장 복귀하거나 재취업하는 과정을 자세히 설명하는 가이드입니다.'}
+              </p>
+            </div>
+            {/* PDF 뷰어 */}
+            <div className="w-screen sm:w-full -ml-4 sm:ml-0 rounded-none sm:rounded-lg overflow-hidden border-0 sm:border border-[var(--border-medium)] bg-white shadow-sm" style={{ maxWidth: 'calc(100vw - 0px)' }}>
+              <div className="w-full h-[300px] sm:h-[400px] md:h-[600px] lg:h-[800px]">
+                <iframe
+                  src={pdfUrl}
+                  className="w-full h-full"
+                  title={`${stage.title} 가이드 PDF`}
+                  style={{ border: 'none' }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'actions' && (
           <div className="space-y-3">
             {stage.actions.length === 0 ? (
@@ -198,8 +315,8 @@ export default function TimelineDetailPanel({
   if (isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-full h-full max-h-screen rounded-none sm:rounded-lg flex flex-col p-0">
-          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-[var(--border-medium)]">
+        <DialogContent className="max-w-full h-[100dvh] max-h-[100dvh] rounded-none sm:rounded-lg flex flex-col p-0 top-0 left-0 translate-x-0 translate-y-0 m-0">
+          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-4 border-b border-[var(--border-medium)] flex-shrink-0">
             <DialogTitle className="text-lg sm:text-xl font-bold font-brand">
               {stage.step_number}단계: {stage.title}
             </DialogTitle>
@@ -207,8 +324,10 @@ export default function TimelineDetailPanel({
               {stage.description}
             </p>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6">
-            <Content />
+          <div className="flex-1 overflow-y-auto overflow-x-hidden px-0 sm:px-6 py-4 sm:py-6 min-h-0">
+            <div className="px-4 sm:px-0">
+              <Content />
+            </div>
           </div>
         </DialogContent>
       </Dialog>

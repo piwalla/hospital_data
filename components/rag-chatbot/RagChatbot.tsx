@@ -23,7 +23,6 @@ import { useUser } from '@clerk/nextjs';
 import { Loader2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import RiuIcon from '@/components/icons/riu-icon';
 import RiuLoader from '@/components/ui/riu-loader';
 import { logError } from '@/lib/utils/error-logging';
 import { logChatbotActivity } from '@/lib/utils/chatbot-analytics';
@@ -285,18 +284,14 @@ export default function RagChatbot() {
 
   return (
     <div 
-      className="leaf-section bg-white border border-[var(--border-light)] rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 mb-8 shadow-canopy"
+      className="leaf-section bg-white border border-[var(--border-light)] rounded-lg p-4 sm:p-6 md:p-8 lg:p-10 mb-8 shadow-canopy"
       role="region"
       aria-label="산재 상담 챗봇"
     >
-      <div className="flex items-center gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-5 md:mb-6">
-        <RiuIcon variant="question" size={40} className="sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" aria-hidden="true" />
-        <div className="flex flex-col gap-1 md:gap-1.5">
-          <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground">산재 전문 노무사에게 질문하세요</h2>
-          <p className="text-xs sm:text-sm md:text-base text-muted-foreground">
-            실제 상담사와 연결되기 전, 궁금한 점을 빠르게 알아보세요.
-          </p>
-        </div>
+      <div className="mb-4 sm:mb-5 md:mb-6">
+        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground">
+          산재 규정과 사례를 학습한 챗봇입니다
+        </p>
       </div>
 
       <div className="space-y-2 sm:space-y-3 md:space-y-4 mb-4 sm:mb-5 md:mb-6">
@@ -350,7 +345,7 @@ export default function RagChatbot() {
         aria-label="질문 입력 폼"
       >
         <Textarea
-          placeholder="예: 요양급여가 뭔가요? 산업재해 신청은 어떻게 하나요?"
+          placeholder=""
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           disabled={loading}
@@ -431,7 +426,7 @@ export default function RagChatbot() {
           aria-atomic="false"
         >
           {[...messages].reverse().map((message, index) => {
-            const baseClasses = 'p-3 sm:p-4 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl border shadow-leaf text-sm sm:text-base md:text-lg';
+            const baseClasses = 'p-3 sm:p-4 md:p-5 lg:p-6 rounded-lg sm:rounded-lg border shadow-leaf text-sm sm:text-base md:text-lg';
             const userClasses = 'bg-accent/10 border-accent/30 text-foreground';
             const assistantClasses =
               'bg-[var(--background-alt)] border-[var(--border-light)] text-foreground prose prose-sm md:prose-base max-w-none';

@@ -102,10 +102,10 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: 0.75rem; /* 12px */
-  --radius-md: 1rem; /* 16px (rounded-2xl) */
-  --radius-lg: 1.25rem; /* 20px */
-  --radius-xl: 1.5rem; /* 24px */
+  --radius-sm: 0.25rem; /* 4px - 각진 모서리 */
+  --radius-md: 0.375rem; /* 6px - 더 각진 모서리 */
+  --radius-lg: 0.5rem; /* 8px - 약간의 둥근 모서리 */
+  --radius-xl: 0.75rem; /* 12px - 중간 둥근 모서리 */
   /* Warm & Rounded 배경색 */
   --color-background-hex: #FFFCF5;
   --color-background-alt: #F5F9F6;
@@ -121,7 +121,7 @@
 
 :root {
   /* Premium & High Contrast 테마 (중장년층 가독성 강화) */
-  --radius: 0.5rem; /* 8px - 너무 둥글지 않은 단단한 느낌 */
+  --radius: 0.25rem; /* 4px - 각진 모서리로 전문성 강화 */
   --background: #FFFFFF; /* 순백색 배경 - 텍스트 대비 최대화 */
   --background-alt: #F3F4F6; /* 섹션 구분용 연회색 배경 */
   --foreground: #111827; /* Almost Black - 본문 텍스트 */
@@ -177,6 +177,19 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* 전역 오버플로우 보호 (모바일 가로 스크롤 방지) */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+iframe {
+  max-width: 100%;
+  display: block;
 }
 
 .dark {
@@ -293,7 +306,7 @@
   }
   
   .text-senior-title {
-    @apply text-[26px] md:text-[32px] font-bold text-[#14532D] tracking-tight;
+    @apply text-[26px] md:text-[48px] font-bold text-[#14532D] tracking-tight;
   }
 
   .btn-touch-target {
@@ -402,5 +415,17 @@
   /* Berry card - 면책 조항 및 중요 정보용 */
   .berry-card {
     background: linear-gradient(135deg, rgba(255, 213, 79, 0.25), rgba(255, 252, 245, 0.9));
+  }
+
+  /* 네이버 지도 스케일바를 우측 하단으로 이동 */
+  /* 숫자 배지에 영향을 주지 않도록 더 구체적인 선택자 사용 */
+  .nmap_scale,
+  div[class*="scale"]:not(.step-number-badge) {
+    position: absolute !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    left: auto !important;
+    top: auto !important;
+    transform: translateX(0) !important;
   }
 }

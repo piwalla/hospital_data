@@ -11,7 +11,7 @@
 import { useState, useEffect } from 'react';
 import { X, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import VideoGuideButton from './VideoGuideButton';
 
 const STORAGE_KEY = 'timeline-first-visit-dismissed';
 
@@ -48,9 +48,10 @@ export default function FirstVisitBanner() {
           <p className="text-base sm:text-lg font-semibold text-foreground mb-1">
             처음이신가요?
           </p>
-          <p className="text-base sm:text-base text-[#374151] leading-relaxed">
+          <p className="text-base sm:text-base text-[#374151] leading-relaxed mb-3">
             아래 단계를 순서대로 확인해보세요. 각 단계에서 해야 할 일, 필요한 서류, 주의사항을 확인할 수 있습니다.
           </p>
+          <VideoGuideButton size="sm" />
         </div>
         <Button
           variant="ghost"

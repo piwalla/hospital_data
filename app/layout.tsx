@@ -38,12 +38,12 @@ export default function RootLayout({
             href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
           />
         </head>
-        <body className="antialiased">
+        <body className="antialiased w-full max-w-full overflow-x-hidden">
           <SyncUserProvider>
-            <div className="flex flex-col min-h-screen">
+            <div className="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
               <Navbar />
               <ResponsiveNavigation />
-              <main className="flex-1 pb-16 md:pb-0">{children}</main>
+              <main className="flex-1 pb-16 md:pb-0 w-full max-w-full overflow-x-hidden min-w-0">{children}</main>
             </div>
           </SyncUserProvider>
         </body>

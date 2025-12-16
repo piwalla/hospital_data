@@ -63,7 +63,7 @@ const documentIconColors: Record<string, string> = {
 export default function DocumentsList() {
   return (
     <div 
-      className="leaf-section rounded-2xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-3 sm:p-4 md:p-6"
+      className="leaf-section rounded-lg border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-3 sm:p-4 md:p-6"
       role="region"
       aria-label="서류 목록"
     >
@@ -81,7 +81,7 @@ export default function DocumentsList() {
             <div
               key={document.id}
               className={cn(
-                'group relative bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-5 md:p-6',
+                'group relative bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-5 md:p-6',
                 'hover:border-primary transition-all duration-200',
                 'text-left w-full h-full flex flex-col',
                 'shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]'
@@ -91,7 +91,7 @@ export default function DocumentsList() {
               {/* 배경 그라데이션 */}
               <div
                 className={cn(
-                  'absolute inset-0 rounded-2xl bg-gradient-to-br',
+                  'absolute inset-0 rounded-lg bg-gradient-to-br',
                   gradient
                 )}
               />
@@ -113,7 +113,7 @@ export default function DocumentsList() {
                 </div>
 
                 {/* 서류명 */}
-                <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                <h3 className="text-base sm:text-lg md:text-[27px] font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
                   {document.name}
                 </h3>
 
@@ -127,10 +127,10 @@ export default function DocumentsList() {
                   asChild
                   variant="outline"
                   className="w-full mt-auto"
-                  aria-label={`${document.name} 작성방법 보기`}
+                  aria-label={`${document.name} 자세히 보기`}
                 >
                   <Link href={`/documents/${document.id}`}>
-                    <span className="text-xs sm:text-sm">작성방법 보기</span>
+                    <span className="text-base sm:text-lg font-bold">자세히 보기</span>
                   </Link>
                 </Button>
               </div>

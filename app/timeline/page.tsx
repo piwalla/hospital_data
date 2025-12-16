@@ -2,6 +2,7 @@ import { getAllStagesWithDetails } from '@/lib/api/timeline';
 import LegalNotice from '@/components/timeline/LegalNotice';
 import TimelineContainer from '@/components/timeline/TimelineContainer';
 import FirstVisitBanner from '@/components/timeline/FirstVisitBanner';
+import VideoGuideButton from '@/components/timeline/VideoGuideButton';
 
 /**
  * @file page.tsx
@@ -37,13 +38,17 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
   return (
     <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12 max-w-7xl space-y-8 sm:space-y-10 md:space-y-16">
       {/* 페이지 헤더 */}
-      <div>
-        <h1 className="text-senior-title">
-          산재 진행 과정
+      <div className="text-center relative">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
+          산재 어떻게 진행하나요?
         </h1>
         <p className="mt-4 sm:mt-6 text-senior-body text-muted-foreground">
           산재 신청 부터 치료, 복귀까지 한번에 살펴보세요
         </p>
+        {/* 비디오 가이드 버튼 - 항상 접근 가능, 우측 정렬 */}
+        <div className="mt-4 sm:mt-6 flex justify-end">
+          <VideoGuideButton>전체 과정 영상 보기</VideoGuideButton>
+        </div>
       </div>
 
       {/* 첫 방문 안내 배너 */}

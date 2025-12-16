@@ -31,6 +31,9 @@ declare global {
         InfoWindow: new (options: any) => any;
         Position: {
           TOP_RIGHT: any;
+          RIGHT_BOTTOM: any;
+          BOTTOM_LEFT: any;
+          BOTTOM_RIGHT: any;
         };
         Event: {
           addListener: (target: any, event: string, handler: () => void) => void;
@@ -186,12 +189,99 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         zoomControlOptions: {
           position: window.naver.maps.Position.TOP_RIGHT,
         },
+        scaleControl: false, // 기본 스케일바 비활성화 (커스텀 스케일바 사용)
       });
 
       console.log('[HospitalMap] 지도 생성 성공');
 
       // 지도 인스턴스 저장
       mapInstanceRef.current = map;
+
+      // 커스텀 스케일바 생성 (우측 하단)
+      const createCustomScaleControl = () => {
+        if (!mapRef.current) return;
+        
+        // 기존 커스텀 스케일바가 있으면 제거
+        const existingScale = mapRef.current.querySelector('.custom-scale-control');
+        if (existingScale) {
+          existingScale.remove();
+        }
+        
+        // 커스텀 스케일바 컨테이너 생성
+        const scaleContainer = document.createElement('div');
+        scaleContainer.className = 'custom-scale-control';
+        scaleContainer.style.cssText = `
+          position: absolute;
+          right: 10px;
+          bottom: 10px;
+          z-index: 1000;
+          background: rgba(255, 255, 255, 0.9);
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 11px;
+          font-weight: 500;
+          color: #333;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          pointer-events: none;
+          user-select: none;
+        `;
+        
+        // 스케일 업데이트 함수
+        const updateScale = () => {
+          if (!map) return;
+          
+          const zoom = map.getZoom();
+          const center = map.getCenter();
+          const bounds = map.getBounds();
+          
+          // 지도 중심에서 좌우 경계까지의 거리 계산
+          const ne = bounds.getNE();
+          const sw = bounds.getSW();
+          const centerLng = center.lng();
+          const neLng = ne.lng();
+          const swLng = sw.lng();
+          
+          // 경도 차이를 거리로 변환 (대략적인 계산)
+          const lngDiff = Math.max(Math.abs(neLng - centerLng), Math.abs(centerLng - swLng));
+          const lat = center.lat();
+          const metersPerDegree = 111320 * Math.cos(lat * Math.PI / 180);
+          const distanceMeters = lngDiff * metersPerDegree;
+          
+          // 표시할 거리 포맷팅
+          let scaleText = '';
+          if (distanceMeters < 1000) {
+            // 100m 단위로 반올림
+            const rounded = Math.round(distanceMeters / 100) * 100;
+            scaleText = `${rounded}m`;
+          } else {
+            // km 단위
+            const km = (distanceMeters / 1000).toFixed(1);
+            scaleText = `${km}km`;
+          }
+          
+          scaleContainer.textContent = scaleText;
+        };
+        
+        // 초기 스케일 설정
+        updateScale();
+        
+        // 지도 zoom 변경 시 스케일 업데이트
+        window.naver.maps.Event.addListener(map, 'zoom_changed', updateScale);
+        window.naver.maps.Event.addListener(map, 'bounds_changed', updateScale);
+        window.naver.maps.Event.addListener(map, 'dragend', updateScale);
+        
+        // 지도 컨테이너에 추가
+        mapRef.current.appendChild(scaleContainer);
+        console.log('[HospitalMap] 커스텀 스케일바 생성 완료');
+      };
+      
+      // 지도 로드 후 커스텀 스케일바 생성
+      setTimeout(createCustomScaleControl, 500);
+      
+      // 지도 타입 변경 시에도 스케일 업데이트
+      window.naver.maps.Event.addListener(map, 'maptypeid_changed', () => {
+        setTimeout(createCustomScaleControl, 100);
+      });
 
       // 지도 클릭 시 InfoWindow 닫기
       window.naver.maps.Event.addListener(map, 'click', () => {
@@ -669,11 +759,13 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   }
 
   return (
-    <div
-      ref={mapRef}
-      className="w-full rounded-lg border border-gray-200"
-      style={{ height: '500px' }}
-    />
+    <div className="relative w-full rounded-lg border border-gray-200" style={{ height: '500px' }}>
+      <div
+        ref={mapRef}
+        className="w-full h-full relative"
+        style={{ height: '500px' }}
+      />
+    </div>
   );
 };
 

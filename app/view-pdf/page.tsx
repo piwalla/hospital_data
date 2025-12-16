@@ -12,9 +12,9 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Download, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
-export default function ViewPdfPage() {
+function ViewPdfContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -94,7 +94,7 @@ export default function ViewPdfPage() {
 
       {/* PDF 뷰어 */}
       <div className="container mx-auto px-4 py-4 sm:py-6 max-w-7xl">
-        <div className="bg-white rounded-2xl shadow-canopy overflow-hidden">
+        <div className="bg-white rounded-lg shadow-canopy overflow-hidden">
           <iframe
             src={`${pdfUrl}#toolbar=1`}
             className="w-full h-[calc(100vh-120px)] sm:h-[calc(100vh-140px)] md:h-[calc(100vh-160px)]"
@@ -104,6 +104,20 @@ export default function ViewPdfPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ViewPdfPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="text-center">
+          <p className="text-muted-foreground">PDF를 불러오는 중...</p>
+        </div>
+      </div>
+    }>
+      <ViewPdfContent />
+    </Suspense>
   );
 }
 

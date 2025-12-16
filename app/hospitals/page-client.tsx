@@ -54,6 +54,12 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
   const [radiusKm, setRadiusKm] = useState<number>(5); // 반경 선택 (기본값: 5km)
   const [activeFilter, setActiveFilter] = useState<FilterType>('all'); // 필터 상태 추가
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]); // 진료과목 필터 상태
+  const [initialInstitutionCount, setInitialInstitutionCount] = useState<number | null>(null); // 초기 검색 결과 개수 저장
+  const [initialCounts, setInitialCounts] = useState<{
+    hospital: number;
+    pharmacy: number;
+    rehabilitation: number;
+  } | null>(null); // 초기 검색 결과 상세 개수 저장
   const [searchMode, setSearchMode] = useState<SearchMode>('location'); // 검색 모드: 'location' | 'region'
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false); // 고급 필터 표시 여부
   const [selectedRegion, setSelectedRegion] = useState<RegionSelection>({
@@ -196,6 +202,23 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
             
             setHospitals(nearbyHospitals);
             setRehabilitationCenters(nearbyRehabilitationCenters);
+            
+            // 초기 검색 결과 개수 저장 (한 번만 저장)
+            if (initialInstitutionCount === null) {
+              const hospitalCount = nearbyHospitals.filter(h => h.type === 'hospital').length;
+              const pharmacyCount = nearbyHospitals.filter(h => h.type === 'pharmacy').length;
+              const rehabilitationCount = nearbyRehabilitationCenters.length;
+              const totalCount = hospitalCount + pharmacyCount + rehabilitationCount;
+              
+              setInitialInstitutionCount(totalCount);
+              setInitialCounts({
+                hospital: hospitalCount,
+                pharmacy: pharmacyCount,
+                rehabilitation: rehabilitationCount,
+              });
+              console.log(`[HospitalsPage] 초기 검색 결과 개수 저장: ${totalCount}개 (병원: ${hospitalCount}, 약국: ${pharmacyCount}, 재활기관: ${rehabilitationCount})`);
+            }
+            
             console.log(`[HospitalsPage] 반경 ${radiusKm}km 내 병원:`, nearbyHospitals.length, '개, 재활기관:', nearbyRehabilitationCenters.length, '개');
             
             // 병원과 재활기관이 모두 없어도 정상 (지도 이동 시 다시 검색됨)
@@ -407,59 +430,92 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
       <div className="container mx-auto px-4 pt-4 pb-2">
         {/* 최상단 멘트 */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-primary text-center">
-            산재 기관을 한번에 확인하세요
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-primary text-center leading-tight">
+            어디서 치료받을 수 있나요?
           </h1>
+          {userLocation && searchMode === 'location' && initialInstitutionCount !== null && initialCounts && (
+            <div className="mt-4 space-y-3">
+              <p className="text-lg text-foreground text-center">
+                주변 <span className="font-bold text-red-600 text-xl">{initialInstitutionCount}</span>개 기관에서 치료 받을 수 있습니다.
+              </p>
+              
+              {/* 상세 개수 표시 */}
+              <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                {initialCounts.hospital > 0 && (
+                  <button
+                    onClick={() => {
+                      // 병원 필터 토글: 이미 병원 필터가 활성화되어 있으면 전체로, 아니면 병원으로
+                      if (activeFilter === 'hospital') {
+                        handleFilterChange('all');
+                      } else {
+                        handleFilterChange('hospital');
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      activeFilter === 'hospital'
+                        ? 'bg-primary text-primary-foreground font-semibold'
+                        : 'bg-white border border-[var(--border-medium)] text-foreground hover:bg-primary/10 hover:border-primary'
+                    }`}
+                  >
+                    병원 <span className="font-bold">{initialCounts.hospital}</span>개
+                  </button>
+                )}
+                {initialCounts.pharmacy > 0 && (
+                  <button
+                    onClick={() => {
+                      // 약국 필터 토글: 이미 약국 필터가 활성화되어 있으면 전체로, 아니면 약국으로
+                      if (activeFilter === 'pharmacy') {
+                        handleFilterChange('all');
+                      } else {
+                        handleFilterChange('pharmacy');
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      activeFilter === 'pharmacy'
+                        ? 'bg-primary text-primary-foreground font-semibold'
+                        : 'bg-white border border-[var(--border-medium)] text-foreground hover:bg-primary/10 hover:border-primary'
+                    }`}
+                  >
+                    약국 <span className="font-bold">{initialCounts.pharmacy}</span>개
+                  </button>
+                )}
+                {initialCounts.rehabilitation > 0 && (
+                  <button
+                    onClick={() => {
+                      // 재활기관 필터 토글: 이미 재활기관 필터가 활성화되어 있으면 전체로, 아니면 job-training으로
+                      if (activeFilter === 'job-training' || activeFilter === 'sports-rehab') {
+                        handleFilterChange('all');
+                      } else {
+                        handleFilterChange('job-training');
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      activeFilter === 'job-training' || activeFilter === 'sports-rehab'
+                        ? 'bg-primary text-primary-foreground font-semibold'
+                        : 'bg-white border border-[var(--border-medium)] text-foreground hover:bg-primary/10 hover:border-primary'
+                    }`}
+                  >
+                    재활기관 <span className="font-bold">{initialCounts.rehabilitation}</span>개
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
         
-        {/* 간소화된 필터 영역 */}
-        <div className="flex flex-wrap items-center gap-4 mb-4">
-          {/* 기본 필터: 기관 유형만 간단하게 표시 */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => handleFilterChange('all')}
-              className={`text-sm font-medium px-3 py-1.5 transition-colors ${
-                activeFilter === 'all'
-                  ? 'text-primary font-semibold font-brand'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              전체
-            </button>
-            <button
-              onClick={() => handleFilterChange('hospital')}
-              className={`text-sm font-medium px-3 py-1.5 transition-colors ${
-                activeFilter === 'hospital'
-                  ? 'text-primary font-semibold font-brand'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              병원
-            </button>
-            <button
-              onClick={() => handleFilterChange('pharmacy')}
-              className={`text-sm font-medium px-3 py-1.5 transition-colors ${
-                activeFilter === 'pharmacy'
-                  ? 'text-primary font-semibold font-brand'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              약국
-            </button>
-          </div>
-
-          {/* 고급 필터 토글 버튼 */}
+        {/* 더 자세한 조건으로 검색하기 메뉴 */}
+        <div className="mb-4">
           <button
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className="text-sm text-[#555555] hover:text-[#1C1C1E] px-3 py-1.5 transition-colors flex items-center gap-1"
+            className="w-full sm:w-auto px-5 py-3 rounded-lg text-base font-semibold transition-all duration-200 border-2 bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md flex items-center justify-center gap-2"
           >
-            <span>필터</span>
+            <span>더 자세한 조건으로 검색하기</span>
             <svg 
-              className={`w-4 h-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 transition-transform duration-200 ${showAdvancedFilters ? 'rotate-180' : ''}`}
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
-              strokeWidth={1.75}
+              strokeWidth={2}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
@@ -468,117 +524,161 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
 
         {/* 고급 필터 영역 (접을 수 있음) */}
         {showAdvancedFilters && (
-          <div className="mb-4 pb-4 border-b border-[#E8F5E9] space-y-4">
-            {/* 검색 모드 선택 */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <button
-                onClick={() => handleSearchModeChange('location')}
-                className={`text-sm px-3 py-1.5 transition-colors ${
-                  searchMode === 'location'
-                    ? 'text-primary font-semibold'
-                    : 'text-[#555555] font-medium hover:text-[#1C1C1E]'
-                }`}
-              >
-                내 위치 주변
-              </button>
-              <button
-                onClick={() => handleSearchModeChange('region')}
-                className={`text-sm px-3 py-1.5 transition-colors ${
-                  searchMode === 'region'
-                    ? 'text-primary font-semibold'
-                    : 'text-[#555555] font-medium hover:text-[#1C1C1E]'
-                }`}
-              >
-                지역 선택
-              </button>
-            </div>
-
-            {/* 검색 모드에 따른 UI */}
-            {searchMode === 'location' ? (
-              <div className="flex items-center gap-3 flex-wrap">
+          <div className="mb-6 p-6 bg-gradient-to-br from-white to-[#F8F9FA] border border-[var(--border-light)] rounded-lg shadow-sm space-y-8">
+            {/* 1. 내 위치 주변 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
+                <h3 className="text-base font-bold text-foreground">내 위치 주변</h3>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap pl-8">
                 {[5, 10, 15, 30].map((radius) => (
                   <button
                     key={radius}
-                    onClick={() => handleRadiusChange(radius)}
-                    className={`text-sm px-3 py-1.5 transition-colors ${
-                      radiusKm === radius
-                        ? 'text-primary font-semibold'
-                        : 'text-[#555555] font-medium hover:text-[#1C1C1E]'
+                    onClick={() => {
+                      handleSearchModeChange('location');
+                      handleRadiusChange(radius);
+                    }}
+                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                      radiusKm === radius && searchMode === 'location'
+                        ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                        : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
                     }`}
                   >
                     {radius}km
                   </button>
                 ))}
               </div>
-            ) : (
-              <div>
-                <RegionSelector
-                  value={selectedRegion}
-                  onChange={handleRegionChange}
-                  onRegionChange={handleRegionCoordinatesChange}
-                />
-              </div>
-            )}
-
-            {/* 재활기관 필터 */}
-            <div className="flex items-center gap-3 flex-wrap">
-              <button
-                onClick={() => handleFilterChange('job-training')}
-                className={`text-sm px-3 py-1.5 transition-colors ${
-                  activeFilter === 'job-training'
-                    ? 'text-primary font-semibold'
-                    : 'text-[#555555] font-medium hover:text-[#1C1C1E]'
-                }`}
-              >
-                직업훈련기관
-              </button>
-              <button
-                onClick={() => handleFilterChange('sports-rehab')}
-                className={`text-sm px-3 py-1.5 transition-colors ${
-                  activeFilter === 'sports-rehab'
-                    ? 'text-primary font-semibold'
-                    : 'text-[#555555] font-medium hover:text-[#1C1C1E]'
-                }`}
-              >
-                재활스포츠기관
-              </button>
             </div>
 
-            {/* 진료과목 필터 (병원 필터일 때만 표시) */}
+            {/* 구분선 */}
+            <div className="border-t border-[var(--border-light)]"></div>
+
+            {/* 2. 지역 선택 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
+                <h3 className="text-base font-bold text-foreground">지역 선택</h3>
+              </div>
+              <div className="pl-8">
+                <button
+                  onClick={() => handleSearchModeChange('region')}
+                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                    searchMode === 'region'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                      : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
+                  }`}
+                >
+                  지역 선택하기
+                </button>
+                {searchMode === 'region' && (
+                  <div className="mt-4">
+                    <RegionSelector
+                      value={selectedRegion}
+                      onChange={handleRegionChange}
+                      onRegionChange={handleRegionCoordinatesChange}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 구분선 */}
+            <div className="border-t border-[var(--border-light)]"></div>
+
+            {/* 3. 종류 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
+                <h3 className="text-base font-bold text-foreground">종류</h3>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap pl-8">
+                <button
+                  onClick={() => handleFilterChange('hospital')}
+                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                    activeFilter === 'hospital'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                      : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
+                  }`}
+                >
+                  병원
+                </button>
+                <button
+                  onClick={() => handleFilterChange('pharmacy')}
+                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                    activeFilter === 'pharmacy'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                      : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
+                  }`}
+                >
+                  약국
+                </button>
+                <button
+                  onClick={() => handleFilterChange('sports-rehab')}
+                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                    activeFilter === 'sports-rehab'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                      : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
+                  }`}
+                >
+                  재활스포츠기관
+                </button>
+                <button
+                  onClick={() => handleFilterChange('job-training')}
+                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                    activeFilter === 'job-training'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                      : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
+                  }`}
+                >
+                  직업훈련기관
+                </button>
+              </div>
+            </div>
+
+            {/* 4. 병원 종류 (병원 필터일 때만 표시) */}
             {(activeFilter === 'hospital' || activeFilter === 'all') && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-3 flex-wrap">
-                  {DEPARTMENT_OPTIONS.slice(0, 4).map((dept) => (
-                    <button
-                      key={dept.value}
-                      onClick={() => toggleDepartment(dept.value)}
-                      className={`text-sm px-3 py-1.5 transition-colors ${
-                        selectedDepartments.includes(dept.value)
-                          ? 'text-primary font-semibold'
-                          : 'text-[#555555] font-medium hover:text-[#1C1C1E]'
-                      }`}
-                    >
-                      {dept.label}
-                    </button>
-                  ))}
-                  {/* 더보기 버튼 (나머지 진료과목) */}
-                  {DEPARTMENT_OPTIONS.length > 4 && (
-                    <div className="relative group">
+              <>
+                {/* 구분선 */}
+                <div className="border-t border-[var(--border-light)]"></div>
+                
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">4</span>
+                    <h3 className="text-base font-bold text-foreground">병원 종류</h3>
+                  </div>
+                  <div className="flex items-center gap-3 flex-wrap pl-8">
+                    {DEPARTMENT_OPTIONS.slice(0, 4).map((dept) => (
                       <button
-                        className="text-sm px-3 py-1.5 text-[#555555] font-medium hover:text-[#1C1C1E] transition-colors"
-                        aria-label="더보기 진료과목"
+                        key={dept.value}
+                        onClick={() => toggleDepartment(dept.value)}
+                        className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                          selectedDepartments.includes(dept.value)
+                            ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
+                            : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
+                        }`}
                       >
-                        더보기
+                        {dept.label}
                       </button>
-                      {/* 드롭다운 메뉴 (호버 시 표시) */}
-                      <div className="absolute top-full left-0 mt-1 bg-white border border-[var(--border-light)] rounded-2xl p-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 min-w-[140px] shadow-canopy">
-                        {DEPARTMENT_OPTIONS.slice(4).map((dept) => (
-                          <button
-                            key={dept.value}
-                            onClick={() => toggleDepartment(dept.value)}
-                            className={`w-full text-left text-sm px-3 py-2 rounded-2xl hover:bg-[var(--background-alt)] transition-colors ${
-                              selectedDepartments.includes(dept.value) ? 'bg-primary/10 text-primary font-semibold' : 'text-foreground'
-                            }`}
+                    ))}
+                    {/* 더보기 버튼 (나머지 진료과목) */}
+                    {DEPARTMENT_OPTIONS.length > 4 && (
+                      <div className="relative group">
+                        <button
+                          className="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105"
+                          aria-label="더보기 진료과목"
+                        >
+                          더보기
+                        </button>
+                        {/* 드롭다운 메뉴 (호버 시 표시) */}
+                        <div className="absolute top-full left-0 mt-2 bg-white border-2 border-[var(--border-light)] rounded-lg p-3 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 min-w-[160px] shadow-lg">
+                          {DEPARTMENT_OPTIONS.slice(4).map((dept) => (
+                            <button
+                              key={dept.value}
+                              onClick={() => toggleDepartment(dept.value)}
+                              className={`w-full text-left text-sm px-4 py-2.5 rounded-lg hover:bg-[var(--background-alt)] transition-colors font-medium ${
+                                selectedDepartments.includes(dept.value) ? 'bg-primary/10 text-primary font-semibold' : 'text-foreground'
+                              }`}
                           >
                             {dept.label}
                           </button>
@@ -586,18 +686,21 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       </div>
                     </div>
                   )}
+                  </div>
+                  {/* 선택된 진료과목 초기화 버튼 */}
+                  {selectedDepartments.length > 0 && (
+                    <div className="pl-8 pt-2">
+                      <button
+                        onClick={() => setSelectedDepartments([])}
+                        className="text-sm text-muted-foreground hover:text-primary underline transition-colors"
+                        aria-label="진료과목 필터 초기화"
+                      >
+                        선택 초기화
+                      </button>
+                    </div>
+                  )}
                 </div>
-                {/* 선택된 진료과목 초기화 버튼 */}
-                {selectedDepartments.length > 0 && (
-                  <button
-                    onClick={() => setSelectedDepartments([])}
-                    className="text-sm text-muted-foreground hover:text-primary underline transition-colors"
-                    aria-label="진료과목 필터 초기화"
-                  >
-                    선택 초기화
-                  </button>
-                )}
-              </div>
+              </>
             )}
           </div>
         )}
@@ -620,7 +723,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
             
             {/* 선택된 병원/재활기관 정보 패널 (지도 아래) */}
             {(selectedHospital || selectedRehabilitationCenter) && (
-              <div className="mt-4 bg-white rounded-2xl border border-[var(--border-light)] p-6 shadow-canopy">
+              <div className="mt-4 bg-white rounded-lg border border-[var(--border-light)] p-6 shadow-canopy">
                 {selectedHospital && (
                   <>
                     <div className="flex items-start justify-between mb-4">
@@ -835,7 +938,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
           
           {/* 모바일: 목록이 하단, 데스크톱: 목록이 좌측 */}
           <div className="lg:col-span-1 order-2 lg:order-1">
-            <div className="leaf-section bg-white rounded-2xl border border-[var(--border-light)] p-6 shadow-canopy flex flex-col" style={{ height: '500px' }}>
+            <div className="leaf-section bg-white rounded-lg border border-[var(--border-light)] p-6 shadow-canopy flex flex-col" style={{ height: '500px' }}>
               <h2 className="text-[22px] font-semibold mb-4 flex-shrink-0">
                 {searchMode === 'location' ? (
                   userLocation ? (
@@ -857,66 +960,6 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                   )
                 )}
               </h2>
-              {userLocation && (
-                <div className="text-sm text-muted-foreground mb-3 flex flex-wrap gap-x-3 gap-y-1 flex-shrink-0 items-center">
-                  {activeFilter !== 'all' && (
-                    <button
-                      onClick={() => handleFilterChange('all')}
-                      className="text-primary font-semibold hover:underline transition-colors cursor-pointer"
-                    >
-                      ← 전체
-                    </button>
-                  )}
-                  {hospitals.filter(h => h.type === 'hospital').length > 0 && (
-                    <button
-                      onClick={() => handleFilterChange('hospital')}
-                      className={`transition-colors cursor-pointer ${
-                        activeFilter === 'hospital'
-                          ? 'text-primary font-semibold'
-                          : 'hover:text-primary hover:font-semibold'
-                      }`}
-                    >
-                      병원 {hospitals.filter(h => h.type === 'hospital').length}개
-                    </button>
-                  )}
-                  {hospitals.filter(h => h.type === 'pharmacy').length > 0 && (
-                    <button
-                      onClick={() => handleFilterChange('pharmacy')}
-                      className={`transition-colors cursor-pointer ${
-                        activeFilter === 'pharmacy'
-                          ? 'text-primary font-semibold'
-                          : 'hover:text-primary hover:font-semibold'
-                      }`}
-                    >
-                      약국 {hospitals.filter(h => h.type === 'pharmacy').length}개
-                    </button>
-                  )}
-                  {rehabilitationCenters.filter(c => c.gigwan_fg_nm === '직업훈련기관').length > 0 && (
-                    <button
-                      onClick={() => handleFilterChange('job-training')}
-                      className={`transition-colors cursor-pointer ${
-                        activeFilter === 'job-training'
-                          ? 'text-primary font-semibold'
-                          : 'hover:text-primary hover:font-semibold'
-                      }`}
-                    >
-                      직업훈련 {rehabilitationCenters.filter(c => c.gigwan_fg_nm === '직업훈련기관').length}개
-                    </button>
-                  )}
-                  {rehabilitationCenters.filter(c => c.gigwan_fg_nm === '재활스포츠기관').length > 0 && (
-                    <button
-                      onClick={() => handleFilterChange('sports-rehab')}
-                      className={`transition-colors cursor-pointer ${
-                        activeFilter === 'sports-rehab'
-                          ? 'text-primary font-semibold'
-                          : 'hover:text-primary hover:font-semibold'
-                      }`}
-                    >
-                      재활스포츠 {rehabilitationCenters.filter(c => c.gigwan_fg_nm === '재활스포츠기관').length}개
-                    </button>
-                  )}
-                </div>
-              )}
               {isFiltering && (
                 <div className="mb-4 text-sm text-[#555555] flex-shrink-0">
                   🔄 위치 기반 필터링 중...
@@ -943,7 +986,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       <div
                         key={hospital.id}
                         onClick={() => handleHospitalClick(hospital)}
-                        className="p-3 border border-[var(--border-light)] rounded-2xl hover:border-primary transition-all cursor-pointer shadow-leaf hover:shadow-canopy"
+                        className="p-3 border border-[var(--border-light)] rounded-lg hover:border-primary transition-all cursor-pointer shadow-leaf hover:shadow-canopy"
                       >
                         <div className="flex items-start justify-between mb-1">
                           <h3 className="font-semibold text-sm flex-1 text-[#1C1C1E]">{hospital.name}</h3>
@@ -977,7 +1020,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       <div
                         key={center.id}
                         onClick={() => handleRehabilitationCenterClick(center)}
-                        className="p-3 border border-[var(--border-light)] rounded-2xl hover:border-[var(--color-rehabilitation)] transition-all cursor-pointer shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                        className="p-3 border border-[var(--border-light)] rounded-lg hover:border-[var(--color-rehabilitation)] transition-all cursor-pointer shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
                       >
                         <div className="flex items-start justify-between mb-1">
                           <h3 className="font-semibold text-sm flex-1 text-[#1C1C1E]">{center.name}</h3>

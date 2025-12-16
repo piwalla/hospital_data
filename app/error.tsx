@@ -33,7 +33,7 @@ export default function Error({ error, reset }: ErrorProps) {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-2xl">
-      <div className="leaf-section rounded-2xl border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 sm:p-8">
+      <div className="leaf-section rounded-lg border border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 sm:p-8">
         <div className="flex flex-col items-center text-center space-y-4">
           <RiuIcon variant="question" size={64} className="text-muted-foreground" aria-hidden="true" />
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">

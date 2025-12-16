@@ -115,7 +115,7 @@ export default function FavoritesPageClient({
                   return (
                     <div
                       key={favorite.id}
-                      className="bg-white rounded-2xl border border-[#E8F5E9] p-6 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
+                      className="bg-white rounded-lg border border-[#E8F5E9] p-6 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
@@ -225,7 +225,7 @@ export default function FavoritesPageClient({
                   return (
                     <div
                       key={favorite.id}
-                      className="bg-white rounded-2xl border border-[#E8F5E9] p-6 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
+                      className="bg-white rounded-lg border border-[#E8F5E9] p-6 shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">

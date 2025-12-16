@@ -41,7 +41,7 @@ const ResponsiveNavigation = () => {
     <>
       {/* 모바일 전용: 하단 탭 바 (< 768px) */}
       <nav 
-        className="fixed bottom-0 left-0 right-0 bg-[var(--background)]/98 backdrop-blur-sm border-t border-[var(--border-light)] z-50 md:hidden safe-area-inset-bottom shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+        className="fixed bottom-0 left-0 right-0 bg-primary border-t border-primary/20 z-[2000] md:hidden safe-area-inset-bottom shadow-lg"
         data-testid="mobile-navigation"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-around h-16 relative">
@@ -56,23 +56,19 @@ const ResponsiveNavigation = () => {
                 className={cn(
                   "flex flex-col items-center justify-center gap-1.5 flex-1 h-full transition-all duration-200 ease-in-out relative",
                   isActive
-                    ? "text-primary bg-primary/10"
-                    : "text-[#555555] active:text-[#1C1C1E] active:scale-95"
+                    ? "text-primary bg-white/20"
+                    : "text-white/80 active:text-white active:scale-95"
                 )}
               >
-                {/* 상단 인디케이터 */}
-                {isActive && (
-                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-primary" />
-                )}
                 <Icon
                   className={cn(
                     "transition-all duration-200",
-                    isActive ? "w-7 h-7 scale-110" : "w-6 h-6"
+                    isActive ? "w-7 h-7 scale-110 text-white" : "w-6 h-6"
                   )}
                 />
                 <span className={cn(
-                  "text-xs transition-all duration-200",
-                  isActive ? "font-bold font-brand" : "font-medium"
+                  "text-xs transition-all duration-200 text-white",
+                  isActive ? "font-bold" : "font-medium"
                 )}>{tab.label}</span>
               </Link>
             );

@@ -31,19 +31,17 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--background)]/95 backdrop-blur-sm border-b border-[var(--border-light)] shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+    <header className="sticky top-0 z-[2000] bg-primary border-b border-primary/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link 
             href="/" 
-            className="flex items-center gap-2 text-2xl font-bold text-foreground hover:text-primary transition-colors duration-200"
+            className="flex items-center gap-2 text-xl font-bold text-white transition-opacity duration-200 hover:opacity-90"
             style={{ fontFamily: 'Paperozi, sans-serif', fontWeight: 700 }}
           >
-            <img 
-              src="/파이왈라_마크-removebg-preview.png" 
-              alt="파이왈라 마크" 
-              className="w-8 h-8 object-contain"
-            />
+            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+              <span className="text-black text-lg font-bold">π</span>
+            </div>
             리워크케어
           </Link>
           
@@ -59,8 +57,8 @@ const Navbar = () => {
                   className={cn(
                     "text-sm transition-colors duration-200 ease-in-out",
                     isActive
-                      ? "text-primary font-semibold font-brand"
-                      : "text-[#555555] hover:text-[#1C1C1E]"
+                      ? "text-white font-semibold"
+                      : "text-white/80 hover:text-white"
                   )}
                 >
                   {tab.label}
@@ -72,7 +70,7 @@ const Navbar = () => {
           <div className="flex gap-4 items-center">
             <SignedOut>
               <SignInButton mode="modal">
-                <Button className="font-medium">로그인</Button>
+                <Button className="font-medium bg-white text-primary hover:bg-white/90">로그인</Button>
               </SignInButton>
             </SignedOut>
             <SignedIn>
@@ -81,22 +79,28 @@ const Navbar = () => {
                 className={cn(
                   "flex items-center gap-2 text-sm transition-colors duration-200 ease-in-out",
                   pathname === "/favorites"
-                    ? "text-[#2F6E4F] font-semibold"
-                    : "text-[#555555] hover:text-[#1C1C1E]"
+                    ? "text-white font-semibold"
+                    : "text-white/80 hover:text-white"
                 )}
               >
                 <Star
                   className={cn(
                     "w-5 h-5",
                     pathname === "/favorites"
-                      ? "fill-[#FBBF24] text-[#FBBF24]"
-                      : "fill-none"
+                      ? "fill-white text-white"
+                      : "fill-none text-white/80"
                   )}
                   strokeWidth={pathname === "/favorites" ? 2.5 : 2}
                 />
                 <span className="hidden sm:inline">즐겨찾기</span>
               </Link>
-              <UserButton />
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: "w-8 h-8 bg-pink-500"
+                  }
+                }}
+              />
             </SignedIn>
           </div>
         </div>

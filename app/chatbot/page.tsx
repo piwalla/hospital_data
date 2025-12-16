@@ -1,7 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import RagChatbot from '@/components/rag-chatbot/RagChatbot';
-import RiuIcon from '@/components/icons/riu-icon';
 
 /**
  * @file page.tsx
@@ -20,11 +19,14 @@ export default async function ChatbotPage() {
 
   return (
     <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12 max-w-full sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl space-y-6 sm:space-y-8 md:space-y-10 lg:space-y-12">
-      <div className="leaf-section rounded-2xl border border-[var(--border-light)] shadow-canopy p-4 sm:p-6 md:p-8">
-        <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-          <RiuIcon variant="question" size={40} className="sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16" />
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[30px] font-bold text-foreground">산재 상담 챗봇</h1>
-        </div>
+      {/* 페이지 헤더 */}
+      <div className="text-center relative">
+        <h1 className="text-senior-title">
+          산재 전문 챗봇과 상담하세요
+        </h1>
+        <p className="mt-4 sm:mt-6 text-senior-body text-muted-foreground">
+          산재 관련 궁금한 점을 자유롭게 물어보세요
+        </p>
       </div>
 
       <RagChatbot />

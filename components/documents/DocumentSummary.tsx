@@ -80,7 +80,7 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
       {/* 기본 설명 섹션 */}
       <div className="space-y-4 sm:space-y-6">
         {/* 서류 목적 */}
-        <div className="bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+        <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
           <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-foreground">
             이 서류는 무엇인가요?
           </h3>
@@ -98,7 +98,7 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
 
         {/* 주요 항목별 작성 방법 */}
         {predefinedSummary.sections && predefinedSummary.sections.length > 0 && (
-          <div className="bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+          <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
             <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">
               주요 항목별 작성 방법
             </h3>
@@ -213,7 +213,7 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
               </div>
 
               {/* AI 요약 내용 */}
-              <div className="bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+              <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
                 <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-foreground">
                   이 서류는 무엇인가요? (AI 설명)
                 </h4>
@@ -231,7 +231,7 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
 
               {/* AI 주요 항목별 작성 방법 */}
               {aiSummary.sections && aiSummary.sections.length > 0 && (
-                <div className="bg-white rounded-2xl border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+                <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
                   <h4 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-foreground">
                     주요 항목별 작성 방법 (AI 설명)
                   </h4>
@@ -337,7 +337,7 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
       </div>
 
       {/* 면책 조항 */}
-      <div className="berry-card mt-4 sm:mt-6 p-3 sm:p-4 border border-[var(--border-light)] rounded-2xl" role="note" aria-label="면책 조항">
+      <div className="berry-card mt-4 sm:mt-6 p-3 sm:p-4 border border-[var(--border-light)] rounded-lg" role="note" aria-label="면책 조항">
         <p className="text-xs sm:text-sm text-muted-foreground">{getDisclaimer()}</p>
       </div>
 

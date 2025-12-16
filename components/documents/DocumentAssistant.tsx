@@ -60,7 +60,7 @@ export default function DocumentAssistant() {
 
   return (
     <div 
-      className="leaf-section bg-white border border-[var(--border-light)] rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 shadow-canopy"
+      className="leaf-section bg-white border border-[var(--border-light)] rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 shadow-canopy"
       role="region"
       aria-label="서류 관련 AI 챗봇"
     >
@@ -125,7 +125,7 @@ export default function DocumentAssistant() {
           aria-label="대화 기록"
         >
           {messages.map((message, index) => {
-            const baseClasses = 'p-4 rounded-2xl border shadow-leaf';
+            const baseClasses = 'p-4 rounded-lg border shadow-leaf';
             const userClasses = 'bg-accent/10 border-accent/30 text-foreground';
             const assistantClasses =
               'bg-[var(--background-alt)] border-[var(--border-light)] text-foreground prose prose-sm max-w-none';
