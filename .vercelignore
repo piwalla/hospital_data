@@ -1,0 +1,13 @@
+# Vercel 빌드 시 무시할 파일/폴더
+temp-pdfs/
+scripts/
+*.md
+!.vercelignore
+
+
+
+
+
+
+
+

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MapPin, FileText, MessageSquareText, ListOrdered } from "lucide-react";
+import { MapPin, FileText, MessageSquareText, ListOrdered, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -34,6 +34,11 @@ const ResponsiveNavigation = () => {
       href: "/chatbot",
       label: "산재 상담",
       icon: MessageSquareText,
+    },
+    {
+      href: "/counseling",
+      label: "심리 상담",
+      icon: Heart,
     },
   ];
 

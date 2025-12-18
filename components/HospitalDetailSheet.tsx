@@ -71,22 +71,16 @@ const HospitalDetailSheet: React.FC<HospitalDetailSheetProps> = ({
 
   // 길찾기 핸들러 (네이버 지도 앱 또는 웹)
   const handleDirections = () => {
-    // 네이버 지도 웹 링크
-    const naverMapUrl = `https://map.naver.com/search/${encodeURIComponent(displayData.address)}`;
+    // 주소 기반 검색 링크 사용 (모바일에서 더 안정적)
+    const address = displayData.address;
     
-    // 모바일에서는 앱 링크 시도, 데스크톱에서는 웹 링크
+    // 모바일에서는 모바일 웹 링크 사용, 데스크톱에서는 웹 링크
     if (typeof window !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      // 모바일: 네이버 지도 앱 링크 시도
-      const naverMapAppUrl = `nmap://search?query=${encodeURIComponent(displayData.address)}`;
-      window.location.href = naverMapAppUrl;
-      
-      // 앱이 없으면 웹으로 폴백
-      setTimeout(() => {
-        window.open(naverMapUrl, '_blank');
-      }, 500);
+      // 모바일: 주소 기반 검색 링크 사용
+      window.open(`https://m.map.naver.com/search/${encodeURIComponent(address)}`, '_blank');
     } else {
-      // 데스크톱: 웹 링크
-      window.open(naverMapUrl, '_blank');
+      // 데스크톱: 주소 기반 검색 링크 사용
+      window.open(`https://map.naver.com/search/${encodeURIComponent(address)}`, '_blank');
     }
   };
 

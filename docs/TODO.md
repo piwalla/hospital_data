@@ -741,6 +741,159 @@
   - [ ] **참고 문서**: 
     - [ ] `docs/features/timeline-improvement-plan.md` (상세 개선 계획)
     - [ ] `docs/features/timeline.md` (기능 문서)
+- [ ] **모바일 WebP 이미지 변환 통합** (Priority 1) 🔴 ⭐ 새로 추가
+  - [ ] **PDF → WebP 변환 스크립트 작성** (1-2시간)
+    - [ ] 변환 도구 선택 (Python + pdf2image + Pillow 권장)
+    - [ ] 변환 스크립트 생성 (`scripts/convert-pdf-to-webp.js` 또는 Python)
+    - [ ] 변환 설정:
+      - [ ] DPI: 150 (모바일 가독성 충분)
+      - [ ] Quality: 85 (품질과 크기 균형)
+      - [ ] 포맷: WebP
+      - [ ] 출력 파일명: `step1.webp`, `step2.webp`, `step3.webp`, `step4.webp`
+  - [ ] **PDF 파일 변환** (30분-1시간)
+    - [ ] Supabase Storage에서 PDF 파일 다운로드 (step1-4.pdf)
+    - [ ] PDF → WebP 변환 실행
+    - [ ] 변환된 WebP 파일 확인 (품질 및 크기 검증)
+  - [ ] **WebP 이미지 Supabase 업로드** (30분)
+    - [ ] 변환된 WebP 파일을 Supabase Storage `uploads` 버킷에 업로드
+    - [ ] 기존 PDF 파일과 동일한 경로 구조 유지
+    - [ ] 파일명: `step1.webp`, `step2.webp`, `step3.webp`, `step4.webp`
+  - [ ] **모바일 감지 유틸리티 생성** (30분)
+    - [ ] `hooks/use-is-mobile.ts` 생성
+    - [ ] `window.innerWidth < 768` 기준으로 모바일 감지
+    - [ ] `useState`와 `useEffect`로 화면 크기 변경 감지
+    - [ ] SSR 안전성 고려 (초기값은 false)
+  - [ ] **Next.js Image 설정** (30분)
+    - [ ] `next.config.ts`에 Supabase 이미지 도메인 추가
+    - [ ] `images.remotePatterns` 설정
+    - [ ] 자동 최적화 활성화 확인
+  - [ ] **조건부 렌더링 컴포넌트 생성** (1-2시간)
+    - [ ] `components/timeline/ConditionalPDFViewer.tsx` 생성
+    - [ ] `useIsMobile` 훅 사용
+    - [ ] 모바일: Next.js `Image` 컴포넌트로 WebP 이미지 표시
+    - [ ] 데스크톱: 기존 `iframe` 렌더링
+    - [ ] Next.js Image 최적화 활용:
+      - [ ] 자동 WebP 변환 (브라우저 지원 시)
+      - [ ] 반응형 이미지 (srcSet)
+      - [ ] 지연 로딩 (lazy loading)
+      - [ ] 이미지 최적화
+  - [ ] **기존 컴포넌트 수정** (1시간)
+    - [ ] `components/timeline/TimelineStepContent.tsx` 수정
+      - [ ] PDF 뷰어 부분을 `ConditionalPDFViewer`로 교체
+      - [ ] WebP 이미지 URL 생성 함수 추가
+      - [ ] 기존 iframe 코드는 `ConditionalPDFViewer` 내부로 이동
+    - [ ] `components/timeline/TimelineDetailPanel.tsx` 수정
+      - [ ] 동일하게 `ConditionalPDFViewer`로 교체
+      - [ ] WebP 이미지 URL 생성 함수 추가
+  - [ ] **에러 처리 및 폴백** (1시간)
+    - [ ] WebP 이미지 로드 실패 시 기존 PDF iframe으로 폴백
+    - [ ] 네트워크 에러 처리
+    - [ ] 이미지 로딩 상태 표시
+  - [ ] **성능 최적화** (1시간)
+    - [ ] Next.js Image 컴포넌트 자동 최적화 활용
+    - [ ] 반응형 이미지 (모바일: 작은 크기, 데스크톱: 큰 크기)
+    - [ ] 지연 로딩 (lazy loading)
+    - [ ] 이미지 캐싱 활용
+  - [ ] **접근성 개선** (30분)
+    - [ ] `alt` 텍스트 명확히 작성
+    - [ ] 로딩 상태 명확히 표시
+    - [ ] 이미지 로드 실패 시 대체 텍스트
+  - [ ] **테스트** (1-2시간)
+    - [ ] 모바일 브라우저에서 WebP 이미지 표시 확인
+    - [ ] 데스크톱에서 기존 iframe 동작 확인
+    - [ ] 이미지 로딩 속도 확인
+    - [ ] 네트워크 에러 시나리오 테스트
+    - [ ] 다양한 스마트폰 기기/브라우저 테스트
+    - [ ] 이미지 품질 확인 (텍스트 가독성)
+  - [ ] **예상 소요 시간**: 6-9시간
+  - [ ] **예상 파일 크기**: 
+    - [ ] PDF 원본: 1.2-2MB (4개 파일 합계)
+    - [ ] WebP 변환: 3.6-6MB (4개 파일 합계)
+    - [ ] Next.js 최적화 후: 2.4-4MB (모바일 기준)
+  - [ ] **참고 문서**: 
+    - [ ] `c:\Users\highs\.cursor\plans\모바일_webp_이미지_변환_통합_b35ac38e.plan.md` (상세 계획)
+    - [ ] [Next.js Image 최적화 문서](https://nextjs.org/docs/app/api-reference/components/image)
+    - [ ] [WebP 포맷 가이드](https://developers.google.com/speed/webp)
+
+### Phase 1.3.7: 심리 상담 메뉴 구현 (신규) 🔴
+- [x] **네비게이션 메뉴 추가** (Priority 1) 🔴 ✅ 완료
+  - [x] `components/Navbar.tsx`에 "심리 상담" 메뉴 추가
+    - [x] 아이콘: `Heart` (lucide-react)
+    - [x] 경로: `/counseling`
+    - [x] 기존 "산재 상담"과 구분되는 별도 메뉴
+  - [x] `components/ResponsiveNavigation.tsx`에 "심리 상담" 탭 추가
+    - [x] 모바일 하단 탭 바에 추가
+    - [x] 아이콘 및 라벨 설정
+  - [x] 예상 소요 시간: 30분-1시간
+- [x] **데이터 구조 정의** (Priority 1) 🔴 ✅ 완료
+  - [x] `lib/data/counseling-content.ts` 파일 생성
+    - [x] 음악 플레이리스트/영상 링크 관리
+    - [x] 영상 컬렉션 링크 관리
+    - [x] 카테고리별 분류 (명상음악, 자연소리, 힐링음악 등)
+  - [x] `CounselingContent` 인터페이스 정의
+    - [x] `id`, `title`, `description`, `youtubeUrl`, `category`, `tags` 필드
+  - [x] 초기 데이터 추가 (음악 3개, 영상 3개 - placeholder URL, 실제 URL로 교체 필요)
+  - [x] 예상 소요 시간: 1-2시간
+- [x] **심리 상담 페이지 생성** (Priority 1) 🔴 ✅ 완료
+  - [x] `app/counseling/page.tsx` 생성
+    - [x] 로그인 필수 여부 결정 (선택 - 로그인 불필요)
+    - [x] 3개 섹션으로 구성:
+      1. AI 심리 상담 채팅
+      2. 릴렉스 음악
+      3. 기분전환 영상
+    - [x] 페이지 헤더 및 레이아웃
+    - [x] 법적 고지 섹션 추가 (위기 상황 신고 번호 포함)
+  - [x] 예상 소요 시간: 1-2시간
+- [x] **AI 심리 상담 컴포넌트** (Priority 1) 🔴 ✅ 완료
+  - [x] `components/counseling/PsychologicalChatbot.tsx` 생성
+    - [x] 기존 `RagChatbot` 컴포넌트 참고
+    - [x] 심리 지원 특화 프롬프트 사용
+    - [x] Google Gemini API 활용 (`lib/api/gemini.ts` 참고)
+    - [x] 공감적, 지지적 톤
+    - [x] 산재 환자 특화 심리 지원
+    - [x] 위기 상황 감지 시 전문가 연결 안내
+  - [x] `app/api/counseling/chat/route.ts` 생성
+    - [x] Google Gemini API 호출
+    - [x] 심리 지원 특화 프롬프트 생성
+    - [x] 에러 처리 및 로깅
+  - [x] `lib/prompts/psychological-support.ts` 생성
+    - [x] 심리 지원 특화 프롬프트 정의
+    - [x] 공감적, 지지적 톤 설정
+    - [x] 산재 환자 특화 가이드라인
+    - [x] 위기 상황 감지 키워드 정의
+  - [x] 예상 소요 시간: 3-4시간
+- [x] **음악/영상 섹션 컴포넌트** (Priority 1) 🔴 ✅ 완료
+  - [x] `components/counseling/MediaSection.tsx` 생성
+    - [x] YouTube 임베드 컴포넌트 (기존 `DocumentSummary.tsx` 패턴 참고)
+    - [x] 그리드 레이아웃으로 여러 영상 표시
+    - [x] 카테고리별 필터링 (선택사항 - 향후 추가 가능)
+    - [x] 반응형 디자인 (모바일/데스크톱)
+    - [x] 태그 표시 기능
+  - [x] 예상 소요 시간: 2-3시간
+- [x] **스타일링 및 반응형 디자인** (Priority 2) 🟡 ✅ 완료
+  - [x] 기존 디자인 시스템 유지 (primary 색상, 둥근 모서리 등)
+  - [x] 차분하고 편안한 색감 (부드러운 파스텔 톤 고려)
+  - [x] 반응형 레이아웃 검증
+  - [x] 예상 소요 시간: 1-2시간
+- [x] **법적 고지 추가** (Priority 2) 🟡 ✅ 완료
+  - [x] 심리 상담은 전문 의료 서비스가 아님을 명시
+  - [x] 위기 상황 감지 시 전문가 연결 안내 포함
+  - [x] 위기 상황 신고 번호 포함 (생명의 전화, 자살예방 상담전화)
+  - [x] 면책 조항 추가
+  - [x] 예상 소요 시간: 30분
+- [ ] **테스트 및 검증** (Priority 2) 🟡
+  - [ ] AI 채팅 기능 테스트
+  - [ ] YouTube 임베드 동작 확인
+  - [ ] 반응형 디자인 검증
+  - [ ] 접근성 검증 (키보드 네비게이션, 스크린 리더)
+  - [ ] 예상 소요 시간: 1-2시간
+- [ ] **실제 YouTube URL 추가** (Priority 1) 🔴
+  - [ ] 릴렉스 음악 YouTube URL 추가 (현재 placeholder)
+  - [ ] 기분전환 영상 YouTube URL 추가 (현재 placeholder)
+  - [ ] 예상 소요 시간: 30분
+- [x] **총 예상 소요 시간**: 9-14시간 (기본 구조 완료: 약 8시간)
+- [ ] **참고 문서**: 
+  - [ ] `c:\Users\highs\.cursor\plans\심리_상담_메뉴_추가_b44424a9.plan.md` (상세 계획)
 
 ### Phase 1.4: 디자인 시스템 일관성 검증 (Priority 3) 🟢
 - [x] **PRD 타이포그래피 시스템 검증 및 적용** ✅ 완료 (2025-01-26)
@@ -875,6 +1028,32 @@
   - [x] 예상 소요 시간: 2-3시간
   - [x] 참고: `docs/HEADER_DESIGN_IMPROVEMENT.md` (상세 계획)
   - [x] **전체 헤더 디자인 개선 완료** ✅ (2025-01-14)
+- [ ] **Footer 컴포넌트 구현 (Priority 2)** 🟡 ⭐ 새로 추가
+  - [ ] **Footer 컴포넌트 생성** (1-2시간)
+    - [ ] `components/Footer.tsx` 파일 생성
+    - [ ] 서비스 정보 섹션 (리워크케어 로고/이름)
+    - [ ] 주요 링크 섹션 (진행 과정, 병원 찾기, 서류 안내, 산재 상담)
+    - [ ] 연락처 섹션 (이메일 - placeholder로 구현, 나중에 실제 값으로 교체 가능)
+    - [ ] 소셜 미디어 링크 섹션 (placeholder로 구현, 나중에 실제 링크 추가 가능)
+    - [ ] 법적 고지 섹션 (기존 `LegalNotice` 컴포넌트의 면책 조항 재사용 또는 `lib/utils/disclaimer.ts` 참고)
+    - [ ] 저작권 정보
+    - [ ] 스타일링: 배경 `bg-gray-50` 또는 `bg-primary/5`, 텍스트 `text-muted-foreground`
+    - [ ] 반응형: 데스크톱에서만 표시 (`hidden md:block`)
+    - [ ] 레이아웃: 그리드 또는 flexbox로 섹션 배치
+    - [ ] 패딩: `py-8 sm:py-12`
+    - [ ] 최대 너비: `max-w-7xl mx-auto` (Navbar와 동일)
+    - [ ] 접근성: `aria-label`, `role` 속성 추가
+  - [ ] **Layout에 Footer 추가** (30분)
+    - [ ] `app/layout.tsx`에 `Footer` 컴포넌트 import
+    - [ ] `main` 태그 아래에 `<Footer />` 추가
+    - [ ] 모바일에서 Footer가 하단 네비게이션과 겹치지 않도록 확인 (이미 `md:hidden`으로 처리)
+  - [ ] **디자인 일관성 검증** (30분)
+    - [ ] 기존 `Navbar`의 primary 색상 사용 확인
+    - [ ] 기존 `LegalNotice` 컴포넌트의 면책 조항 텍스트 재사용 확인
+    - [ ] Tailwind CSS v4 유틸리티 클래스 사용 확인
+    - [ ] 접근성 속성 확인 (`aria-label`, `role`)
+  - [ ] 예상 소요 시간: 2-3시간
+  - [ ] 참고: `c:\Users\highs\.cursor\plans\footer_컴포넌트_구현_c711cc70.plan.md` (상세 계획)
 - [ ] **Warm & Rounded 테마 리뉴얼 (신규)** 🔴
   - [ ] 디자인 토큰 재정의
     - [ ] `app/globals.css`에서 배경을 `#FFFCF5` / `#F5F9F6` 투톤으로 재구성
@@ -1201,7 +1380,15 @@
    - 의존성: 없음
    - 참고: `docs/HEADER_DESIGN_IMPROVEMENT.md` (상세 계획)
 
-2. ✅ **디자인 시스템 일관성 개선** (P3-1) - 완료
+2. [ ] **Footer 컴포넌트 구현** (P2-1) - 미시작
+   - 데스크톱에서만 표시되는 Footer 컴포넌트 생성
+   - 서비스 정보, 링크, 연락처, 소셜 미디어, 법적 고지, 저작권 포함
+   - Layout에 Footer 추가하여 모든 페이지에 적용
+   - 예상 시간: 2-3시간
+   - 의존성: 없음
+   - 참고: `c:\Users\highs\.cursor\plans\footer_컴포넌트_구현_c711cc70.plan.md` (상세 계획)
+
+3. ✅ **디자인 시스템 일관성 개선** (P3-1) - 완료
    - ✅ **H2 타이포그래피 수정** (Priority 1): 18px → 22px
    - ✅ **배경색 수정** (Priority 1): #FFFFFF → #F2F2F7
    - ✅ **Neutral 색상 체계 적용** (Priority 2): #1C1C1E, #8A8A8E
@@ -1209,7 +1396,7 @@
    - ✅ **필터 버튼 비활성 상태 색상 통일** (Priority 2): Neutral 색상 체계 적용
    - 완료 시간: 약 2시간
 
-3. **색상 팔레트 일관성 검증** (P3-2) - 부분 완료 ⏳
+4. **색상 팔레트 일관성 검증** (P3-2) - 부분 완료 ⏳
    - ✅ 필터 버튼 비활성 상태 색상 통일 (완료)
    - [ ] 하드코딩된 색상을 CSS 변수로 통일 (진행 필요)
      - [ ] `#2E7D32` (Primary 색상), `#34C759` (Success/약국 색상), `#9333EA` (재활기관 색상) 등 하드코딩된 색상 검색
@@ -1249,6 +1436,7 @@
 | 🟡 P2 | 필터 버튼 비활성 상태 색상 통일 | 중간 | 낮음 | 30m | 없음 | ✅ |
 | 🔴 P1 | 헤더 디자인 개선 | 높음 | 낮음 | 2-3h | 없음 | ✅ |
 | 🔴 P1 | 필터 UI 디자인 개선 | 높음 | 낮음 | 3h 10m | 없음 | ✅ |
+| 🟡 P2 | Footer 컴포넌트 구현 | 중간 | 낮음 | 2-3h | 없음 | ⏳ |
 | 🟢 P3 | 하드코딩 색상 CSS 변수 통일 | 낮음 | 낮음 | 30m-1h | 없음 | ⏳ |
 | 🟢 P3 | 타이포그래피 검증 | 낮음 | 낮음 | 1-2h | 없음 | ⏳ |
 | 🔵 P4 | 사용자 활동 로깅 | 중간 | 중간 | 2-3h | 없음 | ⏳ |

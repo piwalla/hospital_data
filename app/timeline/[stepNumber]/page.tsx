@@ -51,9 +51,9 @@ export default async function TimelineStepPage({ params, searchParams }: Timelin
   return (
     <div className="min-h-screen bg-[var(--background)] overflow-x-hidden">
       {/* 헤더 (모바일 여백 보호) */}
-      <div className="sticky top-0 z-10 bg-[var(--background)] border-b border-[var(--border-medium)]">
+      <div className="sticky top-0 z-10 bg-[var(--background)]">
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-4xl w-full">
-          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 pb-4 sm:pb-6">
             <div className={cn(
               "flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full",
               "bg-primary text-primary-foreground",

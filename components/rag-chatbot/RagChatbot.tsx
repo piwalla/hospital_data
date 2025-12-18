@@ -20,7 +20,7 @@
 
 import { useMemo, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, MessageSquareText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import RiuLoader from '@/components/ui/riu-loader';
@@ -202,72 +202,51 @@ export default function RagChatbot() {
     }
   };
 
-  // 마크다운을 HTML로 변환하는 함수 (DocumentAssistant와 동일한 로직)
+  // 마크다운을 HTML로 변환하는 함수
   const markdownToHtml = (text: string): string => {
     let html = text;
     
-    // 강조 변환 (**텍스트** -> <strong>텍스트</strong>) - 먼저 처리
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-primary font-brand">$1</strong>');
+    // 강조 변환 (**텍스트** -> <strong>텍스트</strong>)
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-primary">$1</strong>');
     
     // 줄 단위로 분리하여 처리
     const lines = html.split('\n');
     const processedLines: string[] = [];
-    let inOrderedList = false;
-    let inUnorderedList = false;
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       
       // 제목 처리
       if (line.startsWith('### ')) {
-        if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-        if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-        processedLines.push(`<h3 class="text-lg font-semibold mt-4 mb-2 text-primary font-brand">${line.substring(4)}</h3>`);
+        processedLines.push(`<h3 class="text-lg font-semibold mt-4 mb-2 text-primary">${line.substring(4)}</h3>`);
         continue;
       }
       
       if (line.startsWith('## ')) {
-        if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-        if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-        processedLines.push(`<h2 class="text-xl font-bold mt-5 mb-3 text-primary font-brand">${line.substring(3)}</h2>`);
+        processedLines.push(`<h2 class="text-xl font-bold mt-5 mb-3 text-primary">${line.substring(3)}</h2>`);
         continue;
       }
       
       // 인용구 처리
       if (line.startsWith('> ')) {
-        if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-        if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-        processedLines.push(`<blockquote class="border-l-4 border-accent pl-4 py-2 my-3 bg-accent/10 italic">${line.substring(2)}</blockquote>`);
+        processedLines.push(`<blockquote class="border-l-4 border-primary/30 pl-4 py-2 my-3 bg-primary/5 italic">${line.substring(2)}</blockquote>`);
         continue;
       }
       
       // 번호 목록 처리
       const orderedMatch = line.match(/^(\d+)\. (.*)$/);
       if (orderedMatch) {
-        if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-        if (!inOrderedList) {
-          processedLines.push('<ol class="list-decimal list-inside space-y-1 my-2">');
-          inOrderedList = true;
-        }
-        processedLines.push(`<li class="ml-4 mb-1">${orderedMatch[2]}</li>`);
+        processedLines.push(`<li class="ml-4 mb-1 list-decimal">${orderedMatch[2]}</li>`);
         continue;
       }
       
       // 불릿 목록 처리
       if (line.startsWith('- ')) {
-        if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-        if (!inUnorderedList) {
-          processedLines.push('<ul class="list-disc list-inside space-y-1 my-2">');
-          inUnorderedList = true;
-        }
-        processedLines.push(`<li class="ml-4 mb-1">${line.substring(2)}</li>`);
+        processedLines.push(`<li class="ml-4 mb-1 list-disc">${line.substring(2)}</li>`);
         continue;
       }
       
       // 일반 텍스트 처리
-      if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-      if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-      
       if (line.length > 0) {
         processedLines.push(`<p class="mb-2">${line}</p>`);
       } else {
@@ -275,28 +254,19 @@ export default function RagChatbot() {
       }
     }
     
-    // 열려있는 목록 닫기
-    if (inOrderedList) processedLines.push('</ol>');
-    if (inUnorderedList) processedLines.push('</ul>');
-    
     return processedLines.join('');
   };
 
   return (
     <div 
-      className="leaf-section bg-white border border-[var(--border-light)] rounded-lg p-4 sm:p-6 md:p-8 lg:p-10 mb-8 shadow-canopy"
+      className="bg-white border border-[var(--border-light)] rounded-lg p-4 sm:p-6 md:p-8 shadow-sm"
       role="region"
       aria-label="산재 상담 챗봇"
     >
-      <div className="mb-4 sm:mb-5 md:mb-6">
-        <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-foreground">
-          산재 규정과 사례를 학습한 챗봇입니다
-        </p>
-      </div>
-
-      <div className="space-y-2 sm:space-y-3 md:space-y-4 mb-4 sm:mb-5 md:mb-6">
+      {/* 추천 질문 */}
+      <div className="mb-4 sm:mb-6">
         <div 
-          className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-2.5"
+          className="flex flex-wrap gap-2 sm:gap-3"
           role="group"
           aria-label="추천 질문"
         >
@@ -304,7 +274,7 @@ export default function RagChatbot() {
             <button
               key={item}
               type="button"
-              className="text-xs sm:text-sm md:text-base px-2.5 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full border border-border-light bg-muted text-primary hover:bg-border-light transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[var(--border-light)] bg-gray-50 text-foreground hover:bg-primary/10 hover:border-primary transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={() => handleAsk(item)}
               disabled={loading}
               aria-label={`추천 질문: ${item}`}
@@ -313,29 +283,93 @@ export default function RagChatbot() {
             </button>
           ))}
         </div>
+      </div>
 
-        {recentQuestions.length > 0 && (
-          <div 
-            className="flex flex-wrap gap-1.5 sm:gap-2 md:gap-2.5"
-            role="group"
-            aria-label="최근 질문"
-          >
-            {recentQuestions.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className="text-[10px] sm:text-xs md:text-sm px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full border border-border-light bg-white text-muted-foreground hover:bg-muted transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={() => setQuestion(item)}
-                disabled={loading}
-                aria-label={`최근 질문 입력: ${item}`}
+      {/* 대화 기록 */}
+      <div 
+        className="space-y-4 sm:space-y-6 mb-4 sm:mb-6 max-h-[400px] sm:max-h-[500px] md:max-h-[600px] overflow-y-auto pr-2"
+        role="log"
+        aria-live="polite"
+        aria-label="대화 기록"
+      >
+        {messages.length === 0 ? (
+          <div className="text-center py-8 sm:py-12">
+            <MessageSquareText className="w-12 h-12 sm:w-16 sm:h-16 text-primary/30 mx-auto mb-4" />
+            <p className="text-sm sm:text-base text-muted-foreground">
+              산재 관련 궁금한 점을 자유롭게 물어보세요. RAG 기술로 정확한 정보를 제공합니다.
+            </p>
+          </div>
+        ) : (
+          messages.map((msg, index) => (
+            <div
+              key={index}
+              className={msg.role === 'user' ? 'text-right' : 'text-left'}
+            >
+              <div
+                className={`inline-block max-w-[85%] sm:max-w-[80%] rounded-lg p-3 sm:p-4 ${
+                  msg.role === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-gray-50 text-foreground border border-[var(--border-light)]'
+                }`}
               >
-                최근 질문: {item}
-              </button>
-            ))}
+                {msg.role === 'assistant' ? (
+                  <div
+                    className="prose prose-sm sm:prose-base max-w-none"
+                    dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.content) }}
+                  />
+                ) : (
+                  <p className="text-sm sm:text-base whitespace-pre-wrap">{msg.content}</p>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+
+        {loading && (
+          <div className="text-left">
+            <div className="inline-block bg-gray-50 border border-[var(--border-light)] rounded-lg p-3 sm:p-4">
+              <RiuLoader
+                message={
+                  loadingStage === 'analyzing' 
+                    ? '질문을 분석하고 있어요...'
+                    : loadingStage === 'searching'
+                    ? '관련 정보를 찾고 있어요...'
+                    : '전문가가 답변을 작성 중이에요...'
+                }
+                iconVariants={['question', 'smile', 'cheer']}
+                logId="RagChatbot:loading"
+                ariaDescription="답변 생성 중"
+              />
+            </div>
           </div>
         )}
       </div>
 
+      {/* 에러 메시지 */}
+      {error && (
+        <div
+          className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg"
+          role="alert"
+          aria-live="assertive"
+        >
+          <p className="text-sm sm:text-base text-red-800">{error}</p>
+        </div>
+      )}
+
+      {/* 타임아웃 메시지 */}
+      {isTimeout && (
+        <div
+          className="mb-4 sm:mb-6 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg"
+          role="alert"
+          aria-live="polite"
+        >
+          <p className="text-sm sm:text-base text-yellow-800">
+            응답이 길어지고 있습니다. 잠시 후 다시 시도하거나 질문을 조금 더 구체적으로 작성해 주세요.
+          </p>
+        </div>
+      )}
+
+      {/* 입력 폼 */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -344,146 +378,48 @@ export default function RagChatbot() {
         className="space-y-3"
         aria-label="질문 입력 폼"
       >
-        <Textarea
-          placeholder=""
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          disabled={loading}
-          className="min-h-[80px] sm:min-h-[90px] md:min-h-[100px] lg:min-h-[120px] resize-none text-sm sm:text-base md:text-lg focus:ring-2 focus:ring-primary focus:ring-offset-2"
-          aria-label="질문 입력"
-          aria-describedby="question-help-text"
-          aria-required="true"
-        />
-        <p id="question-help-text" className="sr-only">
-          산재 관련 질문을 입력하세요. 최소 2자 이상 입력해야 합니다.
-        </p>
-        <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
-          <button
-            type="button"
-            className="text-xs sm:text-sm md:text-base text-muted-foreground hover:text-primary transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => {
-              setMessages([]);
-              setError(null);
-            }}
-            disabled={loading || messages.length === 0}
-            aria-label="대화 기록 초기화"
-            aria-disabled={loading || messages.length === 0}
-          >
-            대화 초기화
-          </button>
+        <div className="flex gap-2 sm:gap-3">
+          <Textarea
+            placeholder="산재 관련 질문을 입력해주세요..."
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            disabled={loading}
+            className="flex-1 min-h-[80px] sm:min-h-[100px] resize-none"
+            aria-label="질문 입력"
+          />
           <Button
             type="submit"
-            disabled={loading}
-            className="flex items-center gap-1.5 sm:gap-2 md:gap-2.5 w-full sm:w-auto text-sm sm:text-base md:text-lg px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 focus:ring-2 focus:ring-primary focus:ring-offset-2"
-            aria-label={loading ? "답변 준비 중" : "질문 전송"}
-            aria-busy={loading}
+            disabled={loading || question.trim().length < 2}
+            className="self-end"
+            aria-label="질문 전송"
           >
             {loading ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 animate-spin" strokeWidth={1.75} aria-hidden="true" />
-                <span className="text-xs sm:text-sm md:text-base">답변 준비 중...</span>
-              </>
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
             ) : (
-              <>
-                <span className="text-xs sm:text-sm md:text-base">질문하기</span>
-                <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5" strokeWidth={1.75} aria-hidden="true" />
-              </>
+              <Send className="w-4 h-4 sm:w-5 sm:h-5" />
             )}
           </Button>
         </div>
+        {recentQuestions.length > 0 && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
+              onClick={() => {
+                setMessages([]);
+                setQuestion('');
+                setError(null);
+                setRecentQuestions([]);
+                setIsTimeout(false);
+              }}
+              disabled={loading}
+              aria-label="대화 초기화"
+            >
+              대화 초기화
+            </button>
+          </div>
+        )}
       </form>
-
-      {error && (
-        <div 
-          className="mt-3 sm:mt-4 md:mt-5 p-2.5 sm:p-3 md:p-4 rounded-lg bg-red-50 border border-red-200"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-        >
-          <p className="text-xs sm:text-sm md:text-base text-red-600">{error}</p>
-        </div>
-      )}
-
-      {isTimeout && (
-        <div 
-          className="mt-2 sm:mt-3 md:mt-4 p-2.5 sm:p-3 md:p-4 rounded-lg bg-yellow-50 border border-yellow-200"
-          role="alert"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <p className="text-xs sm:text-sm md:text-base text-[#8A6D3B]">
-            응답이 길어지고 있습니다. 잠시 후 다시 시도하거나 질문을 조금 더 구체적으로 작성해 주세요.
-          </p>
-        </div>
-      )}
-
-      {messages.length > 0 && (
-        <div 
-          className="mt-4 sm:mt-6 md:mt-8 space-y-3 sm:space-y-4 md:space-y-5 max-h-[300px] sm:max-h-[400px] md:max-h-[500px] lg:max-h-[600px] overflow-y-auto pr-1 sm:pr-2 md:pr-3 custom-scrollbar"
-          role="log"
-          aria-label="대화 기록"
-          aria-live="polite"
-          aria-atomic="false"
-        >
-          {[...messages].reverse().map((message, index) => {
-            const baseClasses = 'p-3 sm:p-4 md:p-5 lg:p-6 rounded-lg sm:rounded-lg border shadow-leaf text-sm sm:text-base md:text-lg';
-            const userClasses = 'bg-accent/10 border-accent/30 text-foreground';
-            const assistantClasses =
-              'bg-[var(--background-alt)] border-[var(--border-light)] text-foreground prose prose-sm md:prose-base max-w-none';
-
-            if (message.role === 'assistant') {
-              return (
-                <div
-                  key={`${message.role}-${index}`}
-                  className={`${baseClasses} ${assistantClasses}`}
-                  role="article"
-                  aria-label={`챗봇 답변 ${index + 1}`}
-                  dangerouslySetInnerHTML={{
-                    __html: markdownToHtml(message.content),
-                  }}
-                />
-              );
-            }
-
-            return (
-              <div
-                key={`${message.role}-${index}`}
-                className={`${baseClasses} ${userClasses}`}
-                role="article"
-                aria-label={`사용자 질문 ${index + 1}`}
-              >
-                {message.content}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {loading && (
-        <div 
-          className="mt-4 sm:mt-6 md:mt-8"
-          role="status"
-          aria-live="polite"
-          aria-label="답변 준비 중"
-        >
-          <RiuLoader 
-            message={
-              loadingStage === 'analyzing' 
-                ? '질문을 분석하고 있어요...'
-                : loadingStage === 'searching'
-                ? '관련 정보를 찾고 있어요...'
-                : '전문가가 답변을 작성 중이에요...'
-            }
-            iconVariants={['question','smile','cheer']}
-            logId="RagChatbot:loading"
-            ariaDescription="답변이 준비되면 자동으로 표시됩니다"
-          />
-        </div>
-      )}
-
-      <p className="mt-3 sm:mt-4 md:mt-5 text-[10px] sm:text-xs md:text-sm text-muted-foreground text-center" role="note" aria-label="면책 조항">
-        ※ AI가 제공하는 정보는 참고용이며 법률 자문이 아닙니다.
-      </p>
     </div>
   );
 }

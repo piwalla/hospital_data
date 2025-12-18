@@ -427,16 +427,16 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
 
   return (
     <>
-      <div className="container mx-auto px-4 pt-4 pb-2">
+      <div className="container mx-auto px-4 pt-4 pb-12">
         {/* 최상단 멘트 */}
         <div className="mb-6">
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-primary text-center leading-tight">
-            어디서 치료받을 수 있나요?
+            어디서 치료되나요?
           </h1>
           {userLocation && searchMode === 'location' && initialInstitutionCount !== null && initialCounts && (
             <div className="mt-4 space-y-3">
               <p className="text-lg text-foreground text-center">
-                주변 <span className="font-bold text-red-600 text-xl">{initialInstitutionCount}</span>개 기관에서 치료 받을 수 있습니다.
+                <span className="font-bold text-red-600 text-xl">{radiusKm}km</span> 이내 <span className="font-bold text-red-600 text-xl">{initialInstitutionCount}</span>개의 치료기관이 있습니다.
               </p>
               
               {/* 상세 개수 표시 */}
@@ -524,14 +524,14 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
 
         {/* 고급 필터 영역 (접을 수 있음) */}
         {showAdvancedFilters && (
-          <div className="mb-6 p-6 bg-gradient-to-br from-white to-[#F8F9FA] border border-[var(--border-light)] rounded-lg shadow-sm space-y-8">
+          <div className="mb-6 p-4 bg-gradient-to-br from-white to-[#F8F9FA] border border-[var(--border-light)] rounded-lg shadow-sm space-y-4">
             {/* 1. 내 위치 주변 */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
-                <h3 className="text-base font-bold text-foreground">내 위치 주변</h3>
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
+                <h3 className="text-sm font-bold text-foreground">내 위치 주변</h3>
               </div>
-              <div className="flex items-center gap-3 flex-wrap pl-8">
+              <div className="flex items-center gap-2 flex-wrap pl-6">
                 {[5, 10, 15, 30].map((radius) => (
                   <button
                     key={radius}
@@ -539,7 +539,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       handleSearchModeChange('location');
                       handleRadiusChange(radius);
                     }}
-                    className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
                       radiusKm === radius && searchMode === 'location'
                         ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
                         : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
@@ -555,15 +555,15 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
             <div className="border-t border-[var(--border-light)]"></div>
 
             {/* 2. 지역 선택 */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
-                <h3 className="text-base font-bold text-foreground">지역 선택</h3>
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
+                <h3 className="text-sm font-bold text-foreground">지역 선택</h3>
               </div>
-              <div className="pl-8">
+              <div className="pl-6">
                 <button
                   onClick={() => handleSearchModeChange('region')}
-                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
                     searchMode === 'region'
                       ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
                       : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
@@ -572,7 +572,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                   지역 선택하기
                 </button>
                 {searchMode === 'region' && (
-                  <div className="mt-4">
+                  <div className="mt-2">
                     <RegionSelector
                       value={selectedRegion}
                       onChange={handleRegionChange}
@@ -587,15 +587,15 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
             <div className="border-t border-[var(--border-light)]"></div>
 
             {/* 3. 종류 */}
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
-                <h3 className="text-base font-bold text-foreground">종류</h3>
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
+                <h3 className="text-sm font-bold text-foreground">종류</h3>
               </div>
-              <div className="flex items-center gap-3 flex-wrap pl-8">
+              <div className="flex items-center gap-2 flex-wrap pl-6">
                 <button
                   onClick={() => handleFilterChange('hospital')}
-                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
                     activeFilter === 'hospital'
                       ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
                       : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
@@ -605,7 +605,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                 </button>
                 <button
                   onClick={() => handleFilterChange('pharmacy')}
-                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
                     activeFilter === 'pharmacy'
                       ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
                       : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
@@ -615,7 +615,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                 </button>
                 <button
                   onClick={() => handleFilterChange('sports-rehab')}
-                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
                     activeFilter === 'sports-rehab'
                       ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
                       : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
@@ -625,7 +625,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                 </button>
                 <button
                   onClick={() => handleFilterChange('job-training')}
-                  className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
                     activeFilter === 'job-training'
                       ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
                       : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
@@ -642,17 +642,17 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                 {/* 구분선 */}
                 <div className="border-t border-[var(--border-light)]"></div>
                 
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">4</span>
-                    <h3 className="text-base font-bold text-foreground">병원 종류</h3>
+                    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs font-bold">4</span>
+                    <h3 className="text-sm font-bold text-foreground">병원 종류</h3>
                   </div>
-                  <div className="flex items-center gap-3 flex-wrap pl-8">
+                  <div className="flex items-center gap-2 flex-wrap pl-6">
                     {DEPARTMENT_OPTIONS.slice(0, 4).map((dept) => (
                       <button
                         key={dept.value}
                         onClick={() => toggleDepartment(dept.value)}
-                        className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm ${
                           selectedDepartments.includes(dept.value)
                             ? 'bg-primary text-primary-foreground border-primary shadow-md scale-105'
                             : 'bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105'
@@ -665,7 +665,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                     {DEPARTMENT_OPTIONS.length > 4 && (
                       <div className="relative group">
                         <button
-                          className="px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105"
+                          className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border-2 shadow-sm bg-white text-foreground border-[var(--border-medium)] hover:border-primary hover:bg-primary/5 hover:shadow-md hover:scale-105"
                           aria-label="더보기 진료과목"
                         >
                           더보기
@@ -689,7 +689,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                   </div>
                   {/* 선택된 진료과목 초기화 버튼 */}
                   {selectedDepartments.length > 0 && (
-                    <div className="pl-8 pt-2">
+                    <div className="pl-6 pt-1">
                       <button
                         onClick={() => setSelectedDepartments([])}
                         className="text-sm text-muted-foreground hover:text-primary underline transition-colors"
@@ -707,8 +707,8 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
         
         {/* 반응형 레이아웃: 모바일은 세로, 데스크톱은 가로 */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 모바일: 지도가 상단, 데스크톱: 지도가 우측 */}
-          <div className="lg:col-span-2 order-1 lg:order-2">
+          {/* 모바일: 지도가 상단, 데스크톱: 지도가 좌측 */}
+          <div className="lg:col-span-2 order-1 lg:order-1">
             <HospitalMap 
               hospitals={hospitalsForMap} // 필터링된 병원 목록
               rehabilitationCenters={rehabilitationCentersForMap} // 필터링된 재활기관 목록
@@ -822,8 +822,16 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       {/* Secondary CTA: 길찾기 */}
                       <button
                         onClick={() => {
-                          const naverMapUrl = `https://map.naver.com/search/${encodeURIComponent(selectedHospital.address)}`;
-                          window.open(naverMapUrl, '_blank');
+                          const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                          const address = selectedHospital.address;
+                          
+                          if (isMobile) {
+                            // 모바일: 주소 기반 검색 링크 사용
+                            window.open(`https://m.map.naver.com/search/${encodeURIComponent(address)}`, '_blank');
+                          } else {
+                            // 데스크톱: 주소 기반 검색 링크 사용
+                            window.open(`https://map.naver.com/search/${encodeURIComponent(address)}`, '_blank');
+                          }
                         }}
                         className="w-full h-12 border-2 border-primary text-primary rounded-lg font-semibold text-base hover:bg-primary/10 transition-colors flex items-center justify-center gap-2"
                       >
@@ -918,8 +926,16 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       {/* Secondary CTA: 길찾기 */}
                       <button
                         onClick={() => {
-                          const naverMapUrl = `https://map.naver.com/search/${encodeURIComponent(selectedRehabilitationCenter.address)}`;
-                          window.open(naverMapUrl, '_blank');
+                          const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                          const address = selectedRehabilitationCenter.address;
+                          
+                          if (isMobile) {
+                            // 모바일: 주소 기반 검색 링크 사용
+                            window.open(`https://m.map.naver.com/search/${encodeURIComponent(address)}`, '_blank');
+                          } else {
+                            // 데스크톱: 주소 기반 검색 링크 사용
+                            window.open(`https://map.naver.com/search/${encodeURIComponent(address)}`, '_blank');
+                          }
                         }}
                         className="w-full h-12 border-2 border-[var(--color-rehabilitation)] text-[var(--color-rehabilitation)] rounded-lg font-semibold text-base hover:bg-[var(--color-rehabilitation)]/10 transition-colors flex items-center justify-center gap-2"
                       >
@@ -936,36 +952,35 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
             )}
           </div>
           
-          {/* 모바일: 목록이 하단, 데스크톱: 목록이 좌측 */}
-          <div className="lg:col-span-1 order-2 lg:order-1">
-            <div className="leaf-section bg-white rounded-lg border border-[var(--border-light)] p-6 shadow-canopy flex flex-col" style={{ height: '500px' }}>
-              <h2 className="text-[22px] font-semibold mb-4 flex-shrink-0">
-                {searchMode === 'location' ? (
-                  userLocation ? (
-                    <>반경 {radiusKm}km 이내</>
-                  ) : (
-                    <>내 주변 산재 지정 기관 ({filteredHospitals.length + filteredRehabilitationCenters.length}개)</>
-                  )
+          {/* 모바일: 목록이 하단, 데스크톱: 목록이 우측 */}
+          <div className="lg:col-span-1 order-2 lg:order-2 flex flex-col" style={{ height: '650px' }}>
+            <h2 className="text-[22px] font-semibold mb-4 flex-shrink-0">
+              {searchMode === 'location' ? (
+                userLocation ? (
+                  <>산재로 치료가 가능한 곳들입니다</>
                 ) : (
-                  selectedRegion.provinceName ? (
-                    <>
-                      {selectedRegion.subDistrictName 
-                        ? `${selectedRegion.provinceName} ${selectedRegion.districtName} ${selectedRegion.subDistrictName}`
-                        : selectedRegion.districtName
-                        ? `${selectedRegion.provinceName} ${selectedRegion.districtName}`
-                        : selectedRegion.provinceName}
-                    </>
-                  ) : (
-                    <>지역을 선택해주세요</>
-                  )
-                )}
-              </h2>
-              {isFiltering && (
-                <div className="mb-4 text-sm text-[#555555] flex-shrink-0">
-                  🔄 위치 기반 필터링 중...
-                </div>
+                  <>내 주변 산재 지정 기관 ({filteredHospitals.length + filteredRehabilitationCenters.length}개)</>
+                )
+              ) : (
+                selectedRegion.provinceName ? (
+                  <>
+                    {selectedRegion.subDistrictName 
+                      ? `${selectedRegion.provinceName} ${selectedRegion.districtName} ${selectedRegion.subDistrictName}`
+                      : selectedRegion.districtName
+                      ? `${selectedRegion.provinceName} ${selectedRegion.districtName}`
+                      : selectedRegion.provinceName}
+                  </>
+                ) : (
+                  <>지역을 선택해주세요</>
+                )
               )}
-              <div className="space-y-3 overflow-y-auto flex-1 min-h-0">
+            </h2>
+            {isFiltering && (
+              <div className="mb-4 text-sm text-[#555555] flex-shrink-0">
+                🔄 위치 기반 필터링 중...
+              </div>
+            )}
+            <div className="space-y-3 overflow-y-auto flex-1 min-h-0">
                     {filteredHospitals.length === 0 && filteredRehabilitationCenters.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-8 sm:py-12" role="status" aria-live="polite">
                         <RiuLoader
@@ -986,32 +1001,33 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       <div
                         key={hospital.id}
                         onClick={() => handleHospitalClick(hospital)}
-                        className="p-3 border border-[var(--border-light)] rounded-lg hover:border-primary transition-all cursor-pointer shadow-leaf hover:shadow-canopy"
+                        className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer"
                       >
-                        <div className="flex items-start justify-between mb-1">
-                          <h3 className="font-semibold text-sm flex-1 text-[#1C1C1E]">{hospital.name}</h3>
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="text-lg sm:text-xl font-bold text-[#1C1C1E] flex-1">
+                            {hospital.name}
+                          </h3>
                           {hospital.distance !== undefined && (
-                            <span className="text-xs font-medium text-primary ml-2 whitespace-nowrap">
+                            <span className="text-xs sm:text-sm font-medium text-primary ml-2 whitespace-nowrap flex-shrink-0">
                               {formatDistance(hospital.distance)}
                             </span>
                           )}
                         </div>
-                        {/* 기관 유형 및 진료과목 표시 */}
-                        <div className="flex flex-wrap gap-1.5 mb-1">
+                        <div className="flex flex-wrap gap-2 mb-2">
                           {hospital.institution_type && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                               {hospital.institution_type}
                             </span>
                           )}
                           {hospital.department_extracted && hospital.department_extracted !== '기타' && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--color-rehabilitation)]/10 text-[var(--color-rehabilitation)]">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[var(--color-rehabilitation)]/10 text-[var(--color-rehabilitation)]">
                               {hospital.department_extracted}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-[#1C1C1E] mb-1">{hospital.address}</p>
+                        <p className="text-sm text-[#555555] mb-1">{hospital.address}</p>
                         {hospital.phone && (
-                          <p className="text-xs text-[#555555]">📞 {hospital.phone}</p>
+                          <p className="text-sm text-[#555555]">📞 {hospital.phone}</p>
                         )}
                       </div>
                     ))}
@@ -1020,26 +1036,48 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       <div
                         key={center.id}
                         onClick={() => handleRehabilitationCenterClick(center)}
-                        className="p-3 border border-[var(--border-light)] rounded-lg hover:border-[var(--color-rehabilitation)] transition-all cursor-pointer shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                        className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer"
                       >
-                        <div className="flex items-start justify-between mb-1">
-                          <h3 className="font-semibold text-sm flex-1 text-[#1C1C1E]">{center.name}</h3>
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="text-lg sm:text-xl font-bold text-[#1C1C1E] flex-1">
+                            {center.name}
+                          </h3>
                           {center.distance !== undefined && (
-                            <span className="text-xs font-medium text-[var(--color-rehabilitation)] ml-2 whitespace-nowrap">
+                            <span className="text-xs sm:text-sm font-medium text-[var(--color-rehabilitation)] ml-2 whitespace-nowrap flex-shrink-0">
                               {formatDistance(center.distance)}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-[var(--color-rehabilitation)] mb-1">🏥 {center.gigwan_fg_nm || '재활기관'}</p>
-                        <p className="text-xs text-[#1C1C1E] mb-1">{center.address}</p>
+                        <p className="text-sm text-[var(--color-rehabilitation)] mb-2">🏥 {center.gigwan_fg_nm || '재활기관'}</p>
+                        <p className="text-sm text-[#555555] mb-1">{center.address}</p>
                         {center.phone && (
-                          <p className="text-xs text-[#8A8A8E]">📞 {center.phone}</p>
+                          <p className="text-sm text-[#555555]">📞 {center.phone}</p>
                         )}
                       </div>
                     ))}
                   </>
                 )}
-              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 데이터 출처 및 주의사항 */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              데이터 출처 및 안내
+            </h3>
+            <div className="space-y-2 text-sm text-gray-700 leading-relaxed">
+              <p>
+                본 서비스에 표시된 병원, 약국, 재활기관, 직업훈련기관 정보는 <strong className="font-semibold">근로복지공단에서 제공하는 공개 API</strong>를 활용하여 제공됩니다.
+              </p>
+              <p className="text-amber-700 bg-amber-50 border-l-4 border-amber-400 pl-4 py-2 rounded">
+                <strong className="font-semibold">⚠️ 주의사항:</strong> 해당 정보는 실시간 정보가 아니며, 산재 지정이 취소되거나 기관이 폐업하는 경우 변동이 생길 수 있습니다. 
+                정확한 정보는 <a href="https://www.comwel.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-semibold">근로복지공단 홈페이지(www.comwel.or.kr)</a>에서 확인하시기 바랍니다.
+              </p>
             </div>
           </div>
         </div>

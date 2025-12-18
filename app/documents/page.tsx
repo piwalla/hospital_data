@@ -1,19 +1,27 @@
 import DocumentsList from '@/components/documents/DocumentsList';
 
-export default function DocumentsPage() {
+interface DocumentsPageProps {
+  searchParams: Promise<{ stage?: string }>;
+}
+
+export default async function DocumentsPage({ searchParams }: DocumentsPageProps) {
+  const params = await searchParams;
+  const stage = params.stage ? parseInt(params.stage, 10) : undefined;
+
   return (
     <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12 max-w-7xl space-y-8 sm:space-y-10 md:space-y-16">
       {/* 페이지 헤더 */}
       <div className="text-center relative">
         <h1 className="text-senior-title">
-          어떤 서류가 필요한가요?
+          산재 서류, 너무 복잡하죠?
         </h1>
         <p className="mt-4 sm:mt-6 text-senior-body text-muted-foreground">
-          필요한 모든 서류 양식이 여기 있습니다.
+          모든 산재 서류 양식과 설명이 여기 다 있습니다.
         </p>
       </div>
 
-      <DocumentsList />
+      {/* UX Writing 안내 문구 */}
+      <DocumentsList initialStage={stage} />
     </div>
   );
 }

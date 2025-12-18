@@ -2,11 +2,12 @@
 
 import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Star } from "lucide-react";
+import { Star, Heart } from "lucide-react";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -28,6 +29,10 @@ const Navbar = () => {
       href: "/chatbot",
       label: "산재 상담",
     },
+    {
+      href: "/counseling",
+      label: "심리 상담",
+    },
   ];
 
   return (
@@ -39,8 +44,14 @@ const Navbar = () => {
             className="flex items-center gap-2 text-xl font-bold text-white transition-opacity duration-200 hover:opacity-90"
             style={{ fontFamily: 'Paperozi, sans-serif', fontWeight: 700 }}
           >
-            <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-              <span className="text-black text-lg font-bold">π</span>
+            <div className="w-[31px] h-[31px] rounded-full bg-white flex items-center justify-center p-0.5">
+              <Image
+                src="/icons/파이왈라_마크-removebg-preview.png"
+                alt="리워크케어 로고"
+                width={28}
+                height={28}
+                className="w-7 h-7 object-contain"
+              />
             </div>
             리워크케어
           </Link>

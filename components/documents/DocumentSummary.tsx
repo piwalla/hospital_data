@@ -2,125 +2,145 @@
  * @file DocumentSummary.tsx
  * @description 서류 요약 가이드 컴포넌트
  *
- * AI 생성 서류 요약 가이드를 표시합니다.
- * 로딩 상태, 에러 상태, 요약 내용을 표시합니다.
+ * 서류 요약 가이드를 표시합니다.
  */
 
 'use client';
 
-import { useState } from 'react';
-import { AlertCircle, ExternalLink, Sparkles } from 'lucide-react';
-import type { Document, DocumentSummary } from '@/lib/types/document';
+import { ExternalLink, FileText, Youtube } from 'lucide-react';
+import type { Document } from '@/lib/types/document';
 import { Button } from '@/components/ui/button';
 import { getDisclaimer } from '@/lib/utils/disclaimer';
-import RiuIcon from '@/components/icons/riu-icon';
-import RiuLoader from '@/components/ui/riu-loader';
 
 interface DocumentSummaryProps {
   document: Document;
 }
 
 export default function DocumentSummary({ document }: DocumentSummaryProps) {
-  const [aiSummary, setAiSummary] = useState<DocumentSummary | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [fromCache, setFromCache] = useState(false);
-  const [showAiSummary, setShowAiSummary] = useState(false);
-
   const predefinedSummary = document.predefinedSummary;
 
-  const fetchAiSummary = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      setShowAiSummary(true);
-
-      console.log(`[DocumentSummary] AI 요약 요청: ${document.id}`);
-
-      const response = await fetch(`/api/documents/${document.id}/summary`);
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || '요약 생성 실패');
-      }
-
-      const data = await response.json();
-
-      if (!data.success || !data.summary) {
-        throw new Error('요약 데이터를 받을 수 없습니다.');
-      }
-
-      console.log(`[DocumentSummary] AI 요약 수신 완료: ${document.id}`);
-      setAiSummary(data.summary);
-      setFromCache(data.fromCache || false);
-    } catch (err) {
-      console.error(`[DocumentSummary] 오류: ${document.id}`, err);
-      setError(err instanceof Error ? err.message : '알 수 없는 오류');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 기본 설명이 없으면 기존 방식(AI 요약)으로 동작
+  // 기본 설명이 없으면 안내 메시지 표시
   if (!predefinedSummary) {
-    // 기존 로직 유지 (AI 요약만 표시)
     return (
-      <div className="flex items-center justify-center py-8 sm:py-12" role="status" aria-live="polite" aria-label="서류 정보를 불러오는 중">
-        <RiuLoader 
-          message="서류 정보를 불러오는 중..." 
-          iconVariants={['question', 'smile', 'cheer']}
-          logId="DocumentSummary:initial-load"
-        />
+      <div className="flex items-center justify-center py-8 sm:py-12 text-muted-foreground">
+        서류 정보를 준비 중입니다.
       </div>
     );
   }
 
   return (
     <div className="space-y-4 sm:space-y-6 py-2 sm:py-4" role="region" aria-label="서류 요약 정보">
-      {/* 기본 설명 섹션 */}
-      <div className="space-y-4 sm:space-y-6">
-        {/* 서류 목적 */}
-        <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
-          <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-foreground">
-            이 서류는 무엇인가요?
-          </h3>
+      {/* 서류 목적 (최상단 배치) */}
+      <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+        <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-primary border-b-2 border-primary/30 pb-2">
+          이 서류는 무엇인가요?
+        </h3>
+        <div className="bg-gray-50 rounded-lg p-4 sm:p-5">
           <div
-            className="text-sm sm:text-base text-foreground prose prose-sm max-w-none"
+            className="text-sm sm:text-base text-foreground prose prose-sm max-w-none space-y-3"
             dangerouslySetInnerHTML={{
               __html: predefinedSummary.summary
+                .replace(/\n\n/g, '</p><p class="mt-3">')
                 .replace(/\n/g, '<br />')
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\[중요\]/g, '<span class="inline-block bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">중요</span>')
+                .replace(/\[주의\]/g, '<span class="inline-block bg-amber-100 text-amber-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">주의</span>')
+                .replace(/\[팁\]/g, '<span class="inline-block bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">팁</span>'),
             }}
             role="article"
             aria-label="서류 목적 설명"
           />
         </div>
+      </div>
+
+      {/* 유튜브 영상 임베드 */}
+      {document.youtubeUrl && (
+        <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" aria-hidden="true" />
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">
+              영상으로 쉽게 알아보기
+            </h3>
+          </div>
+          <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+            <iframe
+              src={document.youtubeUrl
+                .replace('youtu.be/', 'www.youtube.com/embed/')
+                .replace('watch?v=', 'embed/')
+                .split('?si=')[0]
+              }
+              title="서류 작성 방법 안내 영상"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute top-0 left-0 w-full h-full"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* PDF 가이드 임베드 */}
+      {document.guidePdfPath && (
+        <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-primary" aria-hidden="true" />
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">
+              진행 과정 안내
+            </h3>
+          </div>
+          <div className="relative w-full" style={{ height: '600px' }}>
+            <iframe
+              src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${encodeURIComponent(document.guidePdfPath)}#toolbar=0&navpanes=0&scrollbar=0`}
+              title="서류 진행 과정 안내 PDF"
+              className="w-full h-full rounded-lg border border-gray-200"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 기본 설명 섹션 */}
+      <div className="space-y-4 sm:space-y-6">
 
         {/* 주요 항목별 작성 방법 */}
         {predefinedSummary.sections && predefinedSummary.sections.length > 0 && (
           <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-foreground">
+            <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-primary border-b-2 border-primary/30 pb-2">
               주요 항목별 작성 방법
             </h3>
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-4 sm:space-y-5">
               {predefinedSummary.sections
                 .sort((a, b) => a.order - b.order)
                 .map((section, index) => (
                   <div
                     key={index}
-                    className="border-l-4 border-primary pl-3 sm:pl-4 py-2"
+                    className="bg-gray-50 rounded-lg p-4 sm:p-5"
                     role="article"
                     aria-label={`${section.title} 작성 방법`}
                   >
-                    <h4 className="text-base sm:text-lg font-semibold text-foreground mb-2">
-                      {section.title}
+                    <h4 className="text-base sm:text-lg font-semibold text-foreground mb-2 flex items-start gap-2">
+                      <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary text-white text-sm font-bold flex-shrink-0">
+                        {index + 1}
+                      </span>
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: section.title
+                            .replace(/\[핵심\]/g, '<span class="inline-block bg-primary/20 text-primary font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">핵심</span>')
+                            .replace(/\[중요\]/g, '<span class="inline-block bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">중요</span>')
+                            .replace(/\[팁\]/g, '<span class="inline-block bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">팁</span>')
+                        }}
+                      />
                     </h4>
                     <div
-                      className="text-sm sm:text-base text-foreground prose prose-sm max-w-none"
+                      className="text-sm sm:text-base text-foreground prose prose-sm max-w-none ml-8 sm:ml-9"
                       dangerouslySetInnerHTML={{
                         __html: section.content
+                          .replace(/\n\n/g, '</p><p class="mt-2">')
                           .replace(/\n/g, '<br />')
-                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
+                          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                          .replace(/\[핵심\]/g, '<span class="inline-block bg-primary/20 text-primary font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">핵심</span>')
+                          .replace(/\[지급 기준\]/g, '<span class="inline-block bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">지급 기준</span>')
+                          .replace(/\[나쁜 예[^\]]*\]/g, '<span class="inline-block bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">나쁜 예</span>')
+                          .replace(/\[좋은 예[^\]]*\]/g, '<span class="inline-block bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">좋은 예</span>')
+                          .replace(/\[이동 수단별[^\]]*\]/g, '<span class="inline-block bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-1">이동 수단별</span>'),
                       }}
                     />
                   </div>
@@ -132,171 +152,56 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
         {/* 주의사항 */}
         {predefinedSummary.importantNotes &&
           predefinedSummary.importantNotes.length > 0 && (
-            <div className="bg-[var(--alert)]/10 border border-[var(--alert)]/30 rounded-lg p-4 sm:p-6" role="alert" aria-label="주의사항">
-              <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 text-[var(--alert)]">
+            <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm" role="alert" aria-label="주의사항">
+              <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 text-[var(--alert)] border-b-2 border-[var(--alert)]/30 pb-2">
                 주의사항
               </h3>
-              <ul className="space-y-2" role="list">
-                {predefinedSummary.importantNotes.map((note, index) => (
-                  <li
-                    key={index}
-                    className="text-sm sm:text-base text-foreground flex items-start"
-                    role="listitem"
-                  >
-                    <span className="mr-2 text-[var(--alert)]" aria-hidden="true">•</span>
-                    <span>{note}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="space-y-3 sm:space-y-4" role="list">
+                {predefinedSummary.importantNotes.map((note, index) => {
+                  // 대괄호 태그 추출 및 색상 매핑
+                  const tagMatch = note.match(/^\[([^\]]+)\]/);
+                  const tag = tagMatch ? tagMatch[1] : null;
+                  const content = tagMatch ? note.replace(/^\[[^\]]+\]\s*/, '') : note;
+                  
+                  // 태그별 색상 매핑
+                  const getTagStyle = (tagText: string | null) => {
+                    if (!tagText) return null;
+                    if (tagText.includes('필수') || tagText.includes('꼭')) return 'bg-red-100 text-red-700';
+                    if (tagText.includes('가능') || tagText.includes('지급')) return 'bg-green-100 text-green-700';
+                    if (tagText.includes('주의') || tagText.includes('아님')) return 'bg-amber-100 text-amber-700';
+                    return 'bg-blue-100 text-blue-700';
+                  };
+                  
+                  const tagStyle = getTagStyle(tag);
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="bg-gray-50 rounded-lg p-3 sm:p-4 flex items-start gap-3"
+                      role="listitem"
+                    >
+                      <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[var(--alert)] text-white text-sm font-bold flex-shrink-0">
+                        {index + 1}
+                      </span>
+                      <div className="flex-1">
+                        {tag && (
+                          <span className={`inline-block ${tagStyle} font-bold px-2 py-0.5 rounded text-xs sm:text-sm mr-2 mb-1`}>
+                            {tag}
+                          </span>
+                        )}
+                        <span className="text-sm sm:text-base text-foreground">{content}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
-        {/* 더 자세한 AI 설명 보기 버튼 */}
-        {!showAiSummary && (
-          <div className="flex justify-center">
-            <Button
-              onClick={fetchAiSummary}
-              disabled={loading}
-              className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-              aria-label="더 자세한 AI 설명 보기"
-            >
-              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.75} aria-hidden="true" />
-              <span className="text-xs sm:text-sm">더 자세한 AI 설명 보기</span>
-            </Button>
-          </div>
-        )}
       </div>
 
-      {/* AI 요약 섹션 (선택적 표시) */}
-      {showAiSummary && (
-        <div className="space-y-4 sm:space-y-6 border-t border-gray-200 pt-4 sm:pt-6" role="region" aria-label="AI 추가 설명">
-          {loading && (
-            <div className="py-8 sm:py-12" role="status" aria-live="polite" aria-label="AI가 서류를 분석 중입니다.">
-              <RiuLoader 
-                message="AI가 서류를 분석 중입니다..." 
-                iconVariants={['question', 'smile', 'cheer']}
-                logId="DocumentSummary:ai-analysis"
-              />
-            </div>
-          )}
-
-          {error && (
-            <div className="p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" aria-hidden="true" />
-                <h3 className="text-sm sm:text-base font-semibold text-red-600">
-                  오류 발생
-                </h3>
-              </div>
-              <p className="text-sm sm:text-base text-red-600 mb-3 sm:mb-4">{error}</p>
-              <Button
-                onClick={fetchAiSummary}
-                variant="outline"
-                className="mt-3 sm:mt-4 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                aria-label="다시 시도"
-              >
-                <span className="text-xs sm:text-sm">다시 시도</span>
-              </Button>
-            </div>
-          )}
-
-          {aiSummary && !loading && !error && (
-            <div className="space-y-4 sm:space-y-6">
-              <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <RiuIcon variant="success" size={32} className="sm:w-10 sm:h-10" aria-hidden="true" />
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" strokeWidth={1.75} aria-hidden="true" />
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground">
-                    AI 추가 설명
-                  </h3>
-                </div>
-              </div>
-
-              {/* AI 요약 내용 */}
-              <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
-                <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-foreground">
-                  이 서류는 무엇인가요? (AI 설명)
-                </h4>
-                <div
-                  className="text-sm sm:text-base text-foreground prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{
-                    __html: aiSummary.summary
-                      .replace(/\n/g, '<br />')
-                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
-                  }}
-                  role="article"
-                  aria-label="AI 서류 목적 설명"
-                />
-              </div>
-
-              {/* AI 주요 항목별 작성 방법 */}
-              {aiSummary.sections && aiSummary.sections.length > 0 && (
-                <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
-                  <h4 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-foreground">
-                    주요 항목별 작성 방법 (AI 설명)
-                  </h4>
-                  <div className="space-y-3 sm:space-y-4">
-                    {aiSummary.sections
-                      .sort((a, b) => a.order - b.order)
-                      .map((section, index) => (
-                        <div
-                          key={index}
-                          className="border-l-4 border-primary pl-3 sm:pl-4 py-2"
-                          role="article"
-                          aria-label={`${section.title} 작성 방법 (AI 설명)`}
-                        >
-                          <h5 className="text-base sm:text-lg font-semibold text-foreground mb-2">
-                            {section.title}
-                          </h5>
-                          <div
-                            className="text-sm sm:text-base text-foreground prose prose-sm max-w-none"
-                            dangerouslySetInnerHTML={{
-                              __html: section.content
-                                .replace(/\n/g, '<br />')
-                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
-                            }}
-                          />
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* AI 주의사항 */}
-              {aiSummary.importantNotes &&
-                aiSummary.importantNotes.length > 0 && (
-                  <div className="bg-[var(--alert)]/10 border border-[var(--alert)]/30 rounded-lg p-4 sm:p-6" role="alert" aria-label="주의사항 (AI 설명)">
-                    <h4 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 text-[var(--alert)]">
-                      주의사항 (AI 설명)
-                    </h4>
-                    <ul className="space-y-2" role="list">
-                      {aiSummary.importantNotes.map((note, index) => (
-                        <li
-                          key={index}
-                          className="text-sm sm:text-base text-foreground flex items-start"
-                          role="listitem"
-                        >
-                          <span className="mr-2 text-[var(--alert)]" aria-hidden="true">•</span>
-                          <span>{note}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-              {/* 캐시 표시 (개발용) */}
-              {fromCache && (
-                <p className="text-[12px] text-muted-foreground text-center">
-                  캐시된 결과입니다
-                </p>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
       {/* 다운로드 링크 */}
-      <div className="flex flex-wrap gap-2 sm:gap-4" role="group" aria-label="서류 다운로드 및 예시 링크">
+      <div className="flex flex-wrap gap-2 sm:gap-4 justify-end" role="group" aria-label="서류 다운로드 및 예시 링크">
         {document.officialDownloadUrl && (
           <Button
             asChild
@@ -341,12 +246,6 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
         <p className="text-xs sm:text-sm text-muted-foreground">{getDisclaimer()}</p>
       </div>
 
-      {/* 캐시 표시 (개발용) */}
-      {fromCache && (
-        <p className="text-xs sm:text-sm text-muted-foreground text-center">
-          캐시된 결과입니다
-        </p>
-      )}
     </div>
   );
 }

@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import DocumentDownloadButton from './DocumentDownloadButton';
+import ConditionalPDFViewer from './ConditionalPDFViewer';
 import type { StageWithDetails } from '@/lib/types/timeline';
 import { cn } from '@/lib/utils';
 
@@ -83,18 +84,19 @@ export default function TimelineDetailPanel({
     <button
       onClick={() => setActiveTab(tab)}
       className={cn(
-        "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200",
-        "text-sm sm:text-base font-medium",
+        "flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2 rounded-lg transition-all duration-200",
+        "text-[11px] sm:text-base font-medium whitespace-nowrap",
+        "flex-shrink-0",
         activeTab === tab
           ? "bg-primary text-primary-foreground"
           : "bg-[var(--background-alt)] text-muted-foreground hover:bg-[var(--background-alt)]/80"
       )}
       aria-pressed={activeTab === tab}
     >
-      <Icon className="w-4 h-4" />
+      <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
       <span>{label}</span>
       {count !== undefined && count > 0 && (
-        <span className="ml-1 px-2 py-0.5 rounded-full bg-white/20 text-xs">
+        <span className="ml-0.5 sm:ml-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-white/20 text-[10px] sm:text-xs flex-shrink-0">
           {count}
         </span>
       )}
@@ -155,7 +157,7 @@ export default function TimelineDetailPanel({
       )}
 
       {/* 탭 버튼 */}
-      <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2">
+      <div className="flex flex-nowrap gap-1 sm:gap-3 overflow-x-auto pb-2">
         {/* 1단계, 2단계, 3단계, 4단계일 때 "설명 보기" 탭 표시 */}
         {(stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
           <TabButton
@@ -172,7 +174,7 @@ export default function TimelineDetailPanel({
         />
         <TabButton
           tab="documents"
-          label="필수 서류"
+          label="서류"
           icon={FileText}
           count={stage.documents.length}
         />
@@ -189,30 +191,15 @@ export default function TimelineDetailPanel({
         {/* 설명 보기 탭 (PDF) - 1단계, 2단계, 3단계, 4단계 */}
         {activeTab === 'guide' && (stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
           <div className="space-y-3">
-            {/* 안내 텍스트 */}
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
-              <BookOpen className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-[#374151] leading-relaxed">
-                {stage.step_number === 1 
-                  ? '산재 신청하기 과정을 자세히 설명하는 가이드입니다.'
-                  : stage.step_number === 2
-                  ? '병원에서 치료받고 급여 받는 과정을 자세히 설명하는 가이드입니다.'
-                  : stage.step_number === 3
-                  ? '치료 끝나고 장해 등급 받는 과정을 자세히 설명하는 가이드입니다.'
-                  : '직장 복귀하거나 재취업하는 과정을 자세히 설명하는 가이드입니다.'}
-              </p>
+            {/* 제목 (영상 섹션과 동일한 스타일) */}
+            <div className="flex items-center gap-2 sm:gap-3 mb-3">
+              <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
+              <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
+                이렇게 진행하시면 됩니다.
+              </h2>
             </div>
-            {/* PDF 뷰어 */}
-            <div className="w-screen sm:w-full -ml-4 sm:ml-0 rounded-none sm:rounded-lg overflow-hidden border-0 sm:border border-[var(--border-medium)] bg-white shadow-sm" style={{ maxWidth: 'calc(100vw - 0px)' }}>
-              <div className="w-full h-[300px] sm:h-[400px] md:h-[600px] lg:h-[800px]">
-                <iframe
-                  src={pdfUrl}
-                  className="w-full h-full"
-                  title={`${stage.title} 가이드 PDF`}
-                  style={{ border: 'none' }}
-                />
-              </div>
-            </div>
+            {/* PDF 뷰어 (모바일: WebP 이미지, 데스크톱: PDF iframe) */}
+            <ConditionalPDFViewer stepNumber={stage.step_number} pdfUrl={pdfUrl} />
           </div>
         )}
 

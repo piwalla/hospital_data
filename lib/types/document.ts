@@ -12,6 +12,29 @@ export type DocumentCategory =
   | 'compensation'; // 보상 관련
 
 /**
+ * 요청 서류 발급처
+ */
+export type RequestedDocumentSource = 'hospital' | 'company' | 'court' | 'other';
+
+/**
+ * 요청 서류가 필요한 단계
+ */
+export type RequiredStage = 'initial' | 'treatment' | 'disability' | 'return' | 'all';
+
+/**
+ * 요청 서류 정보 (병원/회사에 요청해야 하는 서류)
+ */
+export interface RequestedDocument {
+  id: string; // 서류 고유 ID
+  name: string; // 서류명
+  source: RequestedDocumentSource; // 발급처
+  description: string; // 쉬운 설명
+  guide: string; // 어떻게 요청하는지 가이드
+  requiredStages: RequiredStage[]; // 필요한 단계
+  isOptional?: boolean; // 선택 서류 여부
+}
+
+/**
  * 미리 정의된 기본 설명 (정적 데이터)
  */
 export interface PredefinedSummary {
@@ -34,6 +57,8 @@ export interface Document {
   category: DocumentCategory; // 서류 카테고리
   officialDownloadUrl?: string; // 공식 다운로드 링크
   exampleUrl?: string; // 작성 예시 링크
+  youtubeUrl?: string; // 유튜브 설명 영상 링크
+  guidePdfPath?: string; // 가이드 PDF 파일 경로 (Supabase Storage)
   requiredDocuments?: string[]; // 필요 서류 목록
   processingPeriod?: string; // 처리 기간 (예: "7일 이내")
   relatedDocuments?: string[]; // 관련 서류 ID 목록

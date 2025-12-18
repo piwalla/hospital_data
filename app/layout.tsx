@@ -4,22 +4,13 @@ import { koKR } from "@clerk/localizations";
 
 import Navbar from "@/components/Navbar";
 import ResponsiveNavigation from "@/components/ResponsiveNavigation";
+import Footer from "@/components/Footer";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "리워크케어(ReWorkCare) - 산재 환자 지원 플랫폼",
   description: "산재 환자를 위한 통합 지원 플랫폼 - 병원 찾기, 서류 안내",
-  icons: {
-    icon: [
-      { url: '/파이왈라_마크-removebg-preview.png', sizes: 'any' },
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
-    ],
-    apple: [
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-    ],
-  },
 };
 
 export default function RootLayout({
@@ -44,6 +35,7 @@ export default function RootLayout({
               <Navbar />
               <ResponsiveNavigation />
               <main className="flex-1 pb-16 md:pb-0 w-full max-w-full overflow-x-hidden min-w-0">{children}</main>
+              <Footer />
             </div>
           </SyncUserProvider>
         </body>

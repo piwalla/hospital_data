@@ -12,6 +12,7 @@ import { CheckCircle2, FileText, AlertTriangle, ArrowRight, ArrowLeft, BookOpen 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import DocumentDownloadButton from './DocumentDownloadButton';
+import ConditionalPDFViewer from './ConditionalPDFViewer';
 import type { StageWithDetails } from '@/lib/types/timeline';
 import { cn } from '@/lib/utils';
 
@@ -68,10 +69,10 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
         }
       }}
       className={cn(
-        "flex items-center justify-center gap-2 sm:gap-3 px-3 py-3 sm:px-5 sm:py-4 rounded-lg transition-all duration-200",
-        "text-sm sm:text-lg font-medium whitespace-nowrap",
+        "flex items-center justify-center gap-1 sm:gap-3 px-2 sm:px-5 py-2 sm:py-4 rounded-lg transition-all duration-200",
+        "text-[11px] sm:text-lg font-medium whitespace-nowrap",
         "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-        "flex-1 min-w-0",
+        "flex-shrink-0",
         activeTab === tab
           ? "bg-primary text-primary-foreground"
           : "bg-primary/5 text-[#6B7280] hover:bg-primary/10 active:bg-primary/15 border border-primary/20"
@@ -82,10 +83,10 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
       aria-pressed={activeTab === tab}
       tabIndex={activeTab === tab ? 0 : -1}
     >
-      <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+      <Icon className="w-3.5 h-3.5 sm:w-6 sm:h-6 flex-shrink-0" />
       <span>{label}</span>
       {count !== undefined && count > 0 && (
-        <span className="ml-1 px-2 py-0.5 rounded-full bg-white/20 text-xs">
+        <span className="ml-0.5 sm:ml-1 px-1.5 sm:px-2 py-0.5 rounded-full bg-white/20 text-[10px] sm:text-xs flex-shrink-0">
           {count}
         </span>
       )}
@@ -112,42 +113,9 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
 
   return (
     <div className="space-y-6 sm:space-y-8 min-w-0 w-full max-w-full overflow-hidden">
-      {/* 유튜브 가이드 영상 (1단계, 2단계, 3단계, 4단계) */}
-      {youtubeVideoId && (
-        <div className="w-full space-y-3 sm:space-y-4 max-w-full overflow-hidden">
-          <div className="flex items-center gap-2 sm:gap-3 px-0 sm:px-0">
-            <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
-            <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
-              영상으로 쉽게 설명해 드려요
-            </h2>
-          </div>
-          <div className="relative w-full max-w-full rounded-xl overflow-hidden border border-[var(--border-medium)] bg-white shadow-sm">
-            <div className="relative w-full max-w-full" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${youtubeVideoId}`}
-                title={`${stage.title} 가이드 영상`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                loading="lazy"
-              />
-            </div>
-          </div>
-          <p className="text-sm sm:text-base text-muted-foreground text-center px-0 sm:px-0">
-            {stage.step_number === 1 
-              ? '산재 신청 과정을 영상으로 확인하세요'
-              : stage.step_number === 2
-              ? '병원에서 치료받고 급여 받는 과정을 영상으로 확인하세요'
-              : stage.step_number === 3
-              ? '치료 끝나고 장해 등급 받는 과정을 영상으로 확인하세요'
-              : '직장 복귀하거나 재취업하는 과정을 영상으로 확인하세요'}
-          </p>
-        </div>
-      )}
-
       {/* 탭 버튼 */}
       <div
-        className="flex flex-nowrap gap-2 sm:gap-4 w-full -mx-3 sm:mx-0 px-3 sm:px-0 min-w-0"
+        className="flex flex-nowrap gap-1 sm:gap-4 w-full min-w-0 overflow-x-auto"
         role="tablist"
         aria-label="단계 상세 정보 탭"
       >
@@ -171,11 +139,11 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
         <span id="tab-actions" className="sr-only">해야 할 일 탭</span>
         <TabButton
           tab="documents"
-          label="필수 서류"
+          label="서류"
           icon={FileText}
           count={stage.documents.length}
         />
-        <span id="tab-documents" className="sr-only">필수 서류 탭</span>
+        <span id="tab-documents" className="sr-only">서류 탭</span>
         <TabButton
           tab="warnings"
           label="주의사항"
@@ -187,45 +155,69 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
 
       {/* 탭 콘텐츠 */}
       <div className="min-h-[400px] min-w-0">
-        {/* 설명 보기 탭 (PDF) - 1단계, 2단계, 3단계, 4단계 */}
+        {/* 설명 보기 탭 (동영상 + PDF) - 1단계, 2단계, 3단계, 4단계 */}
         {activeTab === 'guide' && (stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
           <div 
             id="tabpanel-guide"
             role="tabpanel"
             aria-labelledby="tab-guide"
-            className="space-y-4 sm:space-y-5"
+            className="space-y-6 sm:space-y-8"
           >
-            {/* 안내 텍스트 */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
-              <div className="flex items-start gap-3 sm:gap-4">
-                <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-primary flex-shrink-0 mt-0.5" />
-                <p className="text-base sm:text-base text-[#374151] leading-relaxed">
-                  이렇게 진행하시면 됩니다.
+            {/* 유튜브 가이드 영상 */}
+            {youtubeVideoId && (
+              <div className="w-full space-y-3 sm:space-y-4 max-w-full overflow-hidden">
+                <div className="flex items-center gap-2 sm:gap-3 px-0 sm:px-0">
+                  <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
+                  <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
+                    영상으로 쉽게 설명해 드려요
+                  </h2>
+                </div>
+                <div className="relative w-full max-w-full rounded-xl overflow-hidden border border-[var(--border-medium)] bg-white shadow-sm">
+                  <div className="relative w-full max-w-full" style={{ paddingBottom: '56.25%' }}>
+                    <iframe
+                      className="absolute top-0 left-0 w-full h-full"
+                      src={`https://www.youtube.com/embed/${youtubeVideoId}`}
+                      title={`${stage.title} 가이드 영상`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      loading="lazy"
+                    />
+                  </div>
+                </div>
+                <p className="text-sm sm:text-base text-muted-foreground text-center px-0 sm:px-0">
+                  {stage.step_number === 1 
+                    ? '산재 신청 과정을 영상으로 확인하세요'
+                    : stage.step_number === 2
+                    ? '병원에서 치료받고 급여 받는 과정을 영상으로 확인하세요'
+                    : stage.step_number === 3
+                    ? '치료 끝나고 장해 등급 받는 과정을 영상으로 확인하세요'
+                    : '직장 복귀하거나 재취업하는 과정을 영상으로 확인하세요'}
                 </p>
               </div>
-              <div className="sm:ml-auto">
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <a href={pdfUrl ?? '#'} download target="_blank" rel="noreferrer">
-                    PDF 다운로드
-                  </a>
-                </Button>
+            )}
+
+            {/* PDF 가이드 */}
+            <div className="w-full space-y-3 sm:space-y-4 max-w-full overflow-hidden">
+              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
+                <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
+                <div className="flex items-center justify-between flex-1">
+                  <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
+                    이렇게 진행하시면 됩니다.
+                  </h2>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <a href={pdfUrl ?? '#'} download target="_blank" rel="noreferrer">
+                      PDF 다운로드
+                    </a>
+                  </Button>
+                </div>
               </div>
-            </div>
-            {/* PDF 뷰어 */}
-            <div className="w-full max-w-full rounded-xl overflow-hidden border border-[var(--border-medium)] bg-white shadow-sm">
-              <div className="w-full max-w-full h-[400px] sm:h-[500px] md:h-[700px] lg:h-[1000px]">
-                <iframe
-                  src={pdfUrl}
-                  className="w-full h-full"
-                  title={`${stage.title} 가이드 PDF`}
-                  style={{ border: 'none' }}
-                />
-              </div>
+              {/* PDF 뷰어 (모바일: WebP 이미지, 데스크톱: PDF iframe) */}
+              <ConditionalPDFViewer stepNumber={stage.step_number} pdfUrl={pdfUrl} />
             </div>
           </div>
         )}
@@ -276,28 +268,45 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
             {stage.documents.length === 0 ? (
               <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">필수 서류가 없습니다.</p>
             ) : (
-              <ul className="space-y-4 sm:space-y-5" role="list" aria-label="필수 서류 목록">
-                {stage.documents.map((doc) => (
-                  <li
-                    key={doc.id}
-                    className="flex items-start justify-between gap-3 p-4 sm:p-5 md:p-6 rounded-xl border border-[var(--border-medium)] bg-white"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        {doc.is_required && (
-                          <span className="text-xs font-semibold text-primary px-2 py-0.5 rounded bg-primary/20 flex-shrink-0">
-                            필수
+              <>
+                <ul className="space-y-4 sm:space-y-5" role="list" aria-label="필수 서류 목록">
+                  {stage.documents.map((doc) => (
+                    <li
+                      key={doc.id}
+                      className="flex items-start justify-between gap-3 p-4 sm:p-5 md:p-6 rounded-xl border border-[var(--border-medium)] bg-white"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          {doc.is_required && (
+                            <span className="text-xs font-semibold text-primary px-2 py-0.5 rounded bg-primary/20 flex-shrink-0">
+                              필수
+                            </span>
+                          )}
+                          <span className="text-senior-body font-medium text-foreground break-words">
+                            {doc.title}
                           </span>
-                        )}
-                        <span className="text-senior-body font-medium text-foreground break-words">
-                          {doc.title}
-                        </span>
+                        </div>
                       </div>
-                    </div>
-                    <DocumentDownloadButton document={doc} />
-                  </li>
-                ))}
-              </ul>
+                      <DocumentDownloadButton document={doc} />
+                    </li>
+                  ))}
+                </ul>
+                {/* 더 자세한 서류 안내 링크 */}
+                <div className="mt-4 sm:mt-6 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
+                  <p className="text-sm sm:text-base text-foreground mb-3">
+                    💡 이 서류에 대해 더 자세히 알고 싶으신가요?
+                  </p>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                  >
+                    <Link href={`/documents?stage=${stage.step_number}`}>
+                      {stage.step_number}단계 서류 안내 자세히 보기
+                    </Link>
+                  </Button>
+                </div>
+              </>
             )}
           </div>
         )}

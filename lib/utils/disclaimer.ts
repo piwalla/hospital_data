@@ -8,7 +8,7 @@
 /**
  * 면책 조항 텍스트
  */
-export const DISCLAIMER_TEXT = `※ 이 내용은 법률적/의학적 자문이 아니며, 참고용 정보입니다.
+export const DISCLAIMER_TEXT = `이 내용은 법률적/의학적 자문이 아니며, 참고용 정보입니다.
 정확한 내용은 근로복지공단(www.comwel.or.kr) 또는 전문가와 상의하세요.`;
 
 /**

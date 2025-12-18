@@ -29,6 +29,17 @@ export default async function ChatbotPage() {
         </p>
       </div>
 
+      {/* 법적 고지 */}
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 sm:p-6">
+        <p className="text-sm sm:text-base text-foreground leading-relaxed">
+          <strong className="font-semibold text-amber-800">법적 고지</strong>
+          <br />
+          본 챗봇은 근로복지공단과 법제처에서 제공하는 각종 산재 규정을 전문으로 학습된 RAG 챗봇입니다.
+          <br />
+          <strong className="font-semibold text-amber-800">정확한 사항은 꼭 근로복지공단(www.comwel.or.kr)에 확인하시기 바랍니다.</strong>
+        </p>
+      </div>
+
       <RagChatbot />
     </div>
   );

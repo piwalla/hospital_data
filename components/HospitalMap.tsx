@@ -185,10 +185,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         center: new window.naver.maps.LatLng(mapCenter.lat, mapCenter.lng),
         zoom: zoom,
         mapTypeControl: true,
-        zoomControl: true,
-        zoomControlOptions: {
-          position: window.naver.maps.Position.TOP_RIGHT,
-        },
+        zoomControl: false, // 줌 컨트롤 비활성화
         scaleControl: false, // 기본 스케일바 비활성화 (커스텀 스케일바 사용)
       });
 
@@ -372,7 +369,17 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
                   ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${hospital.phone}</p>` : ''}
                   <div style="display:flex;gap:8px;margin-top:8px;">
                     ${hospital.phone ? `<button onclick="window.open('tel:${hospital.phone}')" style="padding:6px 12px;background:${COLORS.primary};color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
-                    <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(hospital.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
+                    <button onclick="(function() {
+                      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                      const address = '${hospital.address.replace(/'/g, "\\'")}';
+                      if (isMobile) {
+                        // 모바일: 주소 기반 검색 링크 사용
+                        window.open('https://m.map.naver.com/search/' + encodeURIComponent(address), '_blank');
+                      } else {
+                        // 데스크톱: 주소 기반 검색 링크 사용
+                        window.open('https://map.naver.com/search/' + encodeURIComponent(address), '_blank');
+                      }
+                    })()" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
                   </div>
                 </div>
               `,
@@ -441,7 +448,17 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
                   ${center.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${center.phone}</p>` : ''}
                   <div style="display:flex;gap:8px;margin-top:8px;">
                     ${center.phone ? `<button onclick="window.open('tel:${center.phone}')" style="padding:6px 12px;background:${COLORS.rehabilitation};color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
-                    <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(center.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
+                    <button onclick="(function() {
+                      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                      const address = '${center.address.replace(/'/g, "\\'")}';
+                      if (isMobile) {
+                        // 모바일: 주소 기반 검색 링크 사용
+                        window.open('https://m.map.naver.com/search/' + encodeURIComponent(address), '_blank');
+                      } else {
+                        // 데스크톱: 주소 기반 검색 링크 사용
+                        window.open('https://map.naver.com/search/' + encodeURIComponent(address), '_blank');
+                      }
+                    })()" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
                   </div>
                 </div>
               `,
@@ -759,11 +776,11 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   }
 
   return (
-    <div className="relative w-full rounded-lg border border-gray-200" style={{ height: '500px' }}>
+    <div className="relative w-full rounded-lg border border-gray-200" style={{ height: '650px' }}>
       <div
         ref={mapRef}
         className="w-full h-full relative"
-        style={{ height: '500px' }}
+        style={{ height: '650px' }}
       />
     </div>
   );

@@ -40,10 +40,10 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
       {/* 페이지 헤더 */}
       <div className="text-center relative">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
-          산재 어떻게 진행하나요?
+          어떻게 치료 받나요?
         </h1>
         <p className="mt-4 sm:mt-6 text-senior-body text-muted-foreground">
-          산재 신청 부터 치료, 복귀까지 한번에 살펴보세요
+          산재 신청부터 보상까지 아래대로 하세요
         </p>
         {/* 비디오 가이드 버튼 - 항상 접근 가능, 우측 정렬 */}
         <div className="mt-4 sm:mt-6 flex justify-end">

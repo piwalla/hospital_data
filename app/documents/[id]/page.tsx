@@ -10,10 +10,6 @@ import { notFound } from 'next/navigation';
 import { findDocumentById } from '@/lib/data/documents';
 import DocumentSummary from '@/components/documents/DocumentSummary';
 import DocumentAssistant from '@/components/documents/DocumentAssistant';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import RiuIcon from '@/components/icons/riu-icon';
 
 interface DocumentDetailPageProps {
   params: Promise<{ id: string }>;
@@ -32,28 +28,13 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
       {/* 헤더 */}
       <div className="sticky top-0 z-10 bg-[var(--background)] border-b border-[var(--border-light)] shadow-leaf">
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-4xl">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Button
-              asChild
-              variant="ghost"
-              size="sm"
-              aria-label="서류 목록으로 돌아가기"
-            >
-              <Link href="/documents">
-                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-              </Link>
-            </Button>
-            <div className="flex items-center gap-2 sm:gap-3 flex-1">
-              <RiuIcon variant="cheer" size={32} className="sm:w-10 sm:h-10" aria-hidden="true" />
-              <div>
-                <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-                  {document.name}
-                </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  {document.description}
-                </p>
-              </div>
-            </div>
+          <div>
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+              {document.name}
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              {document.description}
+            </p>
           </div>
         </div>
       </div>
