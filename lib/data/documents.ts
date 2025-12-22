@@ -25,6 +25,8 @@ export const DOCUMENTS: Document[] = [
     category: 'application',
     officialDownloadUrl: '/pdf/요양급여신청서.pdf',
     exampleUrl: '/pdf/요양급여신청서.pdf',
+    youtubeUrl: 'https://youtu.be/jR6CJS-GPYM?si=RE8yfJmxfs4ZETWg',
+    guidePdfPath: 'Sanjae_Application_First_Step.pdf',
     requiredDocuments: [
       '산재용 소견서/진단서 (병원에 요청)',
       '의무기록사본 (병원에 요청)',
@@ -75,6 +77,8 @@ export const DOCUMENTS: Document[] = [
     category: 'application',
     officialDownloadUrl: '/pdf/사고경위서.pdf',
     exampleUrl: '/pdf/사고경위서.pdf',
+    youtubeUrl: 'https://youtu.be/FlSxnNFUctI?si=ikFptNvmeHtUUP8m',
+    guidePdfPath: 'Accident Statement.pdf',
     requiredDocuments: [
       '초진차트(의무기록사본) - 병원 기록과 경위서 내용이 일치해야 합니다!',
       '목격자 진술서 (해당 시)',
@@ -646,6 +650,8 @@ export const DOCUMENTS: Document[] = [
     category: 'benefit',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
+    youtubeUrl: 'https://youtu.be/9-g7nEpciX8?si=ZB7lnTCUGT3IwIg4',
+    guidePdfPath: 'nursing care expenses.pdf',
     requiredDocuments: [
       '간병급여 청구서',
       '간병 사실 확인서 (전문 간병인인 경우, 간병 협회 발급)',
@@ -726,6 +732,8 @@ export const DOCUMENTS: Document[] = [
     category: 'application',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
+    youtubeUrl: 'https://youtu.be/DQAkybxo_tU?si=8C2PTqSBLsKFx5Tm',
+    guidePdfPath: 'Parallel treatment.pdf',
     requiredDocuments: [
       '병행진료 신청서',
       '타 의료기관 진료 의뢰서 (주치의 작성)',

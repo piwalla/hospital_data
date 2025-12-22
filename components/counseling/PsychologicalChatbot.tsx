@@ -17,9 +17,11 @@
 
 import { useState } from 'react';
 import { Loader2, Send, Heart } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import RiuLoader from '@/components/ui/riu-loader';
+import { PersonaType, DEFAULT_PERSONA, PERSONAS } from '@/lib/types/persona';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -38,6 +40,7 @@ export default function PsychologicalChatbot() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPersona, setSelectedPersona] = useState<PersonaType>(DEFAULT_PERSONA);
 
   const handleSend = async (customMessage?: string) => {
     const finalMessage = (customMessage ?? message).trim();
@@ -66,6 +69,7 @@ export default function PsychologicalChatbot() {
         body: JSON.stringify({
           message: finalMessage,
           conversationHistory: messages,
+          persona: selectedPersona,
         }),
         signal: controller.signal,
       });
@@ -157,6 +161,57 @@ export default function PsychologicalChatbot() {
       role="region"
       aria-label="심리 상담 챗봇"
     >
+      {/* 페르소나 선택 */}
+      <div className="mb-4 sm:mb-6">
+        <h3 className="text-sm sm:text-base font-semibold text-foreground mb-3">
+          누구와 상담하시겠어요?
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {(Object.keys(PERSONAS) as PersonaType[]).map((personaId) => {
+            const persona = PERSONAS[personaId];
+            const isSelected = selectedPersona === personaId;
+            return (
+              <button
+                key={personaId}
+                type="button"
+                onClick={() => setSelectedPersona(personaId)}
+                disabled={loading}
+                className={`
+                  p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 text-left
+                  ${isSelected
+                    ? 'border-primary bg-primary/5 shadow-md'
+                    : 'border-[var(--border-light)] bg-white hover:border-primary/50 hover:bg-primary/2'
+                  }
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+                `}
+                aria-label={`${persona.name} (${persona.role}) 선택`}
+                aria-pressed={isSelected}
+              >
+                <div className="flex flex-col items-center mb-3">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden mb-2 border-2 border-gray-200">
+                    <Image
+                      src={persona.imagePath}
+                      alt={`${persona.name} (${persona.role})`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 80px, 96px"
+                    />
+                  </div>
+                  <div className="font-semibold text-sm sm:text-base text-foreground text-center">
+                    {persona.name}
+                    <span className="text-xs text-muted-foreground ml-1">({persona.role})</span>
+                  </div>
+                </div>
+                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 text-center">
+                  {persona.description}
+                </p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 추천 질문 */}
       <div className="mb-4 sm:mb-6">
         <div 
@@ -200,12 +255,24 @@ export default function PsychologicalChatbot() {
               className={msg.role === 'user' ? 'text-right' : 'text-left'}
             >
               <div
-                className={`inline-block max-w-[85%] sm:max-w-[80%] rounded-lg p-3 sm:p-4 ${
+                className={`inline-block max-w-[85%] sm:max-w-[80%] rounded-lg p-3 sm:p-4 relative ${
                   msg.role === 'user'
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-gray-50 text-foreground border border-[var(--border-light)]'
                 }`}
               >
+                {msg.role === 'user' && (
+                  <div
+                    className="absolute -right-2 bottom-2 z-10"
+                    style={{
+                      width: 0,
+                      height: 0,
+                      borderLeft: '10px solid var(--primary)',
+                      borderTop: '8px solid transparent',
+                      borderBottom: '8px solid transparent',
+                    }}
+                  />
+                )}
                 {msg.role === 'assistant' ? (
                   <div
                     className="prose prose-sm sm:prose-base max-w-none"
@@ -279,4 +346,5 @@ export default function PsychologicalChatbot() {
     </div>
   );
 }
+
 

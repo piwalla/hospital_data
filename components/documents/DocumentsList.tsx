@@ -156,13 +156,13 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
       {/* 섹션 1: 직접 작성하는 서류 */}
       <section
         aria-labelledby="section-write"
-        className="bg-white rounded-lg border border-[var(--border-light)] shadow-sm p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5"
+        className="space-y-4 sm:space-y-5"
       >
         <header className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 sm:gap-3">
             <FileEdit className="w-4 h-4 sm:w-5 sm:h-5 text-primary" strokeWidth={1.75} />
             <h2 id="section-write" className="text-sm sm:text-base md:text-lg font-semibold text-foreground">
-              직접 작성하는 서류
+              직접 작성하게 되는 서류 12가지예요
             </h2>
           </div>
           <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
@@ -171,7 +171,7 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
         </header>
 
         <div 
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-7"
           role="list"
           aria-label="작성 서류 카드 목록"
         >
@@ -183,7 +183,7 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
             <div
               key={document.id}
               className={cn(
-                'group relative bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-5 md:p-6',
+                'group relative bg-white rounded-lg border border-[var(--border-light)] p-5 sm:p-6 md:p-7 lg:p-8',
                 'hover:border-primary transition-all duration-200',
                 'text-left w-full h-full flex flex-col',
                 'shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
@@ -195,18 +195,35 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
                 <div className="flex items-start gap-3 mb-3">
                   <div
                     className={cn(
-                      'w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0',
+                      'w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0',
                       'bg-primary/10'
                     )}
                     aria-hidden="true"
                   >
-                    <Icon className={cn('w-5 h-5 sm:w-6 sm:h-6', iconColor)} strokeWidth={1.75} />
+                    <Icon className={cn('w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8', iconColor)} strokeWidth={1.75} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg md:text-[27px] font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                      {document.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-1">
+                    {(() => {
+                      // 괄호 안의 내용을 분리
+                      const match = document.name.match(/^(.+?)\s*\((.+?)\)\s*$/);
+                      if (match) {
+                        const [, mainName, bracketContent] = match;
+                        return (
+                          <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+                            <span className="block">{mainName}</span>
+                            <span className="block text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground font-normal">
+                              ({bracketContent})
+                            </span>
+                          </h3>
+                        );
+                      }
+                      return (
+                        <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                          {document.name}
+                        </h3>
+                      );
+                    })()}
+                    <p className="text-xs sm:text-sm md:text-base text-muted-foreground line-clamp-3 mt-2">
                       {document.description}
                     </p>
                   </div>

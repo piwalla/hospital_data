@@ -17,8 +17,9 @@ interface TimelineStepPageProps {
   searchParams: Promise<{ tab?: string }>;
 }
 
-// 동적 렌더링 강제
+// 동적 렌더링 강제 (하지만 캐싱을 통해 성능 최적화)
 export const dynamic = 'force-dynamic';
+export const revalidate = 60; // 60초마다 재검증 (캐싱 활용)
 
 export default async function TimelineStepPage({ params, searchParams }: TimelineStepPageProps) {
   const { stepNumber } = await params;

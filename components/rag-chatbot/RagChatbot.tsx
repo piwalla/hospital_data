@@ -329,13 +329,7 @@ export default function RagChatbot() {
           <div className="text-left">
             <div className="inline-block bg-gray-50 border border-[var(--border-light)] rounded-lg p-3 sm:p-4">
               <RiuLoader
-                message={
-                  loadingStage === 'analyzing' 
-                    ? '질문을 분석하고 있어요...'
-                    : loadingStage === 'searching'
-                    ? '관련 정보를 찾고 있어요...'
-                    : '전문가가 답변을 작성 중이에요...'
-                }
+                message="산재 규정을 살펴보고 있어요. 잠시만 기다려 주세요."
                 iconVariants={['question', 'smile', 'cheer']}
                 logId="RagChatbot:loading"
                 ariaDescription="답변 생성 중"

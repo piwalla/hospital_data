@@ -301,7 +301,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                     variant="outline"
                     className="w-full sm:w-auto"
                   >
-                    <Link href={`/documents?stage=${stage.step_number}`}>
+                    <Link href={`/documents?stage=${stage.step_number}`} prefetch={false}>
                       {stage.step_number}단계 서류 안내 자세히 보기
                     </Link>
                   </Button>

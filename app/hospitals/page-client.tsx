@@ -429,8 +429,8 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
     <>
       <div className="container mx-auto px-4 pt-4 pb-12">
         {/* 최상단 멘트 */}
-        <div className="mb-6">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-primary text-center leading-tight">
+        <div className="mb-6 text-center">
+          <h1 className="text-senior-title">
             어디서 치료되나요?
           </h1>
           {userLocation && searchMode === 'location' && initialInstitutionCount !== null && initialCounts && (
@@ -1001,7 +1001,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       <div
                         key={hospital.id}
                         onClick={() => handleHospitalClick(hospital)}
-                        className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                        className="bg-white rounded-xl border-2 border-[#14532D] p-4 sm:p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="text-lg sm:text-xl font-bold text-[#1C1C1E] flex-1">
@@ -1036,7 +1036,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       <div
                         key={center.id}
                         onClick={() => handleRehabilitationCenterClick(center)}
-                        className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                        className="bg-white rounded-xl border-2 border-[#14532D] p-4 sm:p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="text-lg sm:text-xl font-bold text-[#1C1C1E] flex-1">

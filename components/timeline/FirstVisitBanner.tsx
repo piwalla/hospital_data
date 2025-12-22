@@ -37,7 +37,7 @@ export default function FirstVisitBanner() {
 
   return (
     <div 
-      className="relative p-4 sm:p-6 rounded-xl border-2 border-primary/30 bg-primary/10 mb-6 sm:mb-8"
+      className="relative p-4 sm:p-6 rounded-xl border border-gray-200 bg-gray-50 mb-6 sm:mb-8"
       role="alert"
       aria-label="첫 방문 안내"
       aria-live="polite"

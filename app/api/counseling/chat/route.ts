@@ -9,12 +9,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateContentWithRetry } from '@/lib/api/gemini';
 import { createPsychologicalSupportPrompt } from '@/lib/prompts/psychological-support';
 import { logApiError } from '@/lib/utils/error-logging';
+import { PersonaType, DEFAULT_PERSONA } from '@/lib/types/persona';
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
   try {
-    const { message, conversationHistory = [] } = await request.json();
+    const { message, conversationHistory = [], persona = DEFAULT_PERSONA } = await request.json();
 
     if (!message || typeof message !== 'string' || message.trim().length < 2) {
       return NextResponse.json(
@@ -26,8 +27,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // persona 유효성 검증
+    const validPersonas: PersonaType[] = ['jungwon', 'gangseok', 'miyoung'];
+    const selectedPersona: PersonaType = validPersonas.includes(persona) ? persona : DEFAULT_PERSONA;
+
     // 심리 지원 특화 프롬프트 생성
     const prompt = createPsychologicalSupportPrompt({
+      persona: selectedPersona,
       message: message.trim(),
       conversationHistory,
     });
@@ -47,11 +53,14 @@ export async function POST(request: NextRequest) {
     const responseTime = Date.now() - startTime;
 
     // 에러 로깅
-    logApiError('counseling_chat', error, {
-      responseTime,
+    logApiError(error, {
+      component: 'CounselingChat',
+      action: 'POST',
+      method: 'POST',
       path: '/api/counseling/chat',
-    }).catch(() => {
-      // 로깅 실패는 무시
+      metadata: {
+        responseTime,
+      },
     });
 
     console.error('[CounselingChat] API 오류:', error);
@@ -76,4 +85,5 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
 

@@ -40,17 +40,16 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
   return (
     <Link
       href={`/timeline/${stepNumber}`}
-        className={cn(
+      prefetch={false}
+      className={cn(
         "group relative w-full max-w-full text-left rounded-xl overflow-hidden cursor-pointer",
         "transition-all duration-200 ease-in-out",
-        // 외곽선 70% 줄임 (6px → 2px) 및 기본 그림자 추가
-        isCurrentStep 
-          ? "bg-primary/15 hover:bg-[#f7f9f7] active:bg-primary/25 border-2 border-black shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
-          : "bg-white hover:bg-[#f7f9f7] active:bg-primary/12 border-2 border-black hover:border-black shadow-[0_4px_12px_rgba(0,0,0,0.08)]",
-        "hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:-translate-y-0.5",
-        "active:scale-[0.98] active:shadow-inner active:translate-y-0",
+        isCurrentStep
+          ? "bg-primary/5 border-2 border-[#14532D] shadow-md"
+          : "bg-white border-2 border-[#14532D] shadow-sm hover:shadow-md",
+        "hover:-translate-y-0.5",
         "p-4 sm:p-6 block",
-        "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+        "focus:outline-none focus:ring-2 focus:ring-primary/60 focus:ring-offset-2",
         "touch-manipulation" // 모바일 터치 최적화
       )}
       aria-label={`${stage.step_number}단계: ${stage.title} 자세히 보기`}
@@ -81,7 +80,7 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
 
         {/* 내용 */}
         <div className="flex-1 min-w-0">
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-black mb-2 sm:mb-3 leading-tight break-words">
+          <h3 className="text-xl sm:text-2xl md:text-2xl font-extrabold text-black mb-2 sm:mb-3 leading-tight break-words">
             {stage.title}
           </h3>
           <p id={`step-${stage.step_number}-description`} className="text-sm sm:text-base text-[#374151] leading-relaxed break-words mb-3 sm:mb-4">

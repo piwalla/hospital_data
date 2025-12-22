@@ -87,8 +87,8 @@ export default async function RequestedDocumentDetailPage({ params }: RequestedD
         {/* 안내 문구 */}
         <section className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4" aria-label="추가 안내">
           <p className="text-xs sm:text-sm text-blue-900">
-            이 서류는 <strong>환자가 직접 작성하는 서류가 아니라</strong>, 병원이나 회사에 "
-            <strong>이 서류 발급해 주세요</strong>"라고 요청해야 하는 서류입니다.
+            이 서류는 <strong>환자가 직접 작성하는 서류가 아니라</strong>, 병원이나 회사에 &quot;
+            <strong>이 서류 발급해 주세요</strong>&quot;라고 요청해야 하는 서류입니다.
             어려우시면 병원 원무과나 회사 인사 담당자에게 이 화면을 보여주고 도움을 요청하셔도 좋습니다.
           </p>
         </section>
@@ -96,6 +96,7 @@ export default async function RequestedDocumentDetailPage({ params }: RequestedD
     </div>
   );
 }
+
 
 
 
