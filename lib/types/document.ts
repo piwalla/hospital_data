@@ -29,6 +29,7 @@ export interface RequestedDocument {
   name: string; // 서류명
   source: RequestedDocumentSource; // 발급처
   description: string; // 쉬운 설명
+  searchKeywords?: string[]; // 검색 키워드
   guide: string; // 어떻게 요청하는지 가이드
   requiredStages: RequiredStage[]; // 필요한 단계
   isOptional?: boolean; // 선택 서류 여부
@@ -54,6 +55,7 @@ export interface Document {
   id: string; // 서류 고유 ID (예: "workplace-accident-application")
   name: string; // 서류 이름 (예: "산재신청서")
   description: string; // 서류 설명
+  searchKeywords?: string[]; // 검색 키워드 (일반인이 검색할 만한 용어)
   category: DocumentCategory; // 서류 카테고리
   officialDownloadUrl?: string; // 공식 다운로드 링크
   exampleUrl?: string; // 작성 예시 링크

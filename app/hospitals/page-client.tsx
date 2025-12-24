@@ -71,6 +71,9 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
     subDistrictName: null,
   }); // 지역 선택 상태
 
+  // 모바일 보기 모드 상태 ('map' | 'list')
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+
   const handleHospitalClick = (hospital: Hospital) => {
     setSelectedHospital(hospital);
     setSelectedRehabilitationCenter(null); // 재활기관 초기화
@@ -430,7 +433,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
       <div className="container mx-auto px-4 pt-4 pb-12">
         {/* 최상단 멘트 */}
         <div className="mb-6 text-center">
-          <h1 className="text-senior-title">
+          <h1 className="text-senior-title bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-green-800 to-green-600 drop-shadow-sm pb-1">
             어디서 치료되나요?
           </h1>
           {userLocation && searchMode === 'location' && initialInstitutionCount !== null && initialCounts && (
@@ -705,22 +708,61 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
           </div>
         )}
         
-        {/* 반응형 레이아웃: 모바일은 세로, 데스크톱은 가로 */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* 모바일: 지도가 상단, 데스크톱: 지도가 좌측 */}
-          <div className="lg:col-span-2 order-1 lg:order-1">
+        {/* 모바일 뷰 모드 전환 탭 (Segmented Control) */}
+        <div className="lg:hidden mb-4">
+          <div className="flex p-1 bg-gray-100 rounded-lg">
+            <button
+              onClick={() => setViewMode('map')}
+              className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                viewMode === 'map'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              지도 보기
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex-1 py-2.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                viewMode === 'list'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900'
+              }`}
+            >
+              목록 보기
+            </button>
+          </div>
+        </div>
+        {/* ... (existing header) ... */}
+        
+
+
+        {/* ... (existing filters) ... */}
+
+        {/* 반응형 레이아웃: 모바일은 탭 선택에 따라 표시, 데스크톱은 가로 2단 */}
+        {/* 반응형 레이아웃: 모바일은 탭 선택에 따라 표시, 데스크톱은 가로 2단 */}
+        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
+          {/* 지도 영역 */}
+          <div className={`min-w-0 ${viewMode === 'list' ? 'max-lg:hidden' : ''}`}>
             <HospitalMap 
-              hospitals={hospitalsForMap} // 필터링된 병원 목록
-              rehabilitationCenters={rehabilitationCentersForMap} // 필터링된 재활기관 목록
-              onHospitalClick={handleHospitalClick}
-              onRehabilitationCenterClick={handleRehabilitationCenterClick} // 재활기관 클릭 핸들러
+              hospitals={hospitalsForMap}
+              rehabilitationCenters={rehabilitationCentersForMap}
+              onHospitalClick={(hospital) => {
+                handleHospitalClick(hospital);
+              }}
+              onRehabilitationCenterClick={(center) => {
+                handleRehabilitationCenterClick(center);
+              }}
               center={userLocation ? { lat: userLocation.lat, lng: userLocation.lng } : undefined}
-              zoom={getZoomLevelByRadius(radiusKm)} // 반경에 따른 zoom 레벨
-              userLocation={userLocation} // 사용자 위치 전달 (마커 표시용)
+              zoom={getZoomLevelByRadius(radiusKm)}
+              userLocation={userLocation}
               onLocationChange={handleLocationChange}
-              enableLocationChange={searchMode === 'location'} // 지역 선택 모드에서는 지도 이동 시 재검색 비활성화
+              enableLocationChange={searchMode === 'location'}
             />
-            
+          </div>
+          
+          {/* 목록 영역 */}
+          <div className={`min-w-0 flex flex-col ${viewMode === 'map' ? 'max-lg:hidden' : ''} h-[450px] lg:h-[650px]`}>
             {/* 선택된 병원/재활기관 정보 패널 (지도 아래) */}
             {(selectedHospital || selectedRehabilitationCenter) && (
               <div className="mt-4 bg-white rounded-lg border border-[var(--border-light)] p-6 shadow-canopy">
@@ -950,14 +992,13 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                 )}
               </div>
             )}
-          </div>
-          
-          {/* 모바일: 목록이 하단, 데스크톱: 목록이 우측 */}
-          <div className="lg:col-span-1 order-2 lg:order-2 flex flex-col" style={{ height: '650px' }}>
-            <h2 className="text-[22px] font-semibold mb-4 flex-shrink-0">
+            
+            {/* 모바일: 목록이 하단, 데스크톱: 목록이 우측 */}
+            
+              <h2 className="text-lg font-semibold mb-4 flex-shrink-0 animate-fade-in">
               {searchMode === 'location' ? (
                 userLocation ? (
-                  <>산재로 치료가 가능한 곳들입니다</>
+                  <>주변에서 산재로 치료되는 기관 리스트입니다</>
                 ) : (
                   <>내 주변 산재 지정 기관 ({filteredHospitals.length + filteredRehabilitationCenters.length}개)</>
                 )
@@ -1001,7 +1042,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       <div
                         key={hospital.id}
                         onClick={() => handleHospitalClick(hospital)}
-                        className="bg-white rounded-xl border-2 border-[#14532D] p-4 sm:p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"
+                        className="bg-green-50/30 rounded-[24px] border border-gray-100 p-5 sm:p-7 shadow-md sm:shadow-sm sm:hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-out cursor-pointer"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="text-lg sm:text-xl font-bold text-[#1C1C1E] flex-1">
@@ -1036,7 +1077,7 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
                       <div
                         key={center.id}
                         onClick={() => handleRehabilitationCenterClick(center)}
-                        className="bg-white rounded-xl border-2 border-[#14532D] p-4 sm:p-6 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-in-out cursor-pointer"
+                        className="bg-green-50/30 rounded-[24px] border border-gray-100 p-5 sm:p-7 shadow-md sm:shadow-sm sm:hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ease-out cursor-pointer"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="text-lg sm:text-xl font-bold text-[#1C1C1E] flex-1">
@@ -1061,21 +1102,21 @@ export default function HospitalsPageClient({ hospitals: initialHospitals }: Hos
           </div>
         </div>
 
-        {/* 데이터 출처 및 주의사항 */}
+        {/* 주의사항 및 데이터 출처 */}
         <div className="mt-12 pt-8 border-t border-gray-200">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
             <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
-              데이터 출처 및 안내
+              주의사항
             </h3>
-            <div className="space-y-2 text-sm text-gray-700 leading-relaxed">
+            <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
               <p>
                 본 서비스에 표시된 병원, 약국, 재활기관, 직업훈련기관 정보는 <strong className="font-semibold">근로복지공단에서 제공하는 공개 API</strong>를 활용하여 제공됩니다.
               </p>
-              <p className="text-amber-700 bg-amber-50 border-l-4 border-amber-400 pl-4 py-2 rounded">
-                <strong className="font-semibold">⚠️ 주의사항:</strong> 해당 정보는 실시간 정보가 아니며, 산재 지정이 취소되거나 기관이 폐업하는 경우 변동이 생길 수 있습니다. 
+              <p>
+                해당 정보는 실시간 정보가 아니며, 산재 지정이 취소되거나 기관이 폐업하는 경우 변동이 생길 수 있습니다. 
                 정확한 정보는 <a href="https://www.comwel.or.kr" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-semibold">근로복지공단 홈페이지(www.comwel.or.kr)</a>에서 확인하시기 바랍니다.
               </p>
             </div>

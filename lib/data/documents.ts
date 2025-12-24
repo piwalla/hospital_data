@@ -21,7 +21,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'workplace-accident-application',
     name: '산재 최초 신청서',
-    description: '일하다 다치거나 병이 났을 때, "산재로 인정해 주세요"라고 국가에 처음 알리는 첫 번째 신청서예요.',
+    description: '일하다 다쳤을 때 산재로 인정받기 위해 가장 먼저 내는 신청서입니다.',
+    searchKeywords: ['신청', '접수', '처음', '시작', '승인', '인정', '산재보험', '요양급여', '첫 번째', '최초', '다쳤을 때', '일하다', '업무', '사고', '신청서', '공단', '근로복지공단'],
     category: 'application',
     officialDownloadUrl: '/pdf/요양급여신청서.pdf',
     exampleUrl: '/pdf/요양급여신청서.pdf',
@@ -73,7 +74,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'accident-report',
     name: '사고 경위서 (재해발생경위서)',
-    description: '공단 직원이 내 옆에 있었던 것처럼, 그날의 상황을 글로 보여주는 서류예요. 산재 승인의 80%가 여기서 결정됩니다!',
+    description: '어떻게 다쳤는지 상황을 자세히 설명하는 서류입니다.',
+    searchKeywords: ['경위', '사고', '다친 과정', '어떻게', '상황', '설명', '재해', '발생', '경위서', '사고 내용', '목격자', '증거', '승인'],
     category: 'application',
     officialDownloadUrl: '/pdf/사고경위서.pdf',
     exampleUrl: '/pdf/사고경위서.pdf',
@@ -146,7 +148,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'medical-benefit-application',
     name: '요양비 청구서 (병원비 환급 신청서)',
-    description: '내 돈으로 먼저 낸 병원비와 약값, 꼼꼼하게 챙겨서 돌려받으세요! 카드영수증만 내면 반려됩니다.',
+    description: '내 돈으로 먼저 낸 병원비와 약값을 돌려받는 신청서입니다.',
+    searchKeywords: ['병원비', '치료비', '환급', '돌려받기', '영수증', '자비', '요양비', '의료비', '약값', '약국', '내 돈', '먼저 냄', '상세내역서', '청구'],
     category: 'benefit',
     officialDownloadUrl: '/pdf/요양급여신청서.pdf',
     exampleUrl: '/pdf/요양급여신청서.pdf',
@@ -220,7 +223,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'sick-leave-benefit-application',
     name: '휴업급여 청구서 (쉬는 기간 월급 신청서)',
-    description: '치료받느라 일 못한 날, 월급의 70%를 나라에서 챙겨드립니다. 매달 신청해야 해요!',
+    description: '치료 때문에 일을 못 한 기간의 생활비를 받는 신청서입니다.',
+    searchKeywords: ['급여', '월급', '생활비', '임금', '쉬는 기간', '휴업', '일 못함', '출근 못함', '돈', '지원금', '70%', '평균임금', '쉬는 동안', '치료 기간', '매달'],
     category: 'benefit',
     officialDownloadUrl: '/pdf/휴업급여신청서.pdf',
     exampleUrl: '/pdf/휴업급여신청서.pdf',
@@ -293,7 +297,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'disability-rating-application',
     name: '장해급여 청구서 (장해 보상금 신청서)',
-    description: '치료는 끝났지만 몸이 예전 같지 않다면? 남은 후유증에 대한 보상을 챙기세요. 산재 보상의 마지막 단계 서류입니다.',
+    description: '치료 후 남은 후유증에 대한 보상금을 받는 신청서입니다.',
+    searchKeywords: ['장해', '후유증', '보상금', '등급', '연금', '일시금', '장애', '불편', '남은 증상', '완치 안됨', '장해급여', '장해진단', '심사', '1급', '14급'],
     category: 'compensation',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
@@ -362,7 +367,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'employment-support-application',
     name: '취업지원서비스 신청서 (재취업/직업훈련 신청서)',
-    description: '다친 후 먹고살 길이 막막하다면? 교육비, 교통비, 훈련수당까지 받고 새 출발 하세요! 공짜 교육이 핵심입니다.',
+    description: '다친 후 새로운 일자리를 찾거나 직업교육을 받을 때 지원받는 신청서입니다.',
+    searchKeywords: ['재취업', '직업훈련', '교육', '자격증', '학원비', '취업', '일자리', '새 직장', '직업', '훈련', '배움', '기술', '사회복귀', '복직'],
     category: 'benefit',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0309000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0309000000',
@@ -429,9 +435,79 @@ export const DOCUMENTS: Document[] = [
     },
   },
   {
+    id: 'medical-benefit-payment-application',
+    name: '요양급여 대지급금 청구서',
+    description: '회사가 대신 낸 병원비를 공단에 청구하는 서류입니다.',
+    searchKeywords: ['재요양', '재치료', '다시 아픔', '핀 제거', '악화', '재발', '또 아픔', '핀 빼기', '철심', '금속', '수술', '다시 치료', '종결 후'],
+    category: 'application',
+    officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0310000000',
+    exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0310000000',
+    youtubeUrl: 'https://youtu.be/WFXtyGiqblA?si=wDcozHBDMGflamEP',
+    guidePdfPath: 'Re_treatment.pdf',
+    requiredDocuments: [
+      '재요양신청서 (환자 작성)',
+      '재요양 소견서 (주치의 작성, 실무상 필수)',
+      '산재인정서',
+    ],
+    processingPeriod: '14-30일',
+    relatedDocuments: ['workplace-accident-application', 'disability-rating-application'],
+    predefinedSummary: {
+      summary:
+        '산재 치료가 공식적으로 끝났지만(종결), 다친 부위가 다시 악화되었거나 몸속에 박은 금속핀 제거 수술 등이 필요할 때, "다시 산재로 치료받게 해주세요"라고 신청하는 서류입니다.\n\n환자 본인이 신청서를 쓰고, 주치의가 소견서를 써줍니다. 관할 근로복지공단에 제출하며, 재요양할 병원 원무과를 통해 접수하는 것이 가장 빠릅니다.\n\n[핵심] 가장 흔한 사유는 "핀 제거 수술"입니다. 골절로 수술하면서 몸속에 철심(핀)을 박았다면, 나중에 이걸 빼는 수술이 필요한데, 이때는 거의 100% 재요양이 승인됩니다.',
+      sections: [
+        {
+          title: '[중요] 그냥 아파서는 안 됩니다',
+          content:
+            '단순히 "날씨가 흐리니 쑤신다" 정도로는 승인이 안 납니다.\n\n승인되는 경우:\n- 염증 수치가 올랐거나\n- 뼈가 덧났거나\n- 수술이 필요하다는 등\n\n객관적인 악화 소견이 있어야 합니다.',
+          order: 1,
+        },
+        {
+          title: '의사 소견서는 "선택"이 아니라 "필수"입니다',
+          content:
+            '조사 내용에는 선택이라고 되어 있지만, 실무에서는 의사가 작성한 [재요양 소견서] 없이 환자 말만 듣고 승인해 주는 경우는 거의 없습니다. 반드시 의학적 근거를 첨부해야 합니다.\n\n[병원에 요청하는 법]\n"선생님, 예전에 다친 곳이 너무 심해져서 재요양 신청을 하려고 합니다. 공단에서 납득할 수 있게 [재요양 소견서]에 현재 상태가 얼마나 악화되었는지 구체적으로 적어주실 수 있을까요?"',
+          order: 2,
+        },
+        {
+          title: '가장 흔한 사유: 핀 제거 수술',
+          content:
+            '골절로 수술하면서 몸속에 철심(핀)을 박았다면, 나중에 이걸 빼는 수술을 해야 합니다. 이때는 거의 100% 재요양이 승인됩니다.\n\n핀 제거는 기간 제한 없이 인정해 주는 추세입니다.',
+          order: 3,
+        },
+        {
+          title: '나쁜 예 vs 좋은 예',
+          content:
+            '이 서류는 "인과관계(옛날 그 상처 때문에 아픈 것인가?)" 입증이 핵심입니다.\n\n[나쁜 예 - 거절 확률 높음]\n- 사유: "작년에 다친 허리가 요즘 다시 뻐근해서 물리치료 좀 받고 싶습니다." (단순 통증 호소)\n- 상황: 치료 종결 후 축구를 하다가 다쳐놓고 재요양 신청 (새로운 사고는 재요양 대상 아님)\n\n[좋은 예 - 승인 확률 높음]\n- 핀 제거: "2023년 골절 수술 후 삽입했던 금속 고정물(핀) 제거 수술이 필요하다는 의사 소견이 있음."\n- 악화: "수술 부위에 농양(고름)이 생기고 염증 수치가 상승하여, 재수술 및 입원 치료가 필요함."',
+          order: 4,
+        },
+        {
+          title: '재요양 기간에도 휴업급여가 나오나요?',
+          content:
+            '네! 재요양이 승인되고, 치료 때문에 일을 못 해서 입원하거나 통원한다면 그 기간만큼 휴업급여가 다시 나옵니다.',
+          order: 5,
+        },
+        {
+          title: '다른 병원으로 가도 되나요?',
+          content:
+            '네, 가능합니다. 예전에 치료받던 병원이 멀거나 없어졌다면, 집 근처의 다른 산재 지정 병원에서 초진을 보고 재요양을 신청하셔도 됩니다.',
+          order: 6,
+        },
+      ],
+      importantNotes: [
+        '[핀 제거 수술] 가장 흔한 재요양 사유입니다. 골절 수술 시 삽입한 철심(핀)을 빼는 수술은 거의 100% 승인됩니다. 기간 제한도 없는 추세입니다.',
+        '[의사 소견서 필수] 서류상 선택이지만, 실무에서는 재요양 소견서 없이 승인되는 경우가 거의 없습니다. 반드시 첨부하세요.',
+        '[단순 통증은 안 됨] "날씨가 흐리니 쑤신다" 정도로는 승인이 안 됩니다. 염증 수치 상승, 뼈 변형, 수술 필요 등 객관적 악화 소견이 있어야 합니다.',
+        '[새로운 사고는 제외] 치료 종결 후 다른 원인(축구, 교통사고 등)으로 다친 경우는 재요양 대상이 아닙니다. 새로운 산재 신청을 해야 합니다.',
+        '[휴업급여 재지급] 재요양이 승인되고 치료 때문에 일을 못 하면, 그 기간만큼 휴업급여가 다시 나옵니다.',
+        '[소멸시효] 치유 종결일로부터 3년이 지나면 시효가 소멸될 수 있으나, "증상이 재발한 날"을 기준으로 보기도 합니다. 포기하지 말고 공단과 상담하세요.',
+        '[다른 병원 가능] 예전 병원이 멀거나 없어졌다면, 집 근처의 다른 산재 지정 병원에서 재요양 신청해도 됩니다.',
+      ],
+    },
+  },
+  {
     id: 're-treatment-application',
     name: '재요양신청서 (재치료 신청서)',
-    description: '치료가 끝났는데 상처가 도졌거나, 몸속의 핀을 빼야 한다면 다시 문을 두드리세요! 핀 제거는 거의 100% 승인됩니다.',
+    description: '치료가 끝난 후 다시 아프거나 핀을 빼야 할 때 재치료를 신청하는 서류입니다.',
+    searchKeywords: ['재요양', '재치료', '다시 아픔', '핀 제거', '악화', '재발', '또 아픔', '핀 빼기', '철심', '금속', '수술', '다시 치료', '종결 후'],
     category: 'application',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0310000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0310000000',
@@ -499,7 +575,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'hospital-transfer-application',
     name: '전원요양 신청서 (병원 옮기기 신청서)',
-    description: '수술 끝나고 집 근처로 가고 싶나요? 그냥 옮기면 안 되고 공단의 허락을 받아야 합니다.',
+    description: '치료받는 병원을 다른 곳으로 옮기고 싶을 때 내는 신청서입니다.',
+    searchKeywords: ['전원', '병원 옮기기', '이동', '다른 병원', '병원 바꾸기', '집 근처', '재활병원', '한방병원', '옮김', '전원요양'],
     category: 'application',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
@@ -566,7 +643,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'additional-disease-application',
     name: '추가상병 신청서 (아픈 곳 추가 신청서)',
-    description: '처음에 신청 안 한 곳이 아픈가요? 내 돈 내지 말고 산재에 "추가"하세요! 의사가 알아서 해주지 않습니다.',
+    description: '처음 신청할 때 몰랐던 다른 부상이나 질병을 추가로 인정받는 신청서입니다.',
+    searchKeywords: ['추가', '다른 곳', '합병증', '새로운 부상', '추가상병', '아픈 곳 추가', '또 다른 곳', '신청 안 한 곳', '발견', '새로 아픔'],
     category: 'application',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
@@ -646,7 +724,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'nursing-care-benefit-application',
     name: '간병급여 청구서 (간병비 신청서)',
-    description: '혼자 밥 먹고 화장실 가기 힘든가요? 간병인 비용은 물론, 가족이 돌봐도 하루 약 4만 원을 받을 수 있습니다.',
+    description: '혼자 거동이 어려워 간병인이 필요할 때 간병비를 받는 신청서입니다.',
+    searchKeywords: ['간병비', '간병인', '가족 간병', '돌봄', '수발', '간호', '거동 불편', '혼자 못함', '도움 필요', '간병급여', '4만원'],
     category: 'benefit',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
@@ -728,7 +807,8 @@ export const DOCUMENTS: Document[] = [
   {
     id: 'concurrent-treatment-application',
     name: '병행진료 신청서 (두 곳에서 치료받기 신청서)',
-    description: '입원한 병원에 없는 진료(치과, 한방, MRI 등)가 필요할 때, 다른 병원도 다닐 수 있게 해주는 허락 문서입니다.',
+    description: '현재 병원에 없는 진료를 다른 병원에서 함께 받고 싶을 때 내는 신청서입니다.',
+    searchKeywords: ['병행', '두 곳', '동시', '한방', '침', '양방', '치과', 'MRI', '검사', '다른 병원', '같이', '병행진료', '협진'],
     category: 'application',
     officialDownloadUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',
     exampleUrl: 'https://www.comwel.or.kr/comwel/comwelBoard.do?menuId=comwel0304000000',

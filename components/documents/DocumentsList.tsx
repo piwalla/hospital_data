@@ -84,16 +84,39 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
   const router = useRouter();
   const stageFromUrl = searchParams.get('stage') ? parseInt(searchParams.get('stage')!, 10) : initialStage;
   const [showAll, setShowAll] = useState(!stageFromUrl); // 단계가 없으면 전체 보기
+  const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태
 
   // 단계별 필터링된 서류
   const filteredDocuments = useMemo(() => {
-    if (!stageFromUrl || showAll) {
-      return DOCUMENTS;
+    let docs = DOCUMENTS;
+    
+    // 단계 필터링
+    if (stageFromUrl && !showAll) {
+      const stageDocs = stageDocumentMap[stageFromUrl];
+      if (stageDocs) {
+        docs = docs.filter((doc) => stageDocs.write.includes(doc.id));
+      }
     }
-    const stageDocs = stageDocumentMap[stageFromUrl];
-    if (!stageDocs) return DOCUMENTS;
-    return DOCUMENTS.filter((doc) => stageDocs.write.includes(doc.id));
-  }, [stageFromUrl, showAll]);
+    
+    // 검색어 필터링
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      docs = docs.filter((doc) => {
+        // 검색 대상: 서류명, 설명, 검색 키워드
+        const searchTargets = [
+          doc.name,
+          doc.description,
+          ...(doc.searchKeywords || [])
+        ];
+        
+        return searchTargets.some(target => 
+          target.toLowerCase().includes(query)
+        );
+      });
+    }
+    
+    return docs;
+  }, [stageFromUrl, showAll, searchQuery]);
 
   // 단계별 필터링된 요청 서류
   const filteredRequestedDocuments = useMemo(() => {
@@ -130,6 +153,119 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
       role="region"
       aria-label="서류 목록"
     >
+      {/* 탭 네비게이션 */}
+      <div className="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-start">
+        <button
+          onClick={() => {
+            setShowAll(true);
+            const params = new URLSearchParams(searchParams.toString());
+            params.delete('stage');
+            router.push(`/documents?${params.toString()}`);
+          }}
+          className={cn(
+            'px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200',
+            showAll
+              ? 'bg-primary text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          )}
+        >
+          전체
+        </button>
+        <button
+          onClick={() => {
+            setShowAll(false);
+            router.push('/documents?stage=1');
+          }}
+          className={cn(
+            'px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200',
+            stageFromUrl === 1 && !showAll
+              ? 'bg-primary text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          )}
+        >
+          신청 단계
+        </button>
+        <button
+          onClick={() => {
+            setShowAll(false);
+            router.push('/documents?stage=2');
+          }}
+          className={cn(
+            'px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200',
+            stageFromUrl === 2 && !showAll
+              ? 'bg-primary text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          )}
+        >
+          치료 중
+        </button>
+        <button
+          onClick={() => {
+            setShowAll(false);
+            router.push('/documents?stage=3');
+          }}
+          className={cn(
+            'px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200',
+            stageFromUrl === 3 && !showAll
+              ? 'bg-primary text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          )}
+        >
+          장해 평가
+        </button>
+        <button
+          onClick={() => {
+            setShowAll(false);
+            router.push('/documents?stage=4');
+          }}
+          className={cn(
+            'px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-all duration-200',
+            stageFromUrl === 4 && !showAll
+              ? 'bg-primary text-white shadow-md'
+              : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+          )}
+        >
+          사회복귀
+        </button>
+      </div>
+
+      {/* 검색바 */}
+      <div className="relative max-w-2xl mx-auto">
+        <div className="relative">
+          <svg 
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="서류 이름이나 설명으로 검색하세요..."
+            className="w-full pl-12 pr-12 py-3 sm:py-4 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm sm:text-base"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="검색어 지우기"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <p className="mt-2 text-sm text-gray-600 text-center">
+            <span className="font-semibold text-primary">{filteredDocuments.length}개</span>의 서류를 찾았습니다
+          </p>
+        )}
+      </div>
+
       {/* 단계별 필터 배너 */}
       {stageFromUrl && !showAll && (
         <div className="bg-primary/10 border-2 border-primary rounded-lg p-4 sm:p-6">
@@ -156,11 +292,11 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
       {/* 섹션 1: 직접 작성하는 서류 */}
       <section
         aria-labelledby="section-write"
-        className="space-y-4 sm:space-y-5"
+        className="space-y-4 sm:space-y-5 bg-blue-50/30 rounded-2xl p-6"
       >
         <header className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 sm:gap-3">
-            <FileEdit className="w-4 h-4 sm:w-5 sm:h-5 text-primary" strokeWidth={1.75} />
+            <FileEdit className="w-5 h-5 sm:w-6 sm:h-6 text-primary" strokeWidth={1.75} />
             <h2 id="section-write" className="text-sm sm:text-base md:text-lg font-semibold text-foreground">
               직접 작성하게 되는 서류 12가지예요
             </h2>
@@ -180,68 +316,70 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
           const iconColor = documentIconColors[document.id] || 'text-gray-600';
 
           return (
-            <div
+            <Link
               key={document.id}
-              className={cn(
-                'group relative bg-white rounded-lg border border-[var(--border-light)] p-5 sm:p-6 md:p-7 lg:p-8',
-                'hover:border-primary transition-all duration-200',
-                'text-left w-full h-full flex flex-col',
-                'shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-              )}
-              role="listitem"
+              href={`/documents/${document.id}`}
+              className="block group"
+              aria-label={`${document.name} 상세 정보 보기`}
             >
-              <div className="relative z-10 flex flex-col h-full">
-                {/* 상단: 아이콘 + 제목 */}
-                <div className="flex items-start gap-3 mb-3">
-                  <div
-                    className={cn(
-                      'w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0',
-                      'bg-primary/10'
-                    )}
-                    aria-hidden="true"
-                  >
-                    <Icon className={cn('w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8', iconColor)} strokeWidth={1.75} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    {(() => {
-                      // 괄호 안의 내용을 분리
-                      const match = document.name.match(/^(.+?)\s*\((.+?)\)\s*$/);
-                      if (match) {
-                        const [, mainName, bracketContent] = match;
+              <div
+                className={cn(
+                  'relative bg-white rounded-lg border border-[var(--border-light)] p-5 sm:p-6 md:p-7 lg:p-8',
+                  'hover:border-primary transition-all duration-300',
+                  'text-left w-full h-full flex flex-col',
+                  'shadow-sm hover:shadow-xl hover:-translate-y-1'
+                )}
+                role="listitem"
+              >
+                <div className="relative z-10 flex flex-col h-full">
+                  {/* 상단: 아이콘 + 제목 */}
+                  <div className="flex items-start gap-3 mb-3">
+                    <div
+                      className={cn(
+                        'w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0',
+                        'bg-primary/10'
+                      )}
+                      aria-hidden="true"
+                    >
+                      <Icon className={cn('w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8', iconColor)} strokeWidth={1.75} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {(() => {
+                        // 괄호 안의 내용을 분리
+                        const match = document.name.match(/^(.+?)\s*\((.+?)\)\s*$/);
+                        if (match) {
+                          const [, mainName, bracketContent] = match;
+                          return (
+                            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+                              <span className="block">{mainName}</span>
+                              <span className="block text-base sm:text-lg md:text-xl lg:text-xl text-gray-600 font-normal">
+                                ({bracketContent})
+                              </span>
+                            </h3>
+                          );
+                        }
                         return (
-                          <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                            <span className="block">{mainName}</span>
-                            <span className="block text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground font-normal">
-                              ({bracketContent})
-                            </span>
+                          <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                            {document.name}
                           </h3>
                         );
-                      }
-                      return (
-                        <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                          {document.name}
-                        </h3>
-                      );
-                    })()}
-                    <p className="text-xs sm:text-sm md:text-base text-muted-foreground line-clamp-3 mt-2">
-                      {document.description}
-                    </p>
+                      })()}
+                      <p className="text-xs sm:text-sm md:text-base text-muted-foreground line-clamp-3 mt-2">
+                        {document.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 시각적 표시 (자세히 보기 제거, 화살표 아이콘으로 대체) */}
+                  <div className="flex items-center justify-end mt-auto pt-4 text-primary font-semibold text-sm group-hover:translate-x-1 transition-transform">
+                    <span>자세히 보기</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 </div>
-
-                {/* 자세히 보기 버튼 */}
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full mt-auto"
-                  aria-label={`${document.name} 자세히 보기`}
-                >
-                  <Link href={`/documents/${document.id}`}>
-                    <span className="text-base sm:text-lg font-bold">자세히 보기</span>
-                  </Link>
-                </Button>
               </div>
-            </div>
+            </Link>
           );
         })}
         </div>
@@ -250,12 +388,12 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
       {/* 섹션 2: 병원이나 회사에 요청해야 하는 서류 */}
       <section
         aria-labelledby="section-request"
-        className="space-y-3 sm:space-y-4 border-t border-dashed border-[var(--border-medium)] pt-4 sm:pt-6 mt-2 sm:mt-4"
+        className="space-y-3 sm:space-y-4 bg-green-50/30 rounded-2xl p-6 mt-6"
       >
         <header className="flex items-center gap-2 sm:gap-3">
-          <FileQuestion className="w-4 h-4 sm:w-5 sm:h-5 text-primary" strokeWidth={1.75} />
+          <FileQuestion className="w-5 h-5 sm:w-6 sm:h-6 text-primary" strokeWidth={1.75} />
           <h2 id="section-request" className="text-sm sm:text-base md:text-lg font-semibold text-foreground">
-            병원이나 회사에 요청해야 하는 서류
+            발급 요청하게 되는 서류
           </h2>
         </header>
 

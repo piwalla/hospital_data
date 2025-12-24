@@ -20,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider localization={koKR}>
-      <html lang="ko">
+      <html lang="ko" suppressHydrationWarning>
         <head>
           <link
             rel="stylesheet"

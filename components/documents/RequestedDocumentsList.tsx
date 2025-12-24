@@ -78,85 +78,87 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
           const Icon = config.icon;
 
           return (
-            <div
+            <Link
               key={doc.id}
-              className={cn(
-                'group relative bg-white rounded-lg border border-[var(--border-light)] p-5 sm:p-6 md:p-7 lg:p-8',
-                'hover:border-primary transition-all duration-200',
-                'text-left w-full h-full flex flex-col',
-                'shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)]'
-              )}
-              role="listitem"
+              href={`/requested-documents/${doc.id}`}
+              className="block group"
+              aria-label={`${doc.name} 상세 정보 보기`}
             >
-              <div className="relative z-10 flex flex-col h-full">
-                {/* 상단: 아이콘 + 제목 + 발급처/선택 뱃지 */}
-                <div className="flex items-start gap-3 mb-3">
-                  <div
-                    className={cn(
-                      'w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0',
-                      config.bgColor
-                    )}
-                    aria-hidden="true"
-                  >
-                    <Icon className={cn('w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8', config.color)} strokeWidth={1.75} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-2 flex-wrap mb-2">
-                      {(() => {
-                        // 괄호 안의 내용을 분리
-                        const match = doc.name.match(/^(.+?)\s*\((.+?)\)\s*$/);
-                        if (match) {
-                          const [, mainName, bracketContent] = match;
-                          return (
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                                <span className="block">{mainName}</span>
-                                <span className="block text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground font-normal">
-                                  ({bracketContent})
-                                </span>
-                              </h3>
-                            </div>
-                          );
-                        }
-                        return (
-                          <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 flex-1 min-w-0">
-                            {doc.name}
-                          </h3>
-                        );
-                      })()}
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
-                          {config.label} 발급
-                        </span>
-                        {doc.isOptional && (
-                          <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">
-                            선택
-                          </span>
-                        )}
-                      </div>
+              <div
+                className={cn(
+                  'relative bg-white rounded-lg border border-[var(--border-light)] p-5 sm:p-6 md:p-7 lg:p-8',
+                  'hover:border-primary transition-all duration-300',
+                  'text-left w-full h-full flex flex-col',
+                  'shadow-sm hover:shadow-xl hover:-translate-y-1'
+                )}
+                role="listitem"
+              >
+                <div className="relative z-10 flex flex-col h-full">
+                  {/* 상단: 아이콘 + 제목 + 발급처/선택 뱃지 */}
+                  <div className="flex items-start gap-3 mb-3">
+                    <div
+                      className={cn(
+                        'w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0',
+                        config.bgColor
+                      )}
+                      aria-hidden="true"
+                    >
+                      <Icon className={cn('w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8', config.color)} strokeWidth={1.75} />
                     </div>
-                    <p
-                      className="text-xs sm:text-sm md:text-base text-muted-foreground line-clamp-3"
-                      dangerouslySetInnerHTML={{
-                        __html: doc.description.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>'),
-                      }}
-                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start gap-2 flex-wrap mb-2">
+                        {(() => {
+                          // 괄호 안의 내용을 분리
+                          const match = doc.name.match(/^(.+?)\s*\((.+?)\)\s*$/);
+                          if (match) {
+                            const [, mainName, bracketContent] = match;
+                            return (
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
+                                  <span className="block">{mainName}</span>
+                                  <span className="block text-base sm:text-lg md:text-xl lg:text-xl text-gray-600 font-normal">
+                                    ({bracketContent})
+                                  </span>
+                                </h3>
+                              </div>
+                            );
+                          }
+                          return (
+                            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 flex-1 min-w-0">
+                              {doc.name}
+                            </h3>
+                          );
+                        })()}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                            {config.label} 발급
+                          </span>
+                          {doc.isOptional && (
+                            <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">
+                              선택
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <p
+                        className="text-xs sm:text-sm md:text-base text-muted-foreground line-clamp-3"
+                        dangerouslySetInnerHTML={{
+                          __html: doc.description.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>'),
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* 시각적 표시 (자세히 보기 제거, 화살표 아이콘으로 대체) */}
+                  <div className="flex items-center justify-end mt-auto pt-4 text-primary font-semibold text-sm group-hover:translate-x-1 transition-transform">
+                    <span>자세히 보기</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </div>
                 </div>
-
-                {/* 자세히 보기 버튼 (새 페이지) */}
-                <Button
-                  asChild
-                  variant="outline"
-                  className="w-full mt-auto"
-                  aria-label={`${doc.name} 자세히 보기`}
-                >
-                  <Link href={`/requested-documents/${doc.id}`}>
-                    <span className="text-base sm:text-lg font-bold">자세히 보기</span>
-                  </Link>
-                </Button>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

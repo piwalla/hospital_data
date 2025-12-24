@@ -1,13 +1,35 @@
 "use client";
 
-import { SignedOut, SignInButton, SignedIn, UserButton } from "@clerk/nextjs";
+import { SignedOut, SignInButton, SignedIn, UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Star, Heart } from "lucide-react";
+import { Star, Heart, ShieldCheck } from "lucide-react";
+
+// Admin Check Component
+const AdminLink = () => {
+  const { user } = useUser();
+  const ADMIN_EMAIL = "highstar0301@gmail.com";
+  
+  if (!user) return null;
+  
+  const isAdmin = user.emailAddresses.some(email => email.emailAddress === ADMIN_EMAIL);
+  
+  if (!isAdmin) return null;
+
+  return (
+    <Link
+      href="/admin"
+      className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors duration-200 ease-in-out font-medium"
+    >
+      <ShieldCheck className="w-5 h-5" />
+      <span className="hidden sm:inline">Admin</span>
+    </Link>
+  );
+};
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -105,6 +127,10 @@ const Navbar = () => {
                 />
                 <span className="hidden sm:inline">즐겨찾기</span>
               </Link>
+              
+              {/* Admin Link */}
+              <AdminLink />
+
               <UserButton 
                 appearance={{
                   elements: {

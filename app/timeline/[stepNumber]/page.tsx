@@ -81,7 +81,7 @@ export default async function TimelineStepPage({ params, searchParams }: Timelin
             : stage.step_number === 3
             ? '치료 종결 후 장해평가와 장해급여·보조기구 신청을 준비합니다.'
             : stage.step_number === 4
-            ? '복귀·재취업을 위한 복귀 절차와 지원·훈련을 정리합니다.'
+            ? '복귀 절차와 지원·훈련을 정리합니다.'
             : stage.description}
         </p>
       </div>

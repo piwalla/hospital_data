@@ -43,18 +43,7 @@ declare global {
   }
 }
 
-interface Hospital {
-  id: string;
-  name: string;
-  type: 'hospital' | 'pharmacy';
-  address: string;
-  latitude: number;
-  longitude: number;
-  phone: string | null;
-  department: string | null;
-  institution_type: string | null; // 기관 유형 (대학병원, 종합병원, 병원, 의원, 한의원, 요양병원, 기타)
-  department_extracted: string | null; // 추출된 진료과목 (여러 과목은 쉼표로 구분)
-}
+import type { Hospital } from '@/lib/api/hospitals';
 
 interface HospitalMapProps {
   hospitals?: Hospital[];
@@ -776,11 +765,10 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   }
 
   return (
-    <div className="relative w-full rounded-lg border border-gray-200" style={{ height: '650px' }}>
+    <div className="relative w-full rounded-lg border border-gray-200 h-[450px] lg:h-[650px]">
       <div
         ref={mapRef}
         className="w-full h-full relative"
-        style={{ height: '650px' }}
       />
     </div>
   );

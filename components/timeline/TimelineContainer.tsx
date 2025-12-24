@@ -29,14 +29,53 @@ export default function TimelineContainer({ stages, currentStepNumber }: Timelin
   return (
     <div className="relative">
       {/* 단계 카드 그리드 */}
-      <nav className="relative grid grid-cols-1 gap-6 sm:gap-8" aria-label="산재 진행 과정 단계 목록">
+      <nav className="relative grid grid-cols-1 gap-0" aria-label="산재 진행 과정 단계 목록">
         {stages.map((stage, index) => (
           <div key={stage.id} data-stage-id={stage.id} className="relative">
             <TimelineStepCard
               stage={stage}
               stepNumber={stage.step_number}
               isCurrentStep={currentStepNumber === stage.step_number}
+              isLastStep={index === stages.length - 1}
             />
+            
+            {/* Chevron between cards */}
+            {index < stages.length - 1 && (
+              <div className="flex justify-center my-2" aria-hidden="true">
+                <svg 
+                  width="32" 
+                  height="20" 
+                  viewBox="0 0 32 20" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="text-gray-400"
+                  style={{
+                    animation: 'flowDown 2s ease-in-out infinite'
+                  }}
+                >
+                  {/* Chevron shape - V pointing down */}
+                  <path 
+                    d="M2 2L16 18L30 2" 
+                    stroke="currentColor" 
+                    strokeWidth="3" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <style jsx>{`
+                  @keyframes flowDown {
+                    0%, 100% {
+                      opacity: 0.4;
+                      transform: translateY(-4px);
+                    }
+                    50% {
+                      opacity: 1;
+                      transform: translateY(4px);
+                    }
+                  }
+                `}</style>
+              </div>
+            )}
           </div>
         ))}
       </nav>

@@ -15,6 +15,12 @@ import DocumentDownloadButton from './DocumentDownloadButton';
 import ConditionalPDFViewer from './ConditionalPDFViewer';
 import type { StageWithDetails } from '@/lib/types/timeline';
 import { cn } from '@/lib/utils';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface TimelineStepContentProps {
   stage: StageWithDetails;
@@ -93,6 +99,9 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
     </button>
   );
 
+  // Use actionItems if available, otherwise fall back to actions (though we aim to use actionItems primarily now)
+  const actionsCount = stage.actionItems?.length || stage.actions?.length || 0;
+
   // 각 단계별 유튜브 영상 ID
   const getYouTubeVideoId = () => {
     switch (stage.step_number) {
@@ -114,43 +123,47 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
   return (
     <div className="space-y-6 sm:space-y-8 min-w-0 w-full max-w-full overflow-hidden">
       {/* 탭 버튼 */}
-      <div
-        className="flex flex-nowrap gap-1 sm:gap-4 w-full min-w-0 overflow-x-auto"
-        role="tablist"
-        aria-label="단계 상세 정보 탭"
-      >
-        {/* 1단계, 2단계, 3단계, 4단계일 때 "설명 보기" 탭 표시 */}
-        {(stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
-          <>
-            <TabButton
-              tab="guide"
-              label="설명 보기"
-              icon={BookOpen}
-            />
-            <span id="tab-guide" className="sr-only">설명 보기 탭</span>
-          </>
-        )}
-        <TabButton
-          tab="actions"
-          label="해야 할 일"
-          icon={CheckCircle2}
-          count={stage.actions.length}
-        />
-        <span id="tab-actions" className="sr-only">해야 할 일 탭</span>
-        <TabButton
-          tab="documents"
-          label="서류"
-          icon={FileText}
-          count={stage.documents.length}
-        />
-        <span id="tab-documents" className="sr-only">서류 탭</span>
-        <TabButton
-          tab="warnings"
-          label="주의사항"
-          icon={AlertTriangle}
-          count={stage.warnings.length}
-        />
-        <span id="tab-warnings" className="sr-only">주의사항 탭</span>
+      <div className="relative">
+        <div
+          className="flex flex-nowrap gap-1 sm:gap-4 w-full min-w-0 overflow-x-auto scrollbar-hide"
+          role="tablist"
+          aria-label="단계 상세 정보 탭"
+        >
+          {/* 1단계, 2단계, 3단계, 4단계일 때 "설명 보기" 탭 표시 */}
+          {(stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
+            <>
+              <TabButton
+                tab="guide"
+                label="설명 보기"
+                icon={BookOpen}
+              />
+              <span id="tab-guide" className="sr-only">설명 보기 탭</span>
+            </>
+          )}
+          <TabButton
+            tab="actions"
+            label="해야 할 일"
+            icon={CheckCircle2}
+            count={actionsCount}
+          />
+          <span id="tab-actions" className="sr-only">해야 할 일 탭</span>
+          <TabButton
+            tab="documents"
+            label="서류"
+            icon={FileText}
+            count={stage.documents.length}
+          />
+          <span id="tab-documents" className="sr-only">서류 탭</span>
+          <TabButton
+            tab="warnings"
+            label="주의사항"
+            icon={AlertTriangle}
+            count={stage.warnings.length}
+          />
+          <span id="tab-warnings" className="sr-only">주의사항 탭</span>
+        </div>
+        
+        {/* ... (Scroll hint remains) */}
       </div>
 
       {/* 탭 콘텐츠 */}
@@ -233,83 +246,115 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
             <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
               <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7 text-primary flex-shrink-0 mt-0.5" />
               <p className="text-base sm:text-base text-[#374151] leading-relaxed">
-                이 단계에서는 꼭 해야 하는 일 {stage.actions.length}개가 있습니다.
+                이 단계에서는 꼭 해야 하는 일 {actionsCount}개가 있습니다.
+                {stage.actionItems?.length > 0 && <span> 항목을 눌러 자세한 이유를 확인하세요.</span>}
               </p>
             </div>
-            {stage.actions.length === 0 ? (
+            
+            {actionsCount === 0 ? (
               <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">해야 할 일이 없습니다.</p>
-            ) : (
-              <ul className="space-y-4 sm:space-y-5" role="list" aria-label="해야 할 일 목록">
-                {stage.actions.map((action, index) => (
-                  <li key={index} className="flex items-start gap-3 p-4 sm:p-5 md:p-6 rounded-xl border border-[var(--border-medium)] bg-white">
-                    <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-senior-body text-foreground break-words">{action}</span>
-                  </li>
+            ) : stage.actionItems && stage.actionItems.length > 0 ? (
+              /* 구조화된 Action Items (Numbered List Style) */
+              <div className="space-y-4 sm:space-y-5">
+                {stage.actionItems.map((action, index) => (
+                  <div 
+                    key={action.id} 
+                    className="bg-gray-50 rounded-lg p-4 sm:p-5"
+                    role="article"
+                    aria-label={`${action.title} 상세 내용`}
+                  >
+                    <h4 className="text-base sm:text-lg font-semibold text-foreground mb-2 flex items-start gap-2">
+                       <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary text-white text-sm font-bold flex-shrink-0">
+                        {index + 1}
+                      </span>
+                      <span className="leading-snug pt-0.5">
+                        {action.title}
+                      </span>
+                    </h4>
+                    {action.description && (
+                       <div className="text-sm sm:text-base text-gray-700 ml-8 sm:ml-9 leading-relaxed break-keep">
+                          {action.description}
+                       </div>
+                    )}
+                  </div>
                 ))}
-              </ul>
+              </div>
+            ) : (
+              /* 기존 단순 텍스트 목록 (Fallback) - Numbered for consistency */
+              <div className="space-y-4 sm:space-y-5" role="list" aria-label="해야 할 일 목록">
+                {stage.actions.map((action, index) => (
+                  <div key={index} className="bg-gray-50 rounded-lg p-4 sm:p-5 flex items-start gap-3">
+                     <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-primary text-white text-sm font-bold flex-shrink-0">
+                      {index + 1}
+                    </span>
+                    <span className="text-senior-body text-foreground break-words pt-0.5">{action}</span>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}
 
+        {/* ... (Documents tab logic remains - DocumentDownloadButton handles the logic internally) */}
+        
         {activeTab === 'documents' && (
-          <div 
-            id="tabpanel-documents"
-            role="tabpanel"
-            aria-labelledby="tab-documents"
-            className="space-y-4 sm:space-y-5"
-          >
-            {/* 안내 텍스트 */}
-            <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
-              <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-primary flex-shrink-0 mt-0.5" />
-              <p className="text-base sm:text-base text-[#374151] leading-relaxed">
-                이 단계에서 필요한 서류 {stage.documents.length}개가 있습니다.
-              </p>
-            </div>
-            {stage.documents.length === 0 ? (
-              <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">필수 서류가 없습니다.</p>
-            ) : (
-              <>
-                <ul className="space-y-4 sm:space-y-5" role="list" aria-label="필수 서류 목록">
-                  {stage.documents.map((doc) => (
-                    <li
-                      key={doc.id}
-                      className="flex items-start justify-between gap-3 p-4 sm:p-5 md:p-6 rounded-xl border border-[var(--border-medium)] bg-white"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          {doc.is_required && (
-                            <span className="text-xs font-semibold text-primary px-2 py-0.5 rounded bg-primary/20 flex-shrink-0">
-                              필수
+            <div 
+              id="tabpanel-documents"
+              role="tabpanel"
+              aria-labelledby="tab-documents"
+              className="space-y-4 sm:space-y-5"
+            >
+              <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
+                <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-primary flex-shrink-0 mt-0.5" />
+                <p className="text-base sm:text-base text-[#374151] leading-relaxed">
+                  이 단계에서 필요한 서류 {stage.documents.length}개가 있습니다.
+                </p>
+              </div>
+              {stage.documents.length === 0 ? (
+                <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">필수 서류가 없습니다.</p>
+              ) : (
+                <>
+                  <ul className="space-y-4 sm:space-y-5" role="list" aria-label="필수 서류 목록">
+                    {stage.documents.map((doc) => (
+                      <li
+                        key={doc.id}
+                        className="flex items-start justify-between gap-3 p-4 sm:p-5 md:p-6 rounded-xl border border-[var(--border-medium)] bg-white"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            {doc.is_required && (
+                              <span className="text-xs font-semibold text-primary px-2 py-0.5 rounded bg-primary/20 flex-shrink-0">
+                                필수
+                              </span>
+                            )}
+                            <span className="text-senior-body font-medium text-foreground break-words">
+                              {doc.title}
                             </span>
-                          )}
-                          <span className="text-senior-body font-medium text-foreground break-words">
-                            {doc.title}
-                          </span>
+                          </div>
                         </div>
-                      </div>
-                      <DocumentDownloadButton document={doc} />
-                    </li>
-                  ))}
-                </ul>
-                {/* 더 자세한 서류 안내 링크 */}
-                <div className="mt-4 sm:mt-6 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
-                  <p className="text-sm sm:text-base text-foreground mb-3">
-                    💡 이 서류에 대해 더 자세히 알고 싶으신가요?
-                  </p>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="w-full sm:w-auto"
-                  >
-                    <Link href={`/documents?stage=${stage.step_number}`} prefetch={false}>
-                      {stage.step_number}단계 서류 안내 자세히 보기
-                    </Link>
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        )}
+                        <DocumentDownloadButton document={doc} />
+                      </li>
+                    ))}
+                  </ul>
+                  {/* 더 자세한 서류 안내 링크 */}
+                  <div className="mt-4 sm:mt-6 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
+                    <p className="text-sm sm:text-base text-foreground mb-3">
+                      💡 이 서류에 대해 더 자세히 알고 싶으신가요?
+                    </p>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                    >
+                      <Link href={`/documents?stage=${stage.step_number}`} prefetch={false}>
+                        {stage.step_number}단계 서류 안내 자세히 보기
+                      </Link>
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
         {activeTab === 'warnings' && (
           <div 
@@ -328,17 +373,29 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
             {stage.warnings.length === 0 ? (
               <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">주의사항이 없습니다.</p>
             ) : (
-              <ul className="space-y-4 sm:space-y-5" role="list" aria-label="주의사항 목록">
-                {stage.warnings.map((warning) => (
-                  <li
+              <div className="space-y-4 sm:space-y-5" role="list" aria-label="주의사항 목록">
+                {stage.warnings.map((warning, index) => (
+                  <div
                     key={warning.id}
-                    className="flex items-start gap-3 p-4 sm:p-5 md:p-6 rounded-xl border border-[var(--alert)]/40 bg-[var(--alert)]/5"
+                    className="bg-gray-50 rounded-lg p-4 sm:p-5"
+                    role="listitem"
                   >
-                    <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--alert)] flex-shrink-0 mt-0.5" />
-                    <span className="text-senior-body text-foreground break-words">{warning.content}</span>
-                  </li>
+                    <h4 className="text-base sm:text-lg font-semibold text-foreground mb-2 flex items-start gap-2">
+                      <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-[var(--alert)] text-white text-sm font-bold flex-shrink-0">
+                        {index + 1}
+                      </span>
+                      <span className="leading-snug pt-0.5">
+                        {warning.content}
+                      </span>
+                    </h4>
+                    {warning.description && (
+                      <div className="text-sm sm:text-base text-[var(--alert)] ml-8 sm:ml-9 leading-relaxed break-keep font-medium">
+                         {warning.description}
+                      </div>
+                    )}
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
         )}

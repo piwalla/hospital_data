@@ -16,7 +16,7 @@ export const REQUESTED_DOCUMENTS: RequestedDocument[] = [
     id: 'medical-opinion-certificate',
     name: '산재용 소견서/진단서',
     source: 'hospital',
-    description: '(최초 신청 시) 일반 진단서가 아닙니다. 의사 선생님께 **"산재 신청할 거니 산재용 소견서 써주세요"**라고 해야 합니다.',
+    description: '산재 신청 시 의사가 작성하는 전문 소견서입니다.',
     guide: '의사 선생님께 "산재 신청할 거니 산재용 소견서 써주세요"라고 말씀하세요. 일반 진단서와는 다릅니다.',
     requiredStages: ['initial'],
   },
@@ -24,7 +24,7 @@ export const REQUESTED_DOCUMENTS: RequestedDocument[] = [
     id: 'medical-records-copy',
     name: '의무기록사본',
     source: 'hospital',
-    description: '(최초 신청 시) 초진 차트, 검사 결과지 등 사고 당시의 기록입니다. 원무과에 **"전체 의무기록 복사해주세요"**라고 하세요.',
+    description: '사고 당시의 치료 기록과 검사 결과지입니다.',
     guide: '원무과에 "전체 의무기록 복사해주세요"라고 요청하세요. 초진 차트, 검사 결과지 등 사고 당시의 모든 기록이 필요합니다.',
     requiredStages: ['initial'],
   },
@@ -32,7 +32,7 @@ export const REQUESTED_DOCUMENTS: RequestedDocument[] = [
     id: 'medical-expense-detail',
     name: '진료비 영수증/상세내역서',
     source: 'hospital',
-    description: '(요양비 청구 시) 내가 낸 병원비를 돌려받으려면 필수입니다. 카드 영수증만으로는 안 되고, **"진료비 상세 내역서"**가 꼭 필요해요.',
+    description: '병원비를 돌려받을 때 필요한 세부 내역서입니다.',
     guide: '카드 영수증만으로는 안 됩니다. 병원 원무과에 "진료비 상세 내역서"를 요청하세요. 어떤 주사를 맞고 무슨 검사를 했는지 세부 항목이 나온 내역서가 필요합니다.',
     requiredStages: ['treatment'],
   },
@@ -40,7 +40,7 @@ export const REQUESTED_DOCUMENTS: RequestedDocument[] = [
     id: 'disability-certificate',
     name: '장해진단서',
     source: 'hospital',
-    description: '(장해 청구 시) 치료 종결 후 남은 장해 상태를 의사가 평가한 서류입니다. 대학병원급에서 발급받는 것이 유리할 수 있습니다.',
+    description: '치료 후 남은 장해 상태를 의사가 평가한 서류입니다.',
     guide: '치료 종결 후 주치의에게 장해진단서 발급을 요청하세요. 대학병원급에서 발급받는 것이 유리할 수 있습니다. 의사가 장해 부위 및 상태를 의학적 수치로 기재합니다.',
     requiredStages: ['disability', 'return'],
   },
@@ -48,7 +48,7 @@ export const REQUESTED_DOCUMENTS: RequestedDocument[] = [
     id: 'medical-imaging-cd',
     name: 'MRI / X-ray CD',
     source: 'hospital',
-    description: '(장해 청구 시) 내 몸의 상태를 증명하는 영상 자료입니다. 영상의학과 데스크에서 CD로 구워달라고 하세요.',
+    description: '장해 심사에 필요한 영상 자료입니다.',
     guide: '영상의학과 데스크에서 CD로 구워달라고 요청하세요. 장해 심사는 말로 하는 것이 아니라 "의학적 근거"로 하므로, 영상 자료가 필수입니다.',
     requiredStages: ['disability', 'return'],
   },
@@ -56,7 +56,7 @@ export const REQUESTED_DOCUMENTS: RequestedDocument[] = [
     id: 'employer-confirmation',
     name: '사업주 확인서',
     source: 'company',
-    description: '회사 사장님이 "우리 직원이 일하다 다친 게 맞습니다"라고 확인해 주는 서류입니다. (주의: 사장님이 안 써줘도 산재 신청은 가능합니다!)',
+    description: '회사가 산재 사실을 확인하는 서류입니다(선택사항).',
     guide: '회사에 사업주 확인서를 요청하세요. 하지만 **사장님이 안 써줘도 산재 신청은 가능합니다!** 최근에는 필수 요소가 아니며, 사업주 날인이 없어도 공단에 제출하면 공단이 알아서 확인합니다.',
     requiredStages: ['initial'],
     isOptional: true,
@@ -65,7 +65,7 @@ export const REQUESTED_DOCUMENTS: RequestedDocument[] = [
     id: 'settlement-judgment',
     name: '합의서/판결문',
     source: 'court',
-    description: '혹시 회사와 따로 합의금을 받았거나 소송을 했다면, 그 금액만큼 산재 보상금에서 빠지게 됩니다. 중복 보상을 막기 위해 공단이 확인하는 서류입니다.',
+    description: '회사와 별도 합의금이나 소송 결과가 있을 때 제출하는 서류입니다.',
     guide: '회사와 따로 합의금을 받았거나 소송을 했다면, 합의서나 판결문 사본을 보관하여 제출하세요. 그 금액만큼 산재 보상금에서 빠지게 됩니다. 중복 보상을 막기 위해 공단이 확인하는 서류입니다.',
     requiredStages: ['all'],
     isOptional: true,
@@ -94,6 +94,7 @@ export function getRequestedDocumentsByStage(stage: RequestedDocument['requiredS
 export function findRequestedDocumentById(id: string): RequestedDocument | undefined {
   return REQUESTED_DOCUMENTS.find((doc) => doc.id === id);
 }
+
 
 
 
