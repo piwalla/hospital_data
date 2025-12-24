@@ -113,7 +113,7 @@ export default function EditNoticePage() {
                 <Checkbox 
                   id="important" 
                   checked={formData.isImportant}
-                  onCheckedChange={(checked) => setFormData({...formData, isImportant: checked as boolean})}
+                  onChange={(e) => setFormData({...formData, isImportant: e.target.checked})}
                 />
                 <Label htmlFor="important" className="font-medium">중요 공지로 설정 (상단 고정)</Label>
               </div>
