@@ -2,15 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  ChevronRight,
-  User 
+import {
+  Users,
+  Search,
+  Filter,
+  User
 } from "lucide-react";
-import { MOCK_USERS, AdminUser } from "@/lib/mock-admin-data";
+import { MOCK_USERS } from "@/lib/mock-admin-data";
 import { Button } from "@/components/ui/button";
 
 export default function UserListPage() {
@@ -18,7 +16,7 @@ export default function UserListPage() {
   const [roleFilter, setRoleFilter] = useState("all");
 
   const filteredUsers = MOCK_USERS.filter((user) => {
-    const matchesSearch = 
+    const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
@@ -55,7 +53,7 @@ export default function UserListPage() {
         </div>
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-slate-500" />
-          <select 
+          <select
             className="text-sm border border-slate-200 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
@@ -97,8 +95,8 @@ export default function UserListPage() {
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.status === 'active' 
-                        ? 'bg-green-100 text-green-800' 
+                      user.status === 'active'
+                        ? 'bg-green-100 text-green-800'
                         : 'bg-slate-100 text-slate-800'
                     }`}>
                       {user.status === 'active' ? '활동 중' : '비활성'}
@@ -111,8 +109,8 @@ export default function UserListPage() {
                         <span className="text-slate-400">{user.progress}%</span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div 
-                          className="bg-blue-600 h-full rounded-full" 
+                        <div
+                          className="bg-blue-600 h-full rounded-full"
                           style={{ width: `${user.progress}%` }}
                         />
                       </div>
@@ -125,12 +123,13 @@ export default function UserListPage() {
                     {new Date(user.lastLoginAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Link 
+                    <Link
                       href={`/admin/users/${user.id}`}
                       className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors opacity-0 group-hover:opacity-100"
                     >
                       상세 보기
-                      <ChevronRight className="w-4 h-4 ml-1" />
+                      {/* <img src="/logo.png" alt="Admin Logo" className="h-8 w-auto" />  */}
+        <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">A</div>
                     </Link>
                   </td>
                 </tr>

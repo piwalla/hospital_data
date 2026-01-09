@@ -53,8 +53,10 @@ interface HospitalMapProps {
   userLocation?: { lat: number; lng: number } | null; // 사용자 실제 위치 (마커 표시용)
   onLocationChange?: (lat: number, lng: number) => void;
   onHospitalClick?: (hospital: Hospital) => void;
-  onRehabilitationCenterClick?: (center: RehabilitationCenter) => void; // 재활기관 클릭 핸들러
-  enableLocationChange?: boolean; // 지도 이동 시 onLocationChange 호출 여부 (기본값: true)
+  onRehabilitationCenterClick?: (center: RehabilitationCenter) => void;
+  enableLocationChange?: boolean;
+  className?: string; 
+  onMapChange?: (bounds: { ne: { lat: number; lng: number }; sw: { lat: number; lng: number } }) => void;
 }
 
 const createNaverPoint = (x: number, y: number) => {
@@ -71,8 +73,10 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   userLocation: userLocationProp,
   onLocationChange,
   onHospitalClick,
-  onRehabilitationCenterClick, // 재활기관 클릭 핸들러
-  enableLocationChange = true, // 기본값: true (기존 동작 유지)
+  onRehabilitationCenterClick,
+  enableLocationChange = true,
+  className,
+  onMapChange,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null); // 지도 인스턴스 저장
@@ -83,6 +87,9 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+
+
 
   // enableLocationChange prop 변경 시 ref 업데이트
   useEffect(() => {
@@ -96,6 +103,12 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
       setUserLocation(userLocationProp);
       setIsLoading(false);
       return;
+    }
+
+    // center prop이 있으면 geolocation 대기하지 않음 (바로 지도 표시)
+    if (center) {
+      setIsLoading(false);
+      // userLocation은 없어도 됨 (center를 우선 사용)
     }
 
     // prop이 없으면 브라우저에서 위치 가져오기
@@ -129,11 +142,11 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
       setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLocationProp]); // userLocationProp 변경 시 업데이트
+  }, [userLocationProp, center]); // userLocationProp 또는 center 변경 시 업데이트
 
   // 네이버 지도 초기화 (한 번만 수행)
   useEffect(() => {
-    if (!mapRef.current || !userLocation) return;
+    if (!mapRef.current || (!userLocation && !center)) return;
 
     // 지도가 이미 생성되어 있으면 초기화하지 않음
     if (mapInstanceRef.current) {
@@ -183,6 +196,33 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
       // 지도 인스턴스 저장
       mapInstanceRef.current = map;
 
+      // 지도 경계 업데이트 및 부모 컴포넌트에 알림
+      const updateMapBounds = () => {
+        if (!mapInstanceRef.current) return;
+        
+        const bounds = map.getBounds();
+        const ne = bounds.getNE();
+        const sw = bounds.getSW();
+
+        // Bounds 변경 알림 (동적 로딩용)
+        if (onMapChange) {
+          onMapChange({
+            ne: { lat: ne.lat(), lng: ne.lng() },
+            sw: { lat: sw.lat(), lng: sw.lng() }
+          });
+        }
+
+        // 중심 변경 알림 (기존 로직 호환용)
+        if (onLocationChange && enableLocationChangeRef.current) {
+          const center = map.getCenter();
+          onLocationChange(center.lat(), center.lng());
+        }
+      };
+
+      // 초기 로드시 한 번 호출 (매우 중요: 초기 데이터 로딩 트리거)
+      // 약간의 지연을 두어 맵이 완전히 렌더링 된 후 호출
+      setTimeout(updateMapBounds, 100);
+
       // 커스텀 스케일바 생성 (우측 하단)
       const createCustomScaleControl = () => {
         if (!mapRef.current) return;
@@ -216,7 +256,6 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         const updateScale = () => {
           if (!map) return;
           
-          const zoom = map.getZoom();
           const center = map.getCenter();
           const bounds = map.getBounds();
           
@@ -255,6 +294,19 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         window.naver.maps.Event.addListener(map, 'zoom_changed', updateScale);
         window.naver.maps.Event.addListener(map, 'bounds_changed', updateScale);
         window.naver.maps.Event.addListener(map, 'dragend', updateScale);
+
+        // 지도 유휴 상태(이동 멈춤) 시 부모에게 변경 알림
+        window.naver.maps.Event.addListener(map, 'idle', () => {
+          if (onMapChange) {
+            const bounds = map.getBounds();
+            const ne = bounds.getNE();
+            const sw = bounds.getSW();
+            onMapChange({
+              ne: { lat: ne.lat(), lng: ne.lng() },
+              sw: { lat: sw.lat(), lng: sw.lng() }
+            });
+          }
+        });
         
         // 지도 컨테이너에 추가
         mapRef.current.appendChild(scaleContainer);
@@ -277,18 +329,16 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         }
       });
 
-      // 지도 이동 이벤트 리스너 (지도 중심이 변경될 때만 병원 재검색)
-      // enableLocationChange가 false이면 지도 이동 시 onLocationChange를 호출하지 않음 (지역 선택 모드)
-      // ref를 사용하여 최신 값을 참조하도록 함
-      window.naver.maps.Event.addListener(map, 'dragend', () => {
-        if (enableLocationChangeRef.current && onLocationChange) {
-          const center = map.getCenter();
-          onLocationChange(center.lat(), center.lng());
-        }
-      });
+      // 지도 이동/줌 이벤트 리스너 통합
+      const handleMapEvent = () => {
+         // enableLocationChangeRef가 true일 때만 업데이트
+         if (enableLocationChangeRef.current) {
+            updateMapBounds();
+         }
+      };
 
-      // 줌 변경 이벤트는 병원 재검색을 트리거하지 않음 (확대/축소만 가능하도록)
-      // zoom_changed 이벤트 리스너 제거
+      window.naver.maps.Event.addListener(map, 'dragend', handleMapEvent);
+      window.naver.maps.Event.addListener(map, 'zoom_changed', handleMapEvent);
 
       // 사용자 위치 마커 추가 (항상 표시)
       if (userLocation) {
@@ -302,8 +352,12 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
           map: map,
           title: '내 위치',
           icon: {
-            content: '<div style="width:20px;height:20px;background:#EF4444;border-radius:50%;border:3px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>',
-            anchor: createNaverPoint(10, 10),
+            content: `
+              <div style="background:#F59E0B;width:30px;height:30px;border-radius:50%;border:3px solid white;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.3);">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              </div>
+            `,
+            anchor: createNaverPoint(15, 15),
           },
           zIndex: 1000, // 다른 마커보다 위에 표시
         });
@@ -331,11 +385,22 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
               map: mapInstance,
               title: hospital.name,
               icon: {
-                content: `<div style="width:18px;height:18px;background:${
-                  hospital.type === 'hospital' ? COLORS.primary : COLORS.pharmacy
-                };border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
-                anchor: createNaverPoint(9, 9),
+                content: `<div style="width:${
+                  hospital.is_rehabilitation_certified ? '22px' : '15px'
+                };height:${
+                  hospital.is_rehabilitation_certified ? '22px' : '15px'
+                };background:${
+                  hospital.is_rehabilitation_certified 
+                    ? '#FF0000' // Red (Certified)
+                    : (hospital.type === 'hospital' 
+                        ? '#3B82F6' // Blue (Hospital)
+                        : '#22C55E') // Green (Pharmacy)
+                };border-radius:50%;border:${hospital.is_rehabilitation_certified ? '3px' : '2px'} solid white;box-shadow:0 1px 3px rgba(0,0,0,0.3);${
+                  hospital.is_rehabilitation_certified ? 'box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3); z-index: 10;' : '' // Glow effect for certified (Red)
+                }"></div>`,
+                anchor: createNaverPoint(hospital.is_rehabilitation_certified ? 11 : 7.5, hospital.is_rehabilitation_certified ? 11 : 7.5),
               },
+              zIndex: hospital.is_rehabilitation_certified ? 100 : 1, // Certified on top
             });
 
             // 정보창 생성 (닫기 버튼 포함)
@@ -343,6 +408,9 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
             // 기관 유형 및 진료과목 정보 표시
             const institutionTypeBadge = hospital.institution_type 
               ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.primary};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
+              : '';
+            const certifiedBadge = hospital.is_rehabilitation_certified
+              ? `<span style="display:inline-block;padding:2px 8px;background:#E11D48;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;font-weight:bold;">산재재활인증</span>`
               : '';
             const departmentBadge = hospital.department_extracted && hospital.department_extracted !== '기타'
               ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.rehabilitation};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
@@ -353,7 +421,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
                 <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
                   <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
                   <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${hospital.name}</h4>
-                  ${institutionTypeBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${departmentBadge}</div>` : ''}
+                  ${institutionTypeBadge || certifiedBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${certifiedBadge}${departmentBadge}</div>` : ''}
                   <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${hospital.address}</p>
                   ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${hospital.phone}</p>` : ''}
                   <div style="display:flex;gap:8px;margin-top:8px;">
@@ -375,7 +443,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
             });
 
             // 전역 함수로 InfoWindow 닫기 함수 등록 (각 InfoWindow마다 고유 ID 사용)
-            (window as any).closeInfoWindow = (id: string) => {
+            (window as any).closeInfoWindow = () => {
               if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
                 currentInfoWindowRef.current.close();
                 currentInfoWindowRef.current = null;
@@ -420,9 +488,10 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
               map: mapInstance,
               title: center.name,
               icon: {
-                content: `<div style="width:18px;height:18px;background:${COLORS.rehabilitation};border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
-                anchor: createNaverPoint(9, 9),
+                content: `<div style="width:15px;height:15px;background:#A855F7;border-radius:50%;border:2px solid white;box-shadow:0 1px 2px rgba(0,0,0,0.3);"></div>`, // Purple (Rehab) - 15px
+                anchor: createNaverPoint(7.5, 7.5),
               },
+              zIndex: 50,
             });
 
             // 재활기관 정보창 생성 (기관구분명 표시)
@@ -454,7 +523,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
             });
 
             // 전역 함수로 InfoWindow 닫기 함수 등록
-            (window as any).closeInfoWindow = (id: string) => {
+            (window as any).closeInfoWindow = () => {
               if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
                 currentInfoWindowRef.current.close();
                 currentInfoWindowRef.current = null;
@@ -498,6 +567,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
       setError('지도를 불러오는 중 오류가 발생했습니다.');
       setIsLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapRef, userLocation]); // center, zoom 제거 - 지도는 한 번만 초기화
 
   // center prop 변경 시 지도 중심만 업데이트 (지도 리셋하지 않음)
@@ -549,8 +619,12 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
           map: mapInstanceRef.current,
           title: '내 위치',
           icon: {
-            content: '<div style="width:20px;height:20px;background:#EF4444;border-radius:50%;border:3px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>',
-            anchor: createNaverPoint(10, 10),
+            content: `
+              <div style="background:#F59E0B;width:30px;height:30px;border-radius:50%;border:3px solid white;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.3);">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              </div>
+            `,
+            anchor: createNaverPoint(15, 15),
           },
           zIndex: 1000,
         });
@@ -569,10 +643,20 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
           map: mapInstanceRef.current,
           title: hospital.name,
             icon: {
-              content: `<div style="width:24px;height:24px;background:${
-                hospital.type === 'hospital' ? COLORS.primaryAlt : COLORS.pharmacy
-              };border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
-              anchor: createNaverPoint(12, 12),
+              content: `<div style="width:${
+                hospital.is_rehabilitation_certified ? '22px' : '15px'
+              };height:${
+                hospital.is_rehabilitation_certified ? '22px' : '15px'
+              };background:${
+                hospital.is_rehabilitation_certified 
+                  ? '#FF0000' // Red (Certified)
+                  : (hospital.type === 'hospital' 
+                      ? '#3B82F6' // Blue (Hospital)
+                      : '#22C55E') // Green (Pharmacy)
+              };border-radius:50%;border:${hospital.is_rehabilitation_certified ? '3px' : '2px'} solid white;box-shadow:0 1px 3px rgba(0,0,0,0.3);${
+                hospital.is_rehabilitation_certified ? 'box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3); z-index: 10;' : '' // Glow effect for certified (Red)
+              }"></div>`,
+              anchor: createNaverPoint(hospital.is_rehabilitation_certified ? 11 : 7.5, hospital.is_rehabilitation_certified ? 11 : 7.5),
             },
         });
 
@@ -581,6 +665,9 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         // 기관 유형 및 진료과목 정보 표시
         const institutionTypeBadge = hospital.institution_type 
           ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.primary};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
+          : '';
+        const certifiedBadge = hospital.is_rehabilitation_certified
+          ? `<span style="display:inline-block;padding:2px 8px;background:#2563EB;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">산재재활인증</span>`
           : '';
         const departmentBadge = hospital.department_extracted && hospital.department_extracted !== '기타'
           ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.rehabilitation};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
@@ -591,7 +678,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
             <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
               <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
               <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${hospital.name}</h4>
-              ${institutionTypeBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${departmentBadge}</div>` : ''}
+              ${institutionTypeBadge || certifiedBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${certifiedBadge}${departmentBadge}</div>` : ''}
               <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${hospital.address}</p>
               ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${hospital.phone}</p>` : ''}
               <div style="display:flex;gap:8px;margin-top:8px;">
@@ -603,7 +690,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         });
 
         // 전역 함수로 InfoWindow 닫기 함수 등록
-        (window as any).closeInfoWindow = (id: string) => {
+        (window as any).closeInfoWindow = () => {
           if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
             currentInfoWindowRef.current.close();
             currentInfoWindowRef.current = null;
@@ -646,8 +733,8 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
           map: mapInstanceRef.current,
           title: center.name,
               icon: {
-                content: `<div style="width:24px;height:24px;background:${COLORS.rehabilitation};border-radius:50%;border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
-                anchor: createNaverPoint(12, 12),
+                content: `<div style="width:15px;height:15px;background:#A855F7;border-radius:50%;border:2px solid white;box-shadow:0 1px 2px rgba(0,0,0,0.3);"></div>`, // Purple (Rehab) - 15px
+                anchor: createNaverPoint(7.5, 7.5),
               },
         });
 
@@ -670,7 +757,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         });
 
         // 전역 함수로 InfoWindow 닫기 함수 등록
-        (window as any).closeInfoWindow = (id: string) => {
+        (window as any).closeInfoWindow = () => {
           if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
             currentInfoWindowRef.current.close();
             currentInfoWindowRef.current = null;
@@ -704,7 +791,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
     });
 
     console.log('[HospitalMap] 마커 업데이트 완료:', `병원 ${hospitals.length}개, 재활기관 ${rehabilitationCenters.length}개`);
-  }, [hospitals, rehabilitationCenters, onHospitalClick, onRehabilitationCenterClick]);
+  }, [hospitals, rehabilitationCenters, onHospitalClick, onRehabilitationCenterClick, userLocation]);
 
   // 네이버 지도 SDK 로드 (신규 NCP Maps API v3)
   useEffect(() => {
@@ -765,7 +852,7 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   }
 
   return (
-    <div className="relative w-full rounded-lg border border-gray-200 h-[450px] lg:h-[650px]">
+    <div className={`relative w-full rounded-lg border border-gray-200 overflow-hidden ${className || 'h-[450px] lg:h-[650px]'}`}>
       <div
         ref={mapRef}
         className="w-full h-full relative"

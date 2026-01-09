@@ -48,7 +48,8 @@ export default async function AdminLayout({
             </span>
             {/* 추후 관리자 프로필 등 추가 */}
             <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
-              <img src={user.imageUrl} alt="Profile" className="w-full h-full object-cover" />
+              {/* <img src={user.imageUrl} alt="Profile" className="w-full h-full object-cover" /> */}
+              <div className="h-8 w-8 bg-slate-900 rounded-lg flex items-center justify-center text-white font-bold">A</div>
             </div>
           </div>
         </header>

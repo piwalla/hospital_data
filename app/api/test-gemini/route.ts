@@ -6,10 +6,10 @@
  * - Gemini API가 정상적으로 작동하는지 확인
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { generateContentWithRetry } from '@/lib/api/gemini';
 
-export async function GET(request: NextRequest) {
+export async function POST() {
   console.log('[Test Gemini] API 테스트 시작');
 
   try {

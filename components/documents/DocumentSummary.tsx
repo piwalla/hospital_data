@@ -53,6 +53,53 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
         </div>
       </div>
 
+      {/* 다운로드 링크 (CTA 위치 이동) */}
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4" role="group" aria-label="서류 다운로드 및 예시 링크">
+        {document.officialDownloadUrl && (
+          <Button
+            asChild
+            className="w-full sm:w-auto flex-1 h-12 sm:h-10 text-base"
+            aria-label="공식 서류 보기 (새 창에서 열림)"
+          >
+            <a
+              href={
+                document.officialDownloadUrl.endsWith('.pdf')
+                  ? `/view-pdf?file=${encodeURIComponent(document.officialDownloadUrl)}`
+                  : document.officialDownloadUrl
+              }
+              target={document.officialDownloadUrl.endsWith('.pdf') ? undefined : '_blank'}
+              rel={document.officialDownloadUrl.endsWith('.pdf') ? undefined : 'noopener noreferrer'}
+              className="flex items-center justify-center gap-2"
+            >
+              <span className="font-bold">공식 서류 보기</span>
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} aria-hidden="true" />
+            </a>
+          </Button>
+        )}
+        {document.exampleUrl && (
+          <Button 
+            variant="outline" 
+            asChild 
+            className="w-full sm:w-auto flex-1 h-12 sm:h-10 text-base border-primary/20 text-primary hover:bg-primary/5"
+            aria-label="작성 예시 보기 (새 창에서 열림)"
+          >
+            <a
+              href={
+                document.exampleUrl.endsWith('.pdf')
+                  ? `/view-pdf?file=${encodeURIComponent(document.exampleUrl)}`
+                  : document.exampleUrl
+              }
+              target={document.exampleUrl.endsWith('.pdf') ? undefined : '_blank'}
+              rel={document.exampleUrl.endsWith('.pdf') ? undefined : 'noopener noreferrer'}
+              className="flex items-center justify-center gap-2"
+            >
+              <span className="font-bold">작성 예시 보기</span>
+              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} aria-hidden="true" />
+            </a>
+          </Button>
+        )}
+      </div>
+
       {/* 유튜브 영상 임베드 */}
       {document.youtubeUrl && (
         <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
@@ -200,46 +247,7 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
 
       </div>
 
-      {/* 다운로드 링크 */}
-      <div className="flex flex-wrap gap-2 sm:gap-4 justify-end" role="group" aria-label="서류 다운로드 및 예시 링크">
-        {document.officialDownloadUrl && (
-          <Button
-            asChild
-            aria-label="공식 서류 보기 (새 창에서 열림)"
-          >
-            <a
-              href={
-                document.officialDownloadUrl.endsWith('.pdf')
-                  ? `/view-pdf?file=${encodeURIComponent(document.officialDownloadUrl)}`
-                  : document.officialDownloadUrl
-              }
-              target={document.officialDownloadUrl.endsWith('.pdf') ? undefined : '_blank'}
-              rel={document.officialDownloadUrl.endsWith('.pdf') ? undefined : 'noopener noreferrer'}
-              className="flex items-center gap-2"
-            >
-              <span className="text-xs sm:text-sm">공식 서류 보기</span>
-              <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.75} aria-hidden="true" />
-            </a>
-          </Button>
-        )}
-        {document.exampleUrl && (
-          <Button variant="outline" asChild aria-label="작성 예시 보기 (새 창에서 열림)">
-            <a
-              href={
-                document.exampleUrl.endsWith('.pdf')
-                  ? `/view-pdf?file=${encodeURIComponent(document.exampleUrl)}`
-                  : document.exampleUrl
-              }
-              target={document.exampleUrl.endsWith('.pdf') ? undefined : '_blank'}
-              rel={document.exampleUrl.endsWith('.pdf') ? undefined : 'noopener noreferrer'}
-              className="flex items-center gap-2"
-            >
-              <span className="text-xs sm:text-sm">작성 예시 보기</span>
-              <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.75} aria-hidden="true" />
-            </a>
-          </Button>
-        )}
-      </div>
+
 
       {/* 면책 조항 */}
       <div className="berry-card mt-4 sm:mt-6 p-3 sm:p-4 border border-[var(--border-light)] rounded-lg" role="note" aria-label="면책 조항">

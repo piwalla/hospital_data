@@ -6,7 +6,7 @@
  * Geocoding은 별도 API로 처리합니다.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServiceRoleClient } from '@/lib/supabase/service-role';
 
 const API_KEY = process.env.TOUR_API_KEY || process.env.REHABILITATION_API_KEY || '';
@@ -97,7 +97,7 @@ async function fetchRehabilitationCenters(pageNo: number, numOfRows: number) {
   });
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     if (!API_KEY) {
       return NextResponse.json(

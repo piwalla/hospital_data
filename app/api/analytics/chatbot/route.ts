@@ -17,7 +17,7 @@ import type { ChatbotAction } from '@/lib/utils/chatbot-analytics';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { action, userId, question, responseTime, error, sessionId, metadata } = body;
+    const { action, question, responseTime, error, sessionId, metadata } = body;
 
     // 인증 확인
     const { userId: clerkUserId } = await auth();

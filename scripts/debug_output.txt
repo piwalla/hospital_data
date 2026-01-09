@@ -1,0 +1,35 @@
+﻿[dotenv@17.2.3] injecting env (1) from .env.local -- tip: ?뫁 sync secrets across teammates & machines: https://dotenvx.com/ops
+Fetching sample raw cases for 2023...
+node.exe : Error fetching samples: Error: Non-whitespace before first tag.
+위치 줄:1 문자:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Error fetching ...fore first ta 
+   g.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Line: 0
+Column: 1
+Char: U
+    at error (C:\Users\highs\OneDrive\Desktop\crusor\hospital_data\node_modul
+es\.pnpm\sax@1.4.3\node_modules\sax\lib\sax.js:695:10)
+    at strictFail (C:\Users\highs\OneDrive\Desktop\crusor\hospital_data\node_
+modules\.pnpm\sax@1.4.3\node_modules\sax\lib\sax.js:724:7)
+    at beginWhiteSpace (C:\Users\highs\OneDrive\Desktop\crusor\hospital_data\
+node_modules\.pnpm\sax@1.4.3\node_modules\sax\lib\sax.js:1022:7)
+    at SAXParser.write (C:\Users\highs\OneDrive\Desktop\crusor\hospital_data\
+node_modules\.pnpm\sax@1.4.3\node_modules\sax\lib\sax.js:1079:11)
+    at exports.Parser.Parser.parseString (C:\Users\highs\OneDrive\Desktop\cru
+sor\hospital_data\node_modules\.pnpm\xml2js@0.6.2\node_modules\xml2js\lib\par
+ser.js:337:31)
+    at Parser.parseString (C:\Users\highs\OneDrive\Desktop\crusor\hospital_da
+ta\node_modules\.pnpm\xml2js@0.6.2\node_modules\xml2js\lib\parser.js:5:59)
+    at C:\Users\highs\OneDrive\Desktop\crusor\hospital_data\node_modules\.pnp
+m\xml2js@0.6.2\node_modules\xml2js\lib\parser.js:352:24
+    at new Promise (<anonymous>)
+    at exports.Parser.Parser.parseStringPromise (C:\Users\highs\OneDrive\Desk
+top\crusor\hospital_data\node_modules\.pnpm\xml2js@0.6.2\node_modules\xml2js\
+lib\parser.js:350:14)
+    at Parser.parseStringPromise (C:\Users\highs\OneDrive\Desktop\crusor\hosp
+ital_data\node_modules\.pnpm\xml2js@0.6.2\node_modules\xml2js\lib\parser.js:5
+:59)

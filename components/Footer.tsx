@@ -8,29 +8,29 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { getDisclaimer } from "@/lib/utils/disclaimer";
+
+import CSChatDialog from "@/components/cs/CSChatDialog";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
-  // TODO: 실제 이메일 주소로 교체 필요
-  const contactEmail = "contact@reworkcare.com";
+  // TODO: 실제 이메일 주소로 교체 필요 (Updated)
 
-  // TODO: 실제 소셜 미디어 링크로 교체 필요
+  // TODO: 실제 소셜 미디어 링크로 교체 필요 (Updated)
   const socialLinks = [
     {
       name: "Facebook",
-      href: "#",
+      href: "https://www.youtube.com/@reworkcare",
       icon: "📘",
     },
     {
       name: "Instagram",
-      href: "#",
+      href: "https://www.youtube.com/@reworkcare",
       icon: "📷",
     },
     {
       name: "YouTube",
-      href: "#",
+      href: "https://www.youtube.com/@reworkcare",
       icon: "▶️",
     },
   ];
@@ -51,7 +51,7 @@ export default function Footer() {
               style={{ fontFamily: 'Paperozi, sans-serif', fontWeight: 700 }}
             >
               <Image
-                src="/icons/파이왈라_마크-removebg-preview.png"
+                src="/landing/brand-logo-removebg-preview.png"
                 alt="리워크케어 로고"
                 width={28}
                 height={28}
@@ -59,15 +59,17 @@ export default function Footer() {
               />
               리워크케어
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              산재 환자를 위한 통합 지원 플랫폼
-            </p>
-            <Link
-              href="/about"
-              className="text-sm text-primary hover:text-primary/80 transition-colors duration-200 underline inline-block"
-            >
-              더 알아보기 →
-            </Link>
+            <div className="flex flex-col items-end w-fit">
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                산재 환자를 위한 통합 지원 플랫폼
+              </p>
+              <Link
+                href="/about"
+                className="text-sm text-primary hover:text-primary/80 transition-colors duration-200 underline mt-1"
+              >
+                더 알아보기 →
+              </Link>
+            </div>
           </div>
 
           {/* 서비스 소개 섹션 */}
@@ -83,15 +85,12 @@ export default function Footer() {
           {/* 연락처 섹션 */}
           <div className="space-y-4">
             <h3 className="text-sm font-semibold text-foreground">연락처</h3>
-            <div className="space-y-2">
+            <div className="space-y-3">
+              <div>
+                 <CSChatDialog />
+              </div>
               <p className="text-sm text-muted-foreground">
-                이메일:{" "}
-                <a
-                  href={`mailto:${contactEmail}`}
-                  className="hover:text-foreground transition-colors duration-200 underline"
-                >
-                  {contactEmail}
-                </a>
+                이메일: piwallakorea@gmail.com
               </p>
             </div>
           </div>
@@ -123,12 +122,9 @@ export default function Footer() {
         <div className="mt-8 pt-8 border-t border-gray-200">
           {/* 법적 고지 */}
           <div className="mb-6 text-center">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              <strong className="font-semibold">법적 고지</strong>
-              <br />
-              {getDisclaimer()}
-              <br />
-              본 정보는 법적 효력을 갖지 않으며, 참고용입니다.
+            <p className="text-xs text-muted-foreground leading-relaxed break-keep">
+              본 사이트에서 제공하는 정보는 참고용이며 법적/의학적 효력을 갖지 않습니다.<br className="hidden sm:block"/>
+              정확한 내용은 근로복지공단(www.comwel.or.kr) 또는 전문가와 상의하시기 바랍니다.
             </p>
           </div>
 

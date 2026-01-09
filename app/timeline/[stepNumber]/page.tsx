@@ -8,7 +8,7 @@
 
 import { notFound } from 'next/navigation';
 import { getAllStagesWithDetails } from '@/lib/api/timeline';
-import DocumentDownloadButton from '@/components/timeline/DocumentDownloadButton';
+
 import { cn } from '@/lib/utils';
 import TimelineStepContent from '@/components/timeline/TimelineStepContent';
 

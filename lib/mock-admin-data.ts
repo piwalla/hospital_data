@@ -1,3 +1,21 @@
+export interface CalendarEvent {
+  id: string;
+  date: string; // "YYYY-MM-DD"
+  type: 'hospital' | 'rehab' | 'admin' | 'counseling' | 'other';
+  title: string;
+  memo?: string;
+  isCompleted?: boolean;
+}
+
+export type UserRole = 'patient' | 'family';
+export type InjuryPart = 'hand_arm' | 'foot_leg' | 'spine' | 'brain_neuro' | 'other';
+export type Region = 'seoul' | 'gyeonggi' | 'incheon' | 'busan' | 'daegu' | 'gwangju' | 'daejeon' | 'ulsan' | 'sejong' | 'gangwon' | 'chungbuk' | 'chungnam' | 'jeonbuk' | 'jeonnam' | 'yeongbuk' | 'yeongnam' | 'jeju';
+
+export interface WageInfo {
+  type: 'daily' | 'monthly';
+  amount: number;
+}
+
 export interface AdminUser {
   id: string;
   name: string;
@@ -9,12 +27,21 @@ export interface AdminUser {
   currentStep: number; // 0-4
   progress: number; // 0-100%
   location?: string;
+  
+  // Personalization Fields
+  userRole?: UserRole;
+  injuryPart?: InjuryPart;
+  region?: Region;
+  wageInfo?: WageInfo; // Added for Wage Calculator
+
+  completed_actions: string[]; // IDs of completed TimelineActions
+  calendar_events: CalendarEvent[];
 }
 
 export interface ActivityLog {
   id: string;
   userId: string;
-  action: 'login' | 'view_page' | 'download_doc' | 'search_hospital' | 'start_chat' | 'complete_step';
+  action: 'login' | 'view_page' | 'download_doc' | 'search_hospital' | 'start_chat' | 'complete_step' | 'add_calendar_event' | 'update_profile';
   details: string;
   timestamp: string;
   severity?: 'info' | 'success' | 'warning';
@@ -32,6 +59,22 @@ export const MOCK_USERS: AdminUser[] = [
     currentStep: 2,
     progress: 45,
     location: "서울시 강남구",
+    
+    // Default: Undefined to trigger onboarding
+    userRole: 'family', // Changed to family for testing Guardian features
+    injuryPart: undefined,
+    region: undefined,
+    wageInfo: {
+      type: 'monthly',
+      amount: 3000000
+    },
+
+    completed_actions: ["action-1-1", "action-1-2"],
+    calendar_events: [
+      { id: "evt-1", date: "2024-12-05", type: "hospital", title: "최초 병원 방문", isCompleted: true },
+      { id: "evt-2", date: "2024-12-10", type: "admin", title: "산재 신청 접수", isCompleted: true },
+      { id: "evt-3", date: "2025-06-30", type: "admin", title: "휴업급여 신청 예정일", isCompleted: false },
+    ],
   },
   {
     id: "user-2",
@@ -44,6 +87,11 @@ export const MOCK_USERS: AdminUser[] = [
     currentStep: 1,
     progress: 20,
     location: "경기도 수원시",
+    userRole: 'patient',
+    injuryPart: 'hand_arm',
+    region: 'gyeonggi',
+    completed_actions: ["action-1-1"],
+    calendar_events: [],
   },
   {
     id: "user-3",
@@ -56,6 +104,8 @@ export const MOCK_USERS: AdminUser[] = [
     currentStep: 0,
     progress: 0,
     location: "인천시",
+    completed_actions: [],
+    calendar_events: [],
   },
   // Add more mock users as needed
 ];

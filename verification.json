@@ -1,0 +1,62 @@
+[
+  {
+    "name": "files/e2we7srraukg",
+    "displayName": "Disability Diagnosis Guide",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/e2we7srraukg"
+  },
+  {
+    "name": "files/39iorrx3dbwl",
+    "displayName": "Hospital Guide 2025",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/39iorrx3dbwl"
+  },
+  {
+    "name": "files/ercfub97z0y8",
+    "displayName": "nursing_care_benefit_payment_standards",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/ercfub97z0y8"
+  },
+  {
+    "name": "files/pczq7ds516eq",
+    "displayName": "industrial_accident_compensation_insurance_act_21136",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/pczq7ds516eq"
+  },
+  {
+    "name": "files/wjctkswekr61",
+    "displayName": "industrial_accident_compensation_insurance_act_21065",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/wjctkswekr61"
+  },
+  {
+    "name": "files/a0az02j150z5",
+    "displayName": "enforcement_decree_of_industrial_accident_compensation_insurance_act",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/a0az02j150z5"
+  },
+  {
+    "name": "files/u7zcp03321x2",
+    "displayName": "enforcement_rule_of_industrial_accident_compensation_insurance_act",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/u7zcp03321x2"
+  },
+  {
+    "name": "files/1ehvtpbcfmt4",
+    "displayName": "medical_care_benefit_calculation_standards",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/1ehvtpbcfmt4"
+  },
+  {
+    "name": "files/erx1b7oiyhmu",
+    "displayName": "cardiovascular_musculoskeletal_diseases_criteria",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/erx1b7oiyhmu"
+  },
+  {
+    "name": "files/78n14ispd5g1",
+    "displayName": "industrial_accident_insurance_1",
+    "state": "ACTIVE",
+    "uri": "https://generativelanguage.googleapis.com/v1beta/files/78n14ispd5g1"
+  }
+]

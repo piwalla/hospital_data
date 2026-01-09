@@ -28,6 +28,12 @@ const nextConfig: NextConfig = {
         hostname: supabaseHostname,
         protocol: 'https' as const,
       }] : []),
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+        port: '',
+        pathname: '/vi/**',
+      },
     ],
   },
   // 다중 lockfile 경고 해결을 위한 workspace root 설정

@@ -16,7 +16,7 @@
  * - lucide-react (아이콘)
  */
 
-import { X, Phone, MapPin, Building2 } from "lucide-react";
+import { Phone, MapPin, Building2 } from "lucide-react";
 import {
   Sheet,
   SheetContent,

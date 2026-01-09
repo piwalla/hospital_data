@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import RagChatbot from '@/components/rag-chatbot/RagChatbot';
+import ChatbotHero from '@/components/chatbot/ChatbotHero';
 import { SignInButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Shield, CheckCircle } from 'lucide-react';
@@ -18,143 +19,133 @@ export default async function ChatbotPage() {
     // 로그인하지 않은 경우 로그인 안내 페이지 표시
     if (!userId) {
       return (
-        <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12 max-w-full sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl">
-          <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
-            {/* 헤더 */}
-            <div className="text-center space-y-4">
-              <div className="flex justify-center">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <MessageSquare className="w-8 h-8 sm:w-10 sm:h-10 text-primary" strokeWidth={1.75} />
-                </div>
-              </div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
-                산재 전문 상담 서비스
-              </h1>
-              <p className="text-base sm:text-lg text-muted-foreground">
-                로그인 후 이용 가능한 서비스입니다
-              </p>
-            </div>
+        <>
+          <ChatbotHero />
+          
+          <div className="relative w-screen left-[calc(-50vw+50%)] bg-[#eff2f5] min-h-screen -mt-12">
+            <div className="container mx-auto px-4 sm:px-6 pb-20 pt-16 max-w-7xl">
+              <div className="max-w-4xl mx-auto space-y-12">
+                
+                {/* 기능 소개 카드 섹션 */}
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="group bg-white/80 backdrop-blur-md border border-white/40 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-1">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <CheckCircle className="w-7 h-7 text-primary" strokeWidth={2.5} />
+                    </div>
+                    <h3 className="text-xl font-black text-gray-900 mb-3">정확한 정보</h3>
+                    <p className="text-gray-500 font-medium text-sm leading-relaxed">
+                      공식 문서와 최신 산재 규정을 기반으로 신뢰할 수 있는 답변을 제공합니다.
+                    </p>
+                  </div>
 
-            {/* 기능 소개 */}
-            <div className="bg-white border border-[var(--border-light)] rounded-lg shadow-sm p-6 sm:p-8 space-y-6">
-              <div className="space-y-4">
-                <h2 className="text-lg sm:text-xl font-semibold text-foreground">
-                  이 서비스는 무엇인가요?
-                </h2>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  <strong className="text-foreground">AI 기반 산재 전문 상담 챗봇</strong>입니다. 
-                  근로복지공단과 법제처에서 제공하는 산재 규정을 전문으로 학습한 RAG(검색 기반 생성) 기술을 활용하여, 
-                  산재 관련 궁금한 점을 자유롭게 물어보고 정확한 답변을 받을 수 있습니다.
-                </p>
-              </div>
+                  <div className="group bg-white/80 backdrop-blur-md border border-white/40 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-1">
+                    <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <MessageSquare className="w-7 h-7 text-blue-600" strokeWidth={2.5} />
+                    </div>
+                    <h3 className="text-xl font-black text-gray-900 mb-3">24시간 대기</h3>
+                    <p className="text-gray-500 font-medium text-sm leading-relaxed">
+                      장소와 시간에 구애받지 않고 언제 어디서나 즉각적인 상담이 가능합니다.
+                    </p>
+                  </div>
 
-              <div className="space-y-3 pt-4 border-t border-[var(--border-light)]">
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" strokeWidth={2} />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">정확한 정보 제공</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      공식 문서 기반의 신뢰할 수 있는 답변
+                  <div className="group bg-white/80 backdrop-blur-md border border-white/40 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-500 hover:-translate-y-1">
+                    <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                      <Shield className="w-7 h-7 text-amber-600" strokeWidth={2.5} />
+                    </div>
+                    <h3 className="text-xl font-black text-gray-900 mb-3">맥락 이해</h3>
+                    <p className="text-gray-500 font-medium text-sm leading-relaxed">
+                      단순 질의응답을 넘어 이전 대화의 맥락을 기억하여 맞춤형 정보를 드립니다.
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" strokeWidth={2} />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">24시간 언제든지 상담</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      원하는 시간에 자유롭게 질문하고 답변받기
-                    </p>
+
+                {/* 로그인 안내 & CTA */}
+                <div className="relative overflow-hidden bg-white rounded-[2rem] p-10 sm:p-16 shadow-[0_32px_64px_rgba(0,0,0,0.05)] border border-gray-100 text-center">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                  <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -ml-32 -mb-32"></div>
+                  
+                  <div className="relative z-10 space-y-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-100 text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
+                      <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                      Smart AI Counselor
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+                        로그인 한 번으로<br />전문적인 산재 상담을 시작하세요
+                      </h2>
+                      <p className="text-gray-500 text-lg font-medium max-w-2xl mx-auto">
+                        복잡한 산재 규정, 이제 혼자 고민하지 마세요.<br />
+                        리워크케어 AI가 24시간 당신의 곁을 지킵니다.
+                      </p>
+                    </div>
+
+                    <div className="pt-4">
+                      <SignInButton mode="modal">
+                        <Button size="lg" className="h-16 px-12 text-lg font-black bg-[#14532d] hover:bg-[#114023] text-white rounded-2xl shadow-[0_12px_24px_rgba(20,83,45,0.2)] hover:shadow-[0_20px_40px_rgba(20,83,45,0.3)] transition-all transform hover:-translate-y-1 active:scale-95">
+                          지금 바로 무료 상담하기
+                        </Button>
+                      </SignInButton>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" strokeWidth={2} />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">개인 맞춤 상담</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      이전 대화 내용을 기억하여 맥락 있는 답변 제공
-                    </p>
+
+                {/* 법적 고지 (최하단 정렬) */}
+                <div className="text-center space-y-4 max-w-2xl mx-auto opacity-60">
+                  <div className="flex items-center justify-center gap-2 text-[#14532d] font-bold text-sm">
+                    <Shield className="w-4 h-4" />
+                    법적 고지 가이드라인
                   </div>
+                  <p className="text-xs text-gray-500 leading-relaxed font-medium">
+                    본 챗봇은 근로복지공단과 법제처의 공신력 있는 데이터를 학습한 AI 보조 도구입니다.<br />
+                    제공되는 모든 정보는 참고용이며, 최종적인 법적 결정이나 처분은 반드시 <strong>근로복지공단 공식 채널</strong>을 통해 확인하시기 바랍니다.
+                  </p>
                 </div>
               </div>
-            </div>
-
-            {/* 로그인 안내 */}
-            <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 sm:p-8 text-center space-y-4">
-              <div className="flex justify-center">
-                <Shield className="w-8 h-8 text-primary" strokeWidth={1.75} />
-              </div>
-              <div className="space-y-2">
-                <p className="text-sm sm:text-base text-foreground font-medium">
-                  로그인하시면 상담 서비스를 이용하실 수 있습니다
-                </p>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  간단한 로그인으로 바로 시작하세요
-                </p>
-              </div>
-              <div className="pt-2">
-                <SignInButton mode="modal">
-                  <Button size="lg" className="w-full sm:w-auto px-8 font-semibold">
-                    로그인하고 시작하기
-                  </Button>
-                </SignInButton>
-              </div>
-            </div>
-
-            {/* 법적 고지 */}
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 sm:p-6">
-              <p className="text-xs sm:text-sm text-foreground leading-relaxed">
-                <strong className="font-semibold text-amber-800">법적 고지</strong>
-                <br />
-                본 챗봇은 근로복지공단과 법제처에서 제공하는 각종 산재 규정을 전문으로 학습된 RAG 챗봇입니다.
-                <br />
-                <strong className="font-semibold text-amber-800">정확한 사항은 꼭 근로복지공단(www.comwel.or.kr)에 확인하시기 바랍니다.</strong>
-              </p>
             </div>
           </div>
-        </div>
+        </>
       );
     }
 
     return (
-      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12 max-w-full sm:max-w-2xl md:max-w-4xl lg:max-w-6xl xl:max-w-7xl space-y-6 sm:space-y-8 md:space-y-10 lg:space-y-12">
-        {/* 페이지 헤더 */}
-        <div className="text-center relative">
-          <h1 className="text-senior-title">
-            산재 전문 챗봇과 상담하세요
-          </h1>
-          <p className="mt-4 sm:mt-6 text-senior-body text-muted-foreground">
-            산재 관련 궁금한 점을 자유롭게 물어보세요
-          </p>
-        </div>
+      <>
+        <ChatbotHero />
 
-        <RagChatbot />
+        <div className="relative w-screen left-[calc(-50vw+50%)] bg-[#eff2f5] min-h-screen -mt-12">
+          <div className="container mx-auto px-4 sm:px-6 pb-20 pt-12 max-w-6xl">
+            <div className="space-y-12">
+              {/* 챗봇 메인 컨테이너 */}
+              <div className="bg-white rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.06)] border border-gray-100 overflow-hidden ring-1 ring-black/[0.02]">
+                <RagChatbot />
+              </div>
 
-        {/* 학습자료 출처 */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
-          <h3 className="text-sm sm:text-base font-semibold text-blue-800 mb-2">
-            학습자료 출처
-          </h3>
-          <p className="text-xs sm:text-sm text-blue-700 leading-relaxed">
-            본 챗봇은 다음 기관에서 제공하는 산재 규정 자료를 학습했습니다:
-            <br />
-            • 근로복지공단 (www.comwel.or.kr)
-            <br />
-            • 법제처 (www.moleg.go.kr)
-          </p>
-        </div>
+              {/* 하단 푸터 가이드 */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-white/60 backdrop-blur-sm border border-white/80 rounded-3xl p-8 shadow-sm">
+                  <h3 className="text-sm font-black text-blue-800 mb-4 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    신뢰할 수 있는 데이터 출처
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
+                    리워크케어 AI는 근로복지공단(www.comwel.or.kr)과 법제처(www.moleg.go.kr)에서 관리하는 최신 산재 법령 및 실무 가이드를 학습하여 정확한 정보를 전달합니다.
+                  </p>
+                </div>
 
-        {/* 법적 고지 */}
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 sm:p-6">
-          <p className="text-sm sm:text-base text-foreground leading-relaxed">
-            <strong className="font-semibold text-amber-800">법적 고지</strong>
-            <br />
-            본 챗봇은 근로복지공단과 법제처에서 제공하는 각종 산재 규정을 전문으로 학습된 RAG 챗봇입니다.
-            <br />
-            <strong className="font-semibold text-amber-800">정확한 사항은 꼭 근로복지공단(www.comwel.or.kr)에 확인하시기 바랍니다.</strong>
-          </p>
+                <div className="bg-white/60 backdrop-blur-sm border border-white/80 rounded-3xl p-8 shadow-sm">
+                  <h3 className="text-sm font-black text-amber-800 mb-4 flex items-center gap-2">
+                    <Shield className="w-5 h-5" />
+                    상용화 및 책임 한계 고지
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed font-medium">
+                    제공된 답변은 산재 처리를 돕기 위한 참고 자료이며, 개별 사례에 따른 정확한 법적 효력은 관계 기관의 공식적인 상담과 심사를 통해 결정됩니다.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </>
     );
   } catch (error: any) {
     // 에러 로깅

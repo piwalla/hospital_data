@@ -31,7 +31,7 @@ const ResponsiveNavigation = () => {
       icon: FileText,
     },
     {
-      href: "/chatbot",
+      href: "/chatbot-v2",
       label: "산재 상담",
       icon: MessageSquareText,
     },

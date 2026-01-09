@@ -15,12 +15,6 @@ import DocumentDownloadButton from './DocumentDownloadButton';
 import ConditionalPDFViewer from './ConditionalPDFViewer';
 import type { StageWithDetails } from '@/lib/types/timeline';
 import { cn } from '@/lib/utils';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 interface TimelineStepContentProps {
   stage: StageWithDetails;
@@ -86,7 +80,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
       role="tab"
       aria-selected={activeTab === tab}
       aria-controls={`tabpanel-${tab}`}
-      aria-pressed={activeTab === tab}
+
       tabIndex={activeTab === tab ? 0 : -1}
     >
       <Icon className="w-3.5 h-3.5 sm:w-6 sm:h-6 flex-shrink-0" />

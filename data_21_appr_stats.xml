@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RESULT>
+	<HEAD>
+		<resultCode>00</resultCode>
+		<resultMsg>NORMAL_SERVICE</resultMsg>
+		<totalCount>38566</totalCount>
+		<numOfRows>1</numOfRows>
+		<pageNo>1</pageNo>
+	</HEAD>
+	<BODY>
+		<ROW>
+			<info_reg_ymd>20150102</info_reg_ymd>
+			<info_reg_yr>2015</info_reg_yr>
+			<info_reg_mm>01</info_reg_mm>
+			<info_reg_day>02</info_reg_day>
+			<injds_type_cd></injds_type_cd>
+			<injds_type_nm></injds_type_nm>
+			<ia_rcpr_aprv_nocs>1</ia_rcpr_aprv_nocs>
+			<gnrl_wrkr_cnt>1</gnrl_wrkr_cnt>
+			<spwkr_cnt>0</spwkr_cnt>
+			<dwrkr_cnt>0</dwrkr_cnt>
+			<etc_wrkr_cnt>0</etc_wrkr_cnt>
+			<ml_wrkr_cnt>0</ml_wrkr_cnt>
+			<fml_wrkr_cnt>0</fml_wrkr_cnt>
+			<ml_gnrl_wrkr_cnt>0</ml_gnrl_wrkr_cnt>
+			<fml_gnrl_wrkr_cnt>0</fml_gnrl_wrkr_cnt>
+			<ml_spwkr_cnt>0</ml_spwkr_cnt>
+			<fml_spwkr_cnt>0</fml_spwkr_cnt>
+			<ml_dwrkr_cnt>0</ml_dwrkr_cnt>
+			<fml_dwrkr_cnt>0</fml_dwrkr_cnt>
+		</ROW>
+	</BODY>
+</RESULT>

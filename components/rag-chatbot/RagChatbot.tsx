@@ -20,10 +20,11 @@
 
 import { useMemo, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Loader2, Send, MessageSquareText } from 'lucide-react';
+import { Loader2, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import RiuLoader from '@/components/ui/riu-loader';
+import SmartBrainIcon from '@/components/chatbot/SmartBrainIcon';
 import { logError } from '@/lib/utils/error-logging';
 import { logChatbotActivity } from '@/lib/utils/chatbot-analytics';
 
@@ -45,7 +46,7 @@ export default function RagChatbot() {
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
-  const [loadingStage, setLoadingStage] = useState<'analyzing' | 'searching' | 'writing'>('analyzing');
+
   const [error, setError] = useState<string | null>(null);
   const [recentQuestions, setRecentQuestions] = useState<string[]>([]);
   const [isTimeout, setIsTimeout] = useState(false);
@@ -65,7 +66,6 @@ export default function RagChatbot() {
     setError(null);
     setIsTimeout(false);
     setLoading(true);
-    setLoadingStage('analyzing');
     setQuestion(customQuestion ? question : '');
 
     setMessages((prev) => [...prev, { role: 'user', content: finalQuestion }]);
@@ -82,12 +82,12 @@ export default function RagChatbot() {
 
     // 단계별 로딩 메시지 표시
     stageTimeoutId = window.setTimeout(() => {
-      setLoadingStage('searching');
-    }, 2000); // 2초 후 "검색 중"으로 변경
+       // searching
+    }, 2000); 
 
     stageTimeoutId2 = window.setTimeout(() => {
-      setLoadingStage('writing');
-    }, 5000); // 5초 후 "작성 중"으로 변경
+       // writing
+    }, 5000);
 
     // 질문 로깅
     logChatbotActivity('chatbot_question', {
@@ -198,7 +198,6 @@ export default function RagChatbot() {
         clearTimeout(stageTimeoutId2);
       }
       setLoading(false);
-      setLoadingStage('analyzing');
     }
   };
 
@@ -259,7 +258,7 @@ export default function RagChatbot() {
 
   return (
     <div 
-      className="bg-white border border-[var(--border-light)] rounded-lg p-4 sm:p-6 md:p-8 shadow-sm"
+      className="bg-white/50 backdrop-blur-xl p-4 sm:p-8 md:p-10"
       role="region"
       aria-label="산재 상담 챗봇"
     >
@@ -293,32 +292,38 @@ export default function RagChatbot() {
         aria-label="대화 기록"
       >
         {messages.length === 0 ? (
-          <div className="text-center py-8 sm:py-12">
-            <MessageSquareText className="w-12 h-12 sm:w-16 sm:h-16 text-primary/30 mx-auto mb-4" />
-            <p className="text-sm sm:text-base text-muted-foreground">
-              산재 관련 궁금한 점을 자유롭게 물어보세요. RAG 기술로 정확한 정보를 제공합니다.
-            </p>
+          <div className="text-center py-16 sm:py-24 space-y-8">
+            <div className="flex justify-center">
+              <SmartBrainIcon className="w-32 h-32 sm:w-48 sm:h-48" />
+            </div>
+            <div className="space-y-3">
+              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">똑똑한 산재 AI 비서</h2>
+              <p className="text-gray-500 font-medium max-w-md mx-auto leading-relaxed">
+                24시간 언제나 곁에서 대기하고 있습니다.<br />
+                궁금한 산재 정보를 지금 바로 물어보세요!
+              </p>
+            </div>
           </div>
         ) : (
           messages.map((msg, index) => (
             <div
               key={index}
-              className={msg.role === 'user' ? 'text-right' : 'text-left'}
+              className={msg.role === 'user' ? 'flex justify-end' : 'flex justify-start'}
             >
               <div
-                className={`inline-block max-w-[85%] sm:max-w-[80%] rounded-lg p-3 sm:p-4 ${
+                className={`inline-block max-w-[85%] sm:max-w-[80%] px-5 py-4 ${
                   msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-50 text-foreground border border-[var(--border-light)]'
+                    ? 'bg-[#14532d] text-white rounded-[2rem] rounded-tr-sm shadow-lg shadow-emerald-900/10'
+                    : 'bg-white border border-gray-100 text-gray-800 rounded-[2rem] rounded-tl-sm shadow-[0_8px_30px_rgba(0,0,0,0.04)]'
                 }`}
               >
                 {msg.role === 'assistant' ? (
                   <div
-                    className="prose prose-sm sm:prose-base max-w-none"
+                    className="prose prose-sm sm:prose-base max-w-none prose-p:leading-relaxed prose-strong:text-primary prose-headings:font-black"
                     dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.content) }}
                   />
                 ) : (
-                  <p className="text-sm sm:text-base whitespace-pre-wrap">{msg.content}</p>
+                  <p className="text-sm sm:text-base font-medium whitespace-pre-wrap">{msg.content}</p>
                 )}
               </div>
             </div>
@@ -369,28 +374,28 @@ export default function RagChatbot() {
           e.preventDefault();
           handleAsk();
         }}
-        className="space-y-3"
+        className="relative pt-6"
         aria-label="질문 입력 폼"
       >
-        <div className="flex gap-2 sm:gap-3">
+        <div className="relative group">
           <Textarea
             placeholder="산재 관련 질문을 입력해주세요..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             disabled={loading}
-            className="flex-1 min-h-[80px] sm:min-h-[100px] resize-none"
+            className="w-full min-h-[100px] sm:min-h-[120px] bg-white border-gray-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 rounded-3xl p-6 pr-20 text-base font-medium resize-none shadow-sm transition-all"
             aria-label="질문 입력"
           />
           <Button
             type="submit"
             disabled={loading || question.trim().length < 2}
-            className="self-end"
+            className="absolute right-4 bottom-4 h-12 w-12 rounded-2xl bg-[#14532d] hover:bg-[#114023] text-white shadow-lg transition-all active:scale-95"
             aria-label="질문 전송"
           >
             {loading ? (
-              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Send className="w-5 h-5" />
             )}
           </Button>
         </div>

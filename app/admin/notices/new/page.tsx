@@ -13,7 +13,7 @@ import { useClerkSupabaseClient } from '@/lib/supabase/clerk-client';
 
 export default function NewNoticePage() {
   const router = useRouter();
-  const { user, isLoaded } = useUser();
+  const { user } = useUser();
   const supabase = useClerkSupabaseClient(); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({

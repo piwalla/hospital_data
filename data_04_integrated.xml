@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RESULT>
+	<HEAD>
+		<resultCode>00</resultCode>
+		<resultMsg>NORMAL_SERVICE</resultMsg>
+		<totalCount>1138595</totalCount>
+		<numOfRows>1</numOfRows>
+		<pageNo>1</pageNo>
+	</HEAD>
+	<BODY>
+		<ROW>
+			<rcpr_aprv_yr>2015</rcpr_aprv_yr>
+			<rcpr_aprv_mm>06</rcpr_aprv_mm>
+			<rcpr_aprv_day>03</rcpr_aprv_day>
+			<dstr_ocrn_ymd>20150515</dstr_ocrn_ymd>
+			<dstr_ocrn_shp_cd>01</dstr_ocrn_shp_cd>
+			<dstr_ocrn_shp_nm>업무수행 중의 사고 (시행령 제27조 제1항)</dstr_ocrn_shp_nm>
+			<ocds_cd></ocds_cd>
+			<ocds_nm></ocds_nm>
+			<injds_type_cd>01</injds_type_cd>
+			<injds_type_nm>암, 신생물</injds_type_nm>
+			<thsptl_day_cnt>42</thsptl_day_cnt>
+			<tmdexm_day_cnt>179</tmdexm_day_cnt>
+			<tghsp_day_cnt>137</tghsp_day_cnt>
+			<bzmn_type_se_cd>2</bzmn_type_se_cd>
+			<bplc_scl_se_cd>9</bplc_scl_se_cd>
+			<bplc_scl_se_nm>전규모(규모미확인)</bplc_scl_se_nm>
+			<bplc_tpbiz_cd>4</bplc_tpbiz_cd>
+			<bplc_tpbiz_nm>건축건설공사</bplc_tpbiz_nm>
+			<mctpv_sgg_cd>44710</mctpv_sgg_cd>
+			<mctpv_sgg_nm>충남 금산군</mctpv_sgg_nm>
+			<wrkr_se_cd>01</wrkr_se_cd>
+			<ocpt_cd>7</ocpt_cd>
+			<ocpt_nm>배관공</ocpt_nm>
+			<age_se_nm>50대</age_se_nm>
+			<gndr_cd>M</gndr_cd>
+			<spwkr_ocpt_cd></spwkr_ocpt_cd>
+			<spwkr_ocpt_nm></spwkr_ocpt_nm>
+		</ROW>
+	</BODY>
+</RESULT>

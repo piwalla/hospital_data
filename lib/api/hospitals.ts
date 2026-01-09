@@ -22,6 +22,7 @@ export interface Hospital {
   institution_type: string | null; // 기관 유형 (대학병원, 종합병원, 병원, 의원, 한의원, 요양병원, 기타)
   department_extracted: string | null; // 추출된 진료과목 (여러 과목은 쉼표로 구분)
   last_updated: string;
+  is_rehabilitation_certified?: boolean; // 산재보험 재활인증 의료기관 여부
   distance?: number; // 거리 정보 (km, getHospitalsNearby에서 추가됨)
 }
 
@@ -34,7 +35,8 @@ export async function getAllHospitals(): Promise<Hospital[]> {
   const { data, error } = await supabase
     .from('hospitals_pharmacies')
     .select('*')
-    .order('name', { ascending: true });
+    .order('name', { ascending: true })
+    .range(0, 49999);
 
   if (error) {
     console.error('[Hospitals] 조회 실패:', error);
@@ -73,7 +75,8 @@ export async function getHospitalsNearby(
     .gte('latitude', latitude - roughRadius)
     .lte('latitude', latitude + roughRadius)
     .gte('longitude', longitude - roughRadius)
-    .lte('longitude', longitude + roughRadius);
+    .lte('longitude', longitude + roughRadius)
+    .range(0, 49999);
   
   console.log('[Hospitals] 대략적 범위 필터링 결과:', data?.length || 0, '개');
 
@@ -132,7 +135,8 @@ export async function getHospitalsByDepartment(
     .select('*')
     .eq('type', 'hospital')
     .ilike('department', `%${department}%`)
-    .order('name', { ascending: true });
+    .order('name', { ascending: true })
+    .range(0, 9999);
 
   if (error) {
     console.error('[Hospitals] 진료과목 검색 실패:', error);
@@ -186,6 +190,7 @@ export async function getHospitalsByRegion(
         .from('hospitals_pharmacies')
         .select('*')
         .ilike('address', `%${pattern}%`)
+        .range(0, 49999)
     );
 
     // 모든 쿼리 실행
@@ -227,7 +232,7 @@ export async function getHospitalsByRegion(
       query = query.ilike('address', `%${subDistrictName}%`);
     }
 
-    return query;
+    return query.range(0, 49999);
   });
 
   // 모든 쿼리 실행
@@ -259,3 +264,32 @@ export async function getHospitalsByRegion(
   return hospitals;
 }
 
+
+/**
+ * 영역 기반 병원 검색 (지도 화면 내 검색)
+ * 
+ * 지도의 남서쪽(SW), 북동쪽(NE) 좌표를 받아 해당 영영 내의 병원을 검색합니다.
+ */
+export async function getHospitalsInBounds(
+  northEast: { lat: number; lng: number },
+  southWest: { lat: number; lng: number }
+): Promise<Hospital[]> {
+  const supabase = await createClerkSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('hospitals_pharmacies')
+    .select('*')
+    .gte('latitude', southWest.lat)
+    .lte('latitude', northEast.lat)
+    .gte('longitude', southWest.lng)
+    .lte('longitude', northEast.lng)
+    .range(0, 499); // 최대 500개 제한
+
+  if (error) {
+    console.error('[Hospitals] 영역 검색 실패:', error);
+    throw error;
+  }
+
+  // 거리 계산은 불필요 (화면 내 표시 목적)
+  return data || [];
+}

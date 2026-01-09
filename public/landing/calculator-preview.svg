@@ -1,0 +1,9 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F0FDF4"/>
+  <rect x="100" y="100" width="600" height="400" rx="20" fill="white" stroke="#2F6E4F" stroke-width="4"/>
+  <rect x="150" y="160" width="500" height="60" rx="10" fill="#F3F4F6"/>
+  <rect x="150" y="250" width="230" height="60" rx="10" fill="#D1FAE5"/>
+  <rect x="420" y="250" width="230" height="60" rx="10" fill="#D1FAE5"/>
+  <rect x="150" y="340" width="500" height="100" rx="10" fill="#2F6E4F"/>
+  <text x="400" y="400" font-family="Arial" font-size="24" fill="white" text-anchor="middle">예상 보상금 확인하기</text>
+</svg>

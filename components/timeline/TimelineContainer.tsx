@@ -36,12 +36,11 @@ export default function TimelineContainer({ stages, currentStepNumber }: Timelin
               stage={stage}
               stepNumber={stage.step_number}
               isCurrentStep={currentStepNumber === stage.step_number}
-              isLastStep={index === stages.length - 1}
             />
             
             {/* Chevron between cards */}
             {index < stages.length - 1 && (
-              <div className="flex justify-center my-2" aria-hidden="true">
+              <div className="flex justify-center my-6 sm:my-8" aria-hidden="true">
                 <svg 
                   width="32" 
                   height="20" 

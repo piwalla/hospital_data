@@ -45,7 +45,7 @@ export async function GET() {
           const xmlText = await response.text();
           const { parseString } = await import('xml2js');
           
-          await new Promise<void>((resolve, reject) => {
+          await new Promise<void>((resolve) => {
             parseString(xmlText, { explicitArray: false, mergeAttrs: true }, (err, result) => {
               if (!err && result?.response?.body?.totalCount) {
                 apiTotalCount = parseInt(result.response.body.totalCount, 10);

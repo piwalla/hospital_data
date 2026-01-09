@@ -1,0 +1,10 @@
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#F8FAFC"/>
+  <line x1="100" y1="300" x2="700" y2="300" stroke="#CBD5E1" stroke-width="4"/>
+  <circle cx="150" cy="300" r="30" fill="#2563EB"/>
+  <circle cx="275" cy="300" r="30" fill="#CBD5E1"/>
+  <circle cx="400" cy="300" r="30" fill="#CBD5E1"/>
+  <circle cx="525" cy="300" r="30" fill="#CBD5E1"/>
+  <circle cx="650" cy="300" r="30" fill="#CBD5E1"/>
+  <text x="400" y="500" font-family="Arial" font-size="24" fill="#64748B" text-anchor="middle">단계별 산재 가이드</text>
+</svg>

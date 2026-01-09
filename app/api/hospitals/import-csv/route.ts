@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
         console.log('[Import CSV] 첫 번째 주소 샘플:', sampleAddress.substring(0, 50));
         console.log('[Import CSV] 한글 포함 여부:', /[가-힣]/.test(sampleAddress));
       }
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         {
           success: false,

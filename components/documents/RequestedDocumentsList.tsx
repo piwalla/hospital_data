@@ -13,7 +13,7 @@ import { REQUESTED_DOCUMENTS } from '@/lib/data/requested-documents';
 import type { RequestedDocument } from '@/lib/types/document';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+
 
 // 발급처별 아이콘 및 색상
 const sourceConfig: Record<
@@ -60,10 +60,10 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
       aria-label="요청 서류 목록"
     >
       {/* 안내 문구 */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
-        <p className="text-sm sm:text-base text-foreground leading-relaxed">
-          이 서류들은 환자가 쓰는 게 아닙니다. <strong className="text-blue-700">&quot;의사 선생님께 말씀하세요&quot;</strong> 또는{' '}
-          <strong className="text-blue-700">&quot;원무과에서 떼세요&quot;</strong>라고 가이드해야 합니다. 각 카드를 클릭하면 자세한 설명 페이지로 이동합니다.
+      <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
+        <p className="text-sm md:text-base text-gray-600 leading-relaxed font-medium">
+          이 서류들은 환자가 직접 작성하는 것이 아닙니다. <strong className="text-[#14532d] font-black">&quot;의사 선생님께 말씀하세요&quot;</strong> 또는{' '}
+          <strong className="text-[#14532d] font-black">&quot;원무과에서 발급받으세요&quot;</strong>라고 요청해야 합니다.
         </p>
       </div>
 
@@ -86,55 +86,60 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
             >
               <div
                 className={cn(
-                  'relative bg-white rounded-lg border border-[var(--border-light)] p-5 sm:p-6 md:p-7 lg:p-8',
-                  'hover:border-primary transition-all duration-300',
-                  'text-left w-full h-full flex flex-col',
-                  'shadow-sm hover:shadow-xl hover:-translate-y-1'
+                  'relative h-full bg-white rounded-3xl p-6 md:p-8',
+                  'border border-gray-200/50',
+                  'shadow-[0_8px_30px_rgba(0,0,0,0.04)]',
+                  'transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]',
+                  'hover:shadow-[0_40px_80px_rgba(0,0,0,0.08)] hover:-translate-y-2',
+                  'hover:border-[#14532d]/20',
+                  'flex flex-col overflow-hidden text-left'
                 )}
                 role="listitem"
               >
+                 {/* Premium Brand Accent */}
+                 <div className={cn("absolute top-0 left-0 right-0 h-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300", 
+                   doc.source === 'hospital' ? "bg-primary" : "bg-blue-500")} />
                 <div className="relative z-10 flex flex-col h-full">
                   {/* 상단: 아이콘 + 제목 + 발급처/선택 뱃지 */}
-                  <div className="flex items-start gap-3 mb-3">
+                  <div className="flex items-start gap-4 mb-5">
                     <div
                       className={cn(
-                        'w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-lg flex items-center justify-center flex-shrink-0',
-                        config.bgColor
+                        'w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0',
+                        'bg-[#F8FAFC] border border-gray-100 shadow-sm group-hover:bg-gray-50 transition-all duration-300'
                       )}
                       aria-hidden="true"
                     >
-                      <Icon className={cn('w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8', config.color)} strokeWidth={1.75} />
+                      <Icon className={cn('w-7 h-7', config.color)} strokeWidth={1.5} />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 pt-0.5">
                       <div className="flex items-start gap-2 flex-wrap mb-2">
                         {(() => {
-                          // 괄호 안의 내용을 분리
                           const match = doc.name.match(/^(.+?)\s*\((.+?)\)\s*$/);
                           if (match) {
                             const [, mainName, bracketContent] = match;
                             return (
                               <div className="flex-1 min-w-0">
-                                <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors">
-                                  <span className="block">{mainName}</span>
-                                  <span className="block text-base sm:text-lg md:text-xl lg:text-xl text-gray-600 font-normal">
-                                    ({bracketContent})
+                                <h3 className="group-hover:text-[#14532d] transition-colors leading-tight">
+                                  <span className="block text-lg md:text-xl font-black text-gray-900">{mainName}</span>
+                                  <span className="block text-sm text-gray-400 font-bold group-hover:text-[#14532d]/60 mt-0.5">
+                                    {bracketContent}
                                   </span>
                                 </h3>
                               </div>
                             );
                           }
                           return (
-                            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 flex-1 min-w-0">
+                            <h3 className="text-lg md:text-xl font-black text-gray-900 group-hover:text-[#14532d] transition-colors leading-tight flex-1">
                               {doc.name}
                             </h3>
                           );
                         })()}
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
-                            {config.label} 발급
+                        <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-bold">
+                            {config.label}
                           </span>
                           {doc.isOptional && (
-                            <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 border border-orange-100 font-bold">
                               선택
                             </span>
                           )}
@@ -149,12 +154,15 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
                     </div>
                   </div>
 
-                  {/* 시각적 표시 (자세히 보기 제거, 화살표 아이콘으로 대체) */}
-                  <div className="flex items-center justify-end mt-auto pt-4 text-primary font-semibold text-sm group-hover:translate-x-1 transition-transform">
-                    <span>자세히 보기</span>
-                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <div className="mt-auto pt-5 border-t border-gray-100/60 flex items-center justify-between group/link">
+                     <span className="text-xs font-black uppercase tracking-wider text-gray-400 group-hover:text-primary transition-colors">
+                       Request Guide
+                     </span>
+                     <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm">
+                        <svg className="w-5 h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                        </svg>
+                     </div>
                   </div>
                 </div>
               </div>

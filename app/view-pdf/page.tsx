@@ -24,7 +24,11 @@ function ViewPdfContent() {
     const file = searchParams.get('file');
     if (file) {
       // 파일 경로가 /pdf/로 시작하는지 확인
-      const url = file.startsWith('/') ? file : `/pdf/${file}`;
+      // 파일 경로 처리: http/https로 시작하거나 /로 시작하면 그대로 사용, 그 외에는 /pdf/ 경로 추가
+      const url =
+        file.startsWith('http://') || file.startsWith('https://') || file.startsWith('/')
+          ? file
+          : `/pdf/${file}`;
       setPdfUrl(url);
       // 파일명 추출
       const name = file.split('/').pop() || file;

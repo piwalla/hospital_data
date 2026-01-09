@@ -21,6 +21,8 @@ export interface Region {
   name: string; // 시/도 이름
   type: ProvinceType; // 광역시, 일반 도, 특별시
   districts?: District[]; // 시/군/구 목록
+  latitude?: number; // 위도 (시청/도청 기준)
+  longitude?: number; // 경도 (시청/도청 기준)
 }
 
 /**

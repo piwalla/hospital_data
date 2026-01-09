@@ -16,12 +16,18 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, Send, Heart } from 'lucide-react';
+import { Loader2, Send } from 'lucide-react';
 import Image from 'next/image';
+
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import RiuLoader from '@/components/ui/riu-loader';
+
 import { PersonaType, DEFAULT_PERSONA, PERSONAS } from '@/lib/types/persona';
+import WarmHeartIcon from './WarmHeartIcon';
+import { cn } from '@/lib/utils';
+import JungwonLoader from './JungwonLoader';
+import GangseokLoader from './GangseokLoader';
+import MiyoungLoader from './MiyoungLoader';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -55,8 +61,10 @@ export default function PsychologicalChatbot() {
 
     setMessages((prev) => [...prev, { role: 'user', content: finalMessage }]);
 
+    // 최소 4초간 애니메이션을 보여주기 위해 시작 시간 기록
     const controller = new AbortController();
-    const startTime = Date.now();
+    const animationStartTime = Date.now();
+    const MIN_ANIMATION_DURATION = 4200; // 4.2초 (사용자의 4~5초 요청 반영)
 
     try {
       const timeoutId = window.setTimeout(() => {
@@ -86,6 +94,14 @@ export default function PsychologicalChatbot() {
 
       if (!answer) {
         throw new Error('응답을 받지 못했습니다.');
+      }
+
+      // 인공적인 딜레이를 추가하여 사용자 요청(4~5초) 달성
+      const elapsedTime = Date.now() - animationStartTime;
+      const remainingTime = MIN_ANIMATION_DURATION - elapsedTime;
+      
+      if (remainingTime > 0) {
+        await new Promise(resolve => setTimeout(resolve, remainingTime));
       }
 
       setMessages((prev) => [...prev, { role: 'assistant', content: answer }]);
@@ -166,7 +182,7 @@ export default function PsychologicalChatbot() {
         <h3 className="text-sm sm:text-base font-semibold text-foreground mb-3">
           누구와 상담하시겠어요?
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
           {(Object.keys(PERSONAS) as PersonaType[]).map((personaId) => {
             const persona = PERSONAS[personaId];
             const isSelected = selectedPersona === personaId;
@@ -176,36 +192,42 @@ export default function PsychologicalChatbot() {
                 type="button"
                 onClick={() => setSelectedPersona(personaId)}
                 disabled={loading}
-                className={`
-                  p-3 sm:p-4 rounded-lg border-2 transition-all duration-200 text-left
-                  ${isSelected
-                    ? 'border-primary bg-primary/5 shadow-md'
-                    : 'border-[var(--border-light)] bg-white hover:border-primary/50 hover:bg-primary/2'
-                  }
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-                `}
-                aria-label={`${persona.name} (${persona.role}) 선택`}
-                aria-pressed={isSelected}
+                className={cn(
+                  "p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border-2 text-center flex flex-col items-center justify-center transition-colors",
+                  isSelected
+                    ? "border-rose-500 bg-rose-50 shadow-md shadow-rose-100/50"
+                    : "border-gray-100 bg-white hover:border-rose-200"
+                )}
               >
-                <div className="flex flex-col items-center mb-3">
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden mb-2 border-2 border-gray-200">
+                {/* 프로필 이미지 - 모바일에서 크기 축소 */}
+                <div className={cn(
+                  "w-16 h-16 sm:w-24 sm:h-24 rounded-full overflow-hidden border-[3px] sm:border-4 mb-2 sm:mb-4",
+                  isSelected ? "border-rose-500" : "border-gray-50"
+                )}>
+                  <div className="w-full h-full relative">
                     <Image
                       src={persona.imagePath}
-                      alt={`${persona.name} (${persona.role})`}
+                      alt={persona.name}
                       fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 80px, 96px"
+                      priority={isSelected}
+                      className="object-cover object-top"
+                      sizes="(max-width: 640px) 64px, 96px"
                     />
                   </div>
-                  <div className="font-semibold text-sm sm:text-base text-foreground text-center">
-                    {persona.name}
-                    <span className="text-xs text-muted-foreground ml-1">({persona.role})</span>
-                  </div>
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 text-center">
-                  {persona.description}
-                </p>
+                
+                {/* 정보 텍스트 - 모바일 최적화 */}
+                <div className="w-full">
+                  <div className="font-bold text-sm sm:text-base text-gray-900 mb-0.5 sm:mb-1">
+                    {persona.name}
+                    <span className="ml-1.5 text-[9px] sm:text-[10px] font-bold text-rose-500 bg-rose-50 px-1.5 sm:px-2 py-0.5 rounded-full ring-1 ring-rose-100 whitespace-nowrap">
+                      {persona.role}
+                    </span>
+                  </div>
+                  <p className="text-[10px] sm:text-[11px] md:text-xs text-gray-500 leading-tight sm:leading-relaxed line-clamp-2 sm:line-clamp-3">
+                    {persona.description}
+                  </p>
+                </div>
               </button>
             );
           })}
@@ -242,10 +264,11 @@ export default function PsychologicalChatbot() {
         aria-label="대화 기록"
       >
         {messages.length === 0 ? (
-          <div className="text-center py-8 sm:py-12">
-            <Heart className="w-12 h-12 sm:w-16 sm:h-16 text-primary/30 mx-auto mb-4" />
-            <p className="text-sm sm:text-base text-muted-foreground">
-              마음의 고민을 편하게 이야기해보세요. 공감과 지지를 바탕으로 상담을 제공합니다.
+          <div className="text-center py-10 sm:py-16">
+            <WarmHeartIcon />
+            <p className="text-sm sm:text-lg text-gray-500 mt-8 max-w-md mx-auto leading-relaxed">
+              마음속 깊이 담아두었던 고민들, <br/>
+              리워크케어 상담사가 따뜻하게 들어드릴게요.
             </p>
           </div>
         ) : (
@@ -255,31 +278,20 @@ export default function PsychologicalChatbot() {
               className={msg.role === 'user' ? 'text-right' : 'text-left'}
             >
               <div
-                className={`inline-block max-w-[85%] sm:max-w-[80%] rounded-lg p-3 sm:p-4 relative ${
+                className={cn(
+                  "inline-block max-w-[85%] sm:max-w-[80%] rounded-3xl p-4 sm:p-5 relative shadow-sm",
                   msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-gray-50 text-foreground border border-[var(--border-light)]'
-                }`}
-              >
-                {msg.role === 'user' && (
-                  <div
-                    className="absolute -right-2 bottom-2 z-10"
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderLeft: '10px solid var(--primary)',
-                      borderTop: '8px solid transparent',
-                      borderBottom: '8px solid transparent',
-                    }}
-                  />
+                    ? "bg-rose-500 text-white rounded-tr-none shadow-rose-100"
+                    : "bg-white text-gray-800 border border-gray-100 rounded-tl-none shadow-gray-100 backdrop-blur-sm bg-white/90"
                 )}
+              >
                 {msg.role === 'assistant' ? (
                   <div
-                    className="prose prose-sm sm:prose-base max-w-none"
+                    className="prose prose-sm sm:prose-base max-w-none prose-rose prose-p:leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.content) }}
                   />
                 ) : (
-                  <p className="text-sm sm:text-base whitespace-pre-wrap">{msg.content}</p>
+                  <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                 )}
               </div>
             </div>
@@ -287,14 +299,11 @@ export default function PsychologicalChatbot() {
         )}
 
         {loading && (
-          <div className="text-left">
-            <div className="inline-block bg-gray-50 border border-[var(--border-light)] rounded-lg p-3 sm:p-4">
-              <RiuLoader
-                message="답변을 준비하고 있습니다..."
-                iconVariants={['smile', 'cheer']}
-                logId="PsychologicalChatbot:loading"
-                ariaDescription="답변 생성 중"
-              />
+          <div className="w-full">
+            <div className="bg-white/80 border border-gray-100 rounded-3xl p-6 shadow-sm backdrop-blur-sm mx-auto max-w-sm">
+              {selectedPersona === 'jungwon' && <JungwonLoader />}
+              {selectedPersona === 'gangseok' && <GangseokLoader />}
+              {selectedPersona === 'miyoung' && <MiyoungLoader />}
             </div>
           </div>
         )}
@@ -320,25 +329,25 @@ export default function PsychologicalChatbot() {
         className="space-y-3"
         aria-label="메시지 입력 폼"
       >
-        <div className="flex gap-2 sm:gap-3">
+        <div className="flex gap-2 sm:gap-3 items-end p-2 bg-gray-50/50 rounded-[2rem] border border-gray-100 backdrop-blur-sm">
           <Textarea
-            placeholder="마음의 고민을 편하게 이야기해보세요..."
+            placeholder="상담사에게 마음의 고민을 털어놓으세요..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             disabled={loading}
-            className="flex-1 min-h-[80px] sm:min-h-[100px] resize-none"
+            className="flex-1 min-h-[60px] sm:min-h-[80px] border-none bg-transparent focus-visible:ring-0 resize-none px-4 py-3 placeholder:text-gray-400"
             aria-label="상담 메시지 입력"
           />
           <Button
             type="submit"
             disabled={loading || message.trim().length < 2}
-            className="self-end"
+            className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-rose-500 hover:bg-rose-600 shadow-lg shadow-rose-200 hover:shadow-rose-300 transition-all duration-300 flex-shrink-0"
             aria-label="메시지 전송"
           >
             {loading ? (
-              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+              <Send className="w-5 h-5 ml-0.5" />
             )}
           </Button>
         </div>

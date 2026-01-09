@@ -5,7 +5,7 @@
 
 'use client';
 
-import { ChevronRight, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { StageWithDetails } from '@/lib/types/timeline';
@@ -15,10 +15,9 @@ interface TimelineStepCardProps {
   stage: StageWithDetails;
   stepNumber: number;
   isCurrentStep?: boolean;
-  isLastStep?: boolean;
 }
 
-export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = false, isLastStep = false }: TimelineStepCardProps) {
+export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = false }: TimelineStepCardProps) {
   const router = useRouter();
   
   const title = 
@@ -66,65 +65,72 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
 
       {/* Content Card Column */}
       <div className={cn(
-        "flex-1 min-w-0 mb-8",
-        "relative rounded-[24px] overflow-hidden",
-        "bg-amber-50/30 border-2 border-gray-200",
-        "shadow-[0_4px_20px_rgba(0,0,0,0.08)]",
-        "hover:shadow-[0_12px_40px_rgba(0,0,0,0.15)]",
-        "hover:border-slate-400",
-        "hover:-translate-y-2",
+        "flex-1 min-w-0 relative",
+        "bg-white border border-gray-300/40", // Stronger static border
+        "rounded-[24px] overflow-hidden",
+        "shadow-[0_8px_30px_rgba(0,0,0,0.05)]", // More visible static shadow
+        "group-hover:shadow-[0_24px_48px_rgba(0,0,0,0.12)]", // Stronger hover lift
+        "group-hover:border-primary/40",
+        "group-hover:-translate-y-1.5",
         "transition-all duration-300 ease-out",
         "cursor-pointer",
-        isCurrentStep && "ring-2 ring-slate-400 shadow-[0_8px_30px_rgba(100,116,139,0.15)] bg-slate-50/30",
-        "p-5 sm:p-7"
+        isCurrentStep && "ring-2 ring-primary/25 shadow-[0_12px_40px_rgba(47,110,79,0.15)] bg-primary/[0.01]",
+        "p-6 sm:p-8"
       )}>
+        {/* Accent Bar - Vertical line on the left */}
+        <div className={cn(
+          "absolute left-0 top-0 bottom-0 w-1.5 transition-all duration-300",
+          isCurrentStep ? "bg-primary" : "bg-transparent group-hover:bg-primary/40"
+        )} />
+
         {/* Card Header Section */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center gap-4">
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex items-center gap-4 sm:gap-5">
             {/* Step Number Badge */}
             <div 
               className={cn(
-                "flex items-center justify-center rounded-full shadow-lg transition-all duration-300 flex-shrink-0",
-                "border-4 border-white",
+                "flex items-center justify-center rounded-2xl shadow-sm transition-all duration-300 flex-shrink-0 font-display",
                 isCurrentStep 
-                  ? "bg-slate-700 text-white shadow-xl ring-4 ring-slate-200" 
-                  : "bg-slate-600 text-white shadow-md group-hover:bg-slate-700 group-hover:shadow-xl"
+                  ? "bg-primary text-white shadow-md ring-4 ring-primary/10" 
+                  : "bg-gray-100 text-gray-400 group-hover:bg-primary/10 group-hover:text-primary"
               )}
               style={{ 
                 width: '3.5rem',
                 height: '3.5rem',
-                fontSize: '1.25rem',
-                fontWeight: 700,
+                fontSize: '1.5rem',
+                fontWeight: 800,
               }}
             >
               {stage.step_number}
             </div>
             
             <h3 className={cn(
-              "text-xl sm:text-2xl font-bold leading-tight transition-colors",
-              isCurrentStep ? "text-gray-900" : "text-gray-900 group-hover:text-green-900"
+              "text-xl sm:text-2xl font-bold leading-tight transition-colors mt-2",
+              isCurrentStep ? "text-gray-900" : "text-gray-900 group-hover:text-primary"
             )}>
               {title}
             </h3>
           </div>
           
           {/* Icon visual cue */}
-          <ChevronRight className={cn(
-            "w-6 h-6 text-slate-600 transition-all duration-300",
-            "group-hover:text-green-600 group-hover:translate-x-1"
-          )} />
+          <div className={cn(
+            "p-2 rounded-full transition-all duration-300 mt-1",
+            "bg-gray-50 text-gray-400 group-hover:bg-primary group-hover:text-white"
+          )}>
+            <ArrowRight className="w-5 h-5" />
+          </div>
         </div>
         
-        <p id={`step-${stage.step_number}-description`} className="text-[15px] sm:text-[16px] text-gray-600 font-medium leading-[1.7] mb-6">
+        <p id={`step-${stage.step_number}-description`} className="text-[15px] sm:text-[16px] text-gray-600 font-medium leading-[1.7] mb-6 pl-[4.75rem]">
           {description}
         </p>
 
         {/* Tags & Action Row */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mt-auto">
+        <div className="flex flex-wrap items-center justify-between gap-4 mt-auto pl-[4.75rem]">
           {/* Left: Tags */}
           <div className="flex flex-wrap gap-2">
             {isCurrentStep && (
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-green-600 text-white text-[11px] font-bold shadow-sm">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
                 진행중
               </span>
             )}
@@ -134,7 +140,7 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
               <span
                 role="button"
                 onClick={(e) => handleTagClick(e, 'actions')}
-                className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-50 hover:bg-green-50 text-gray-600 hover:text-green-700 text-xs font-semibold border border-gray-200 transition-colors cursor-pointer"
+                className="inline-flex items-center px-3 py-1 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-900 text-xs font-semibold border border-gray-200 transition-colors cursor-pointer"
               >
                 할일 {stage.actionItems?.length || stage.actions?.length}
               </span>
@@ -144,17 +150,11 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
               <span
                 role="button"
                 onClick={(e) => handleTagClick(e, 'documents')}
-                className="inline-flex items-center px-2.5 py-1 rounded-full bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-700 text-xs font-semibold border border-gray-200 transition-colors cursor-pointer"
+                className="inline-flex items-center px-3 py-1 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-900 text-xs font-semibold border border-gray-200 transition-colors cursor-pointer"
               >
                 서류 {stage.documents.length}
               </span>
             )}
-          </div>
-
-          {/* Right: Explicit CTA Button */}
-          <div className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-lg group-hover:border-green-500 group-hover:text-green-600 group-hover:bg-green-50 transition-all shadow-sm">
-            상세보기
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </div>
         </div>
       </div>

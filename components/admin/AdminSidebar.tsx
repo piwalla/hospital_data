@@ -9,10 +9,10 @@ import {
   BarChart3, 
   Settings,
   LogOut,
-  Megaphone
+  Megaphone,
+  FileText
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
 const menuItems = [
   {
@@ -34,6 +34,11 @@ const menuItems = [
     title: "공지사항 관리",
     href: "/admin/notices",
     icon: Megaphone,
+  },
+  {
+    title: "RAG 문서 관리",
+    href: "/admin/rag",
+    icon: FileText,
   },
   {
     title: "통계 분석",

@@ -11,7 +11,6 @@ import {
   LogOut,
   MoreVertical,
   Loader2,
-  Menu,
   ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";

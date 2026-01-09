@@ -33,7 +33,8 @@ export async function getAllRehabilitationCenters(): Promise<RehabilitationCente
   const { data, error } = await supabase
     .from('rehabilitation_centers')
     .select('*')
-    .order('gigwan_nm', { ascending: true });
+    .order('gigwan_nm', { ascending: true })
+    .range(0, 49999);
 
   if (error) {
     console.error('[Rehabilitation Centers] 조회 실패:', error);
@@ -84,7 +85,8 @@ export async function getRehabilitationCentersNearby(
     .gte('latitude', latitude - roughRadius)
     .lte('latitude', latitude + roughRadius)
     .gte('longitude', longitude - roughRadius)
-    .lte('longitude', longitude + roughRadius);
+    .lte('longitude', longitude + roughRadius)
+    .range(0, 49999);
   
   console.log('[Rehabilitation Centers] 대략적 범위 필터링 결과:', data?.length || 0, '개');
 
@@ -154,7 +156,8 @@ export async function getRehabilitationCentersByType(
     .from('rehabilitation_centers')
     .select('*')
     .eq('gigwan_fg_nm', gigwanFgNm)
-    .order('gigwan_nm', { ascending: true });
+    .order('gigwan_nm', { ascending: true })
+    .range(0, 49999);
 
   if (error) {
     console.error('[Rehabilitation Centers] 기관구분 검색 실패:', error);
@@ -219,6 +222,7 @@ export async function getRehabilitationCentersByRegion(
         .from('rehabilitation_centers')
         .select('*')
         .ilike('address', `%${pattern}%`)
+        .range(0, 49999)
     );
 
     // 모든 쿼리 실행
@@ -271,7 +275,7 @@ export async function getRehabilitationCentersByRegion(
       query = query.ilike('address', `%${subDistrictName}%`);
     }
 
-    return query;
+    return query.range(0, 49999);
   });
 
   // 모든 쿼리 실행
@@ -314,3 +318,43 @@ export async function getRehabilitationCentersByRegion(
   return centers;
 }
 
+
+/**
+ * 영역 기반 재활기관 검색 (지도 화면 내 검색)
+ * 
+ * 지도의 남서쪽(SW), 북동쪽(NE) 좌표를 받아 해당 영영 내의 재활기관을 검색합니다.
+ */
+export async function getRehabilitationCentersInBounds(
+  northEast: { lat: number; lng: number },
+  southWest: { lat: number; lng: number }
+): Promise<RehabilitationCenter[]> {
+  const supabase = await createClerkSupabaseClient();
+
+  const { data, error } = await supabase
+    .from('rehabilitation_centers')
+    .select('*')
+    .gte('latitude', southWest.lat)
+    .lte('latitude', northEast.lat)
+    .gte('longitude', southWest.lng)
+    .lte('longitude', northEast.lng)
+    .range(0, 499); // 최대 500개 제한
+
+  if (error) {
+    console.error('[Rehabilitation Centers] 영역 검색 실패:', error);
+    throw error;
+  }
+
+  // Supabase 데이터를 RehabilitationCenter 인터페이스로 변환
+  return (data || []).map((item) => ({
+    id: item.id,
+    name: item.gigwan_nm,
+    type: 'rehabilitation' as const,
+    address: item.address,
+    latitude: item.latitude,
+    longitude: item.longitude,
+    phone: item.tel_no,
+    department: item.gigwan_fg_nm,
+    gigwan_fg_nm: item.gigwan_fg_nm,
+    last_updated: item.last_updated,
+  }));
+}

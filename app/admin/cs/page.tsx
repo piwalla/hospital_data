@@ -1,33 +1,147 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { 
   MessageSquare, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
   Send,
   User,
   Clock,
-  CheckCircle2,
-  AlertCircle
+  CheckCircle2
 } from "lucide-react";
-import { CSSession, MOCK_CS_SESSIONS, MOCK_CS_MESSAGES, CSMessage } from "@/lib/mock-admin-data";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useClerkSupabaseClient } from "@/lib/supabase/clerk-client";
+import { CSSession, CSMessage } from "@/lib/types/cs";
+import { subscribeToMessages, sendMessage } from "@/lib/api/cs";
+import { formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
 
 export default function CSCenterPage() {
-  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(MOCK_CS_SESSIONS[0].id);
+  const client = useClerkSupabaseClient();
+  
+  const [sessions, setSessions] = useState<CSSession[]>([]);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<CSMessage[]>([]);
   const [replyText, setReplyText] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
 
-  const selectedSession = MOCK_CS_SESSIONS.find(s => s.id === selectedSessionId);
-  const messages = selectedSessionId ? MOCK_CS_MESSAGES[selectedSessionId] : [];
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const filteredSessions = MOCK_CS_SESSIONS.filter(s => 
+  // 1. Fetch Sessions
+  const fetchSessions = useCallback(async () => {
+    // Note: This query requires Admin Policies to see all rows.
+    const { data } = await client
+      .from('cs_sessions')
+      .select('*')
+      .order('updated_at', { ascending: false });
+    
+    if (data) {
+      setSessions(data);
+    }
+  }, [client]);
+
+  useEffect(() => {
+    fetchSessions();
+
+    const channel = client
+      .channel('cs_sessions_admin')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'cs_sessions' },
+        () => {
+          fetchSessions(); // Refresh list on any change
+        }
+      )
+      .subscribe();
+
+    return () => {
+      client.removeChannel(channel);
+    };
+  }, [client, fetchSessions]);
+
+  // 2. Fetch Messages when Session Selected
+  useEffect(() => {
+    if (!selectedSessionId) {
+      setMessages([]);
+      return;
+    }
+
+    const fetchMessages = async () => {
+      const { data } = await client
+        .from('cs_messages')
+        .select('*')
+        .eq('session_id', selectedSessionId)
+        .order('created_at', { ascending: true });
+      
+      if (data) {
+        setMessages(data);
+        scrollToBottom();
+      }
+    };
+
+    fetchMessages();
+
+    // Subscribe to new messages in this session
+    const channel = subscribeToMessages(client, selectedSessionId, (newMsg) => {
+      setMessages(prev => [...prev, newMsg]);
+      scrollToBottom();
+      // Also update session list to show 'last message'? (Requires refetch or smart update)
+      fetchSessions();
+    });
+
+    return () => {
+      client.removeChannel(channel);
+    };
+  }, [selectedSessionId, client, fetchSessions]);
+
+
+
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
+  const handleSend = async () => {
+    if (!replyText.trim() || !selectedSessionId) return;
+    
+    const content = replyText.trim();
+    setReplyText("");
+
+    try {
+      await sendMessage(client, selectedSessionId, content, 'admin');
+      // Update session timestamp
+      await client
+        .from('cs_sessions')
+        .update({ updated_at: new Date().toISOString(), status: 'open' }) // Admin reply keeps it open or changes?
+        .eq('id', selectedSessionId);
+    } catch (e) {
+      console.error(e);
+      alert("전송 실패");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const toggleStatus = async () => {
+    if (!selectedSessionId) return;
+    const current = sessions.find(s => s.id === selectedSessionId);
+    if (!current) return;
+    const newStatus = current.status === 'open' ? 'closed' : 'open';
+
+    await client.from('cs_sessions').update({ status: newStatus }).eq('id', selectedSessionId);
+  };
+
+  const filteredSessions = sessions.filter(s => 
     filterStatus === "all" || s.status === filterStatus
   );
+
+  const selectedSession = sessions.find(s => s.id === selectedSessionId);
 
   return (
     <div className="flex bg-white rounded-xl border border-gray-200 shadow-sm h-[calc(100vh-140px)] overflow-hidden">
@@ -37,20 +151,17 @@ export default function CSCenterPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-slate-900 flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-blue-600" />
-              상담 문의
+              상담 문의 (Admin)
             </h2>
             <div className="flex gap-1">
               <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                {MOCK_CS_SESSIONS.filter(s => s.status === 'open').length} 대기
+                {sessions.filter(s => s.status === 'open').length} 대기
               </span>
             </div>
           </div>
-          <div className="relative mb-3">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-             <input className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg bg-slate-50 focus:bg-white transition-colors" placeholder="사용자 검색..." />
-          </div>
+          {/* Filter Buttons */}
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {['all', 'open', 'pending', 'closed'].map(status => (
+            {['all', 'open', 'closed'].map(status => (
                <button
                  key={status}
                  onClick={() => setFilterStatus(status)}
@@ -68,6 +179,9 @@ export default function CSCenterPage() {
         </div>
         
         <div className="flex-1 overflow-y-auto">
+          {filteredSessions.length === 0 && (
+             <div className="p-4 text-center text-slate-400 text-sm">문의 내역이 없습니다.</div>
+          )}
           {filteredSessions.map(session => (
             <button
               key={session.id}
@@ -78,36 +192,18 @@ export default function CSCenterPage() {
               )}
             >
               <div className="flex justify-between items-start mb-1">
-                <span className="font-semibold text-slate-900 text-sm">{session.userName}</span>
+                <span className="font-semibold text-slate-900 text-sm">User {session.user_id.slice(0,4)}...</span>
                 <span className="text-xs text-slate-400">
-                  {new Date(session.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {formatDistanceToNow(new Date(session.updated_at), { addSuffix: true, locale: ko })}
                 </span>
               </div>
-              <p className={cn(
-                "text-sm line-clamp-1 mb-2",
-                session.unreadCount > 0 ? "text-slate-900 font-medium" : "text-slate-500"
-              )}>
-                {session.lastMessage}
+              <p className="text-xs text-slate-500 mb-1 truncate">
+                 ID: {session.id}
               </p>
-              <div className="flex items-center justify-between">
-                <div className="flex gap-1.5">
-                  {session.tags.map(tag => (
-                    <span key={tag} className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-                {session.unreadCount > 0 && (
-                   <span className="bg-blue-600 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1">
-                     {session.unreadCount}
-                   </span>
-                )}
-              </div>
               {/* Status Indicator Bar */}
               <div className={cn(
                 "absolute left-0 top-0 bottom-0 w-1",
-                session.status === 'open' ? 'bg-red-500' : 
-                session.status === 'pending' ? 'bg-amber-500' : 'bg-slate-300'
+                session.status === 'open' ? 'bg-red-500' : 'bg-slate-300'
               )} />
             </button>
           ))}
@@ -126,29 +222,24 @@ export default function CSCenterPage() {
                  </div>
                  <div>
                    <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                     {selectedSession.userName}
+                     User {selectedSession.user_id.slice(0,8)}
                      <span className={cn(
                        "px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider",
-                       selectedSession.status === 'open' ? "bg-red-100 text-red-700" :
-                       selectedSession.status === 'pending' ? "bg-amber-100 text-amber-700" :
-                       "bg-slate-100 text-slate-600"
+                       selectedSession.status === 'open' ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-600"
                      )}>
                        {selectedSession.status}
                      </span>
                    </h3>
                    <span className="text-xs text-slate-500 flex items-center gap-1">
                      <Clock className="w-3 h-3" />
-                     마지막 활동: 10분 전
+                     {new Date(selectedSession.created_at).toLocaleString()}
                    </span>
                  </div>
                </div>
                <div className="flex gap-2">
-                 <Button variant="outline" size="sm">
+                 <Button variant="outline" size="sm" onClick={toggleStatus}>
                    <CheckCircle2 className="w-4 h-4 mr-2" />
-                   상담 종료
-                 </Button>
-                 <Button variant="ghost" size="icon">
-                   <MoreHorizontal className="w-5 h-5" />
+                   {selectedSession.status === 'open' ? '종료하기' : '다시 열기'}
                  </Button>
                </div>
              </div>
@@ -160,19 +251,23 @@ export default function CSCenterPage() {
                    key={msg.id} 
                    className={cn(
                      "flex w-full",
-                     msg.sender === 'admin' ? "justify-end" : "justify-start"
+                     msg.sender_role === 'admin' ? "justify-end" : "justify-start"
                    )}
                  >
                    <div className={cn(
                      "max-w-[70%] rounded-2xl px-4 py-3 text-sm shadow-sm",
-                     msg.sender === 'admin' 
+                     msg.sender_role === 'admin' 
                        ? "bg-blue-600 text-white rounded-br-none"
                        : "bg-white text-slate-800 border border-gray-100 rounded-bl-none"
                    )}>
                      {msg.content}
                    </div>
+                   <div className="text-[10px] text-slate-400 self-end ml-1 mr-1">
+                      {new Date(msg.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                   </div>
                  </div>
                ))}
+               <div ref={messagesEndRef} />
              </div>
 
              {/* Input Area */}
@@ -183,14 +278,11 @@ export default function CSCenterPage() {
                    placeholder="답변을 입력하세요... (Enter to send)"
                    value={replyText}
                    onChange={(e) => setReplyText(e.target.value)}
+                   onKeyDown={handleKeyDown}
                  />
-                 <Button className="h-[50px] w-[50px] rounded-xl self-end" size="icon">
+                 <Button className="h-[50px] w-[50px] rounded-xl self-end" size="icon" onClick={handleSend}>
                    <Send className="w-5 h-5" />
                  </Button>
-               </div>
-               <div className="text-xs text-slate-400 mt-2 flex justify-between">
-                 <span>Shift + Enter 줄바꿈</span>
-                 <span>저장된 답변 단축키: /welcome</span>
                </div>
              </div>
            </>
@@ -201,34 +293,6 @@ export default function CSCenterPage() {
           </div>
         )}
       </div>
-
-      {/* 3. Right Session Info (Optional, Hidden on smaller screens) */}
-      {selectedSession && (
-        <div className="hidden xl:flex w-72 border-l border-gray-200 flex-col bg-white p-6">
-           <h4 className="font-bold text-slate-900 mb-4">상담 정보</h4>
-           
-           <div className="space-y-6">
-             <div>
-               <label className="text-xs font-semibold text-slate-500 block mb-2">사용자 여정 요약</label>
-               <div className="bg-slate-50 rounded-lg p-3 text-sm text-slate-600 space-y-2">
-                 <div className="flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                   Step 2: 요양급여 신청 중
-                 </div>
-                 <div className="flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                   서류 다운로드 완료
-                 </div>
-               </div>
-             </div>
-
-             <div>
-               <label className="text-xs font-semibold text-slate-500 block mb-2">상담 메모</label>
-               <textarea className="w-full h-24 border border-gray-200 rounded-lg bg-yellow-50/50 p-2 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-yellow-400" placeholder="사용자 특이사항 메모..." />
-             </div>
-           </div>
-        </div>
-      )}
     </div>
   );
 }

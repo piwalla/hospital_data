@@ -3,7 +3,7 @@
 import { getServiceRoleClient } from '@/lib/supabase/service-role';
 import { currentUser } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
+
 
 const ADMIN_EMAIL = 'highstar0301@gmail.com';
 

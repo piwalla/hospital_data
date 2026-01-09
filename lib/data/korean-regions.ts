@@ -5,7 +5,7 @@
  * 광역시는 구 단위까지 포함하고, 일반 시/도는 시/군 단위만 포함합니다.
  */
 
-import type { Region, District } from '@/lib/types/region';
+import type { Region } from '@/lib/types/region';
 
 /**
  * 주요 광역시 목록 (7개)
@@ -15,6 +15,8 @@ export const METROPOLITAN_CITIES: Region[] = [
     code: '11',
     name: '서울특별시',
     type: 'metropolitan',
+    latitude: 37.5665,
+    longitude: 126.9780,
     districts: [
       { code: '11680', name: '강남구', type: 'gu' },
       { code: '11740', name: '강동구', type: 'gu' },
@@ -47,6 +49,8 @@ export const METROPOLITAN_CITIES: Region[] = [
     code: '26',
     name: '부산광역시',
     type: 'metropolitan',
+    latitude: 35.1796,
+    longitude: 129.0756,
     districts: [
       { code: '26410', name: '강서구', type: 'gu' },
       { code: '26440', name: '금정구', type: 'gu' },
@@ -70,6 +74,8 @@ export const METROPOLITAN_CITIES: Region[] = [
     code: '27',
     name: '대구광역시',
     type: 'metropolitan',
+    latitude: 35.8714,
+    longitude: 128.6014,
     districts: [
       { code: '27140', name: '남구', type: 'gu' },
       { code: '27200', name: '달서구', type: 'gu' },
@@ -85,6 +91,8 @@ export const METROPOLITAN_CITIES: Region[] = [
     code: '28',
     name: '인천광역시',
     type: 'metropolitan',
+    latitude: 37.4563,
+    longitude: 126.7052,
     districts: [
       { code: '28177', name: '강화군', type: 'county' },
       { code: '28185', name: '옹진군', type: 'county' },
@@ -102,6 +110,8 @@ export const METROPOLITAN_CITIES: Region[] = [
     code: '29',
     name: '광주광역시',
     type: 'metropolitan',
+    latitude: 35.1595,
+    longitude: 126.8526,
     districts: [
       { code: '29140', name: '광산구', type: 'gu' },
       { code: '29110', name: '남구', type: 'gu' },
@@ -114,6 +124,8 @@ export const METROPOLITAN_CITIES: Region[] = [
     code: '30',
     name: '대전광역시',
     type: 'metropolitan',
+    latitude: 36.3504,
+    longitude: 127.3845,
     districts: [
       { code: '30230', name: '대덕구', type: 'gu' },
       { code: '30110', name: '동구', type: 'gu' },
@@ -126,6 +138,8 @@ export const METROPOLITAN_CITIES: Region[] = [
     code: '31',
     name: '울산광역시',
     type: 'metropolitan',
+    latitude: 35.5384,
+    longitude: 129.3114,
     districts: [
       { code: '31170', name: '남구', type: 'gu' },
       { code: '31200', name: '동구', type: 'gu' },
@@ -145,6 +159,8 @@ export const PROVINCES: Region[] = [
     code: '41',
     name: '경기도',
     type: 'province',
+    latitude: 37.2751, // 경기도청
+    longitude: 127.0096,
     districts: [
       { code: '41111', name: '수원시', type: 'city', subDistricts: [
         { code: '41115', name: '영통구' },
@@ -206,6 +222,8 @@ export const PROVINCES: Region[] = [
     code: '42',
     name: '강원도',
     type: 'province',
+    latitude: 37.8810, // 강원도청
+    longitude: 127.7298,
     districts: [
       { code: '42110', name: '춘천시', type: 'city' },
       { code: '42130', name: '원주시', type: 'city' },
@@ -231,6 +249,8 @@ export const PROVINCES: Region[] = [
     code: '43',
     name: '충청북도',
     type: 'province',
+    latitude: 36.6350, // 충북도청
+    longitude: 127.4914,
     districts: [
       { code: '43111', name: '청주시', type: 'city', subDistricts: [
         { code: '43112', name: '상당구' },
@@ -254,6 +274,8 @@ export const PROVINCES: Region[] = [
     code: '44',
     name: '충청남도',
     type: 'province',
+    latitude: 36.6588, // 충남도청
+    longitude: 126.6728,
     districts: [
       { code: '44131', name: '천안시', type: 'city', subDistricts: [
         { code: '44133', name: '동남구' },
@@ -279,6 +301,8 @@ export const PROVINCES: Region[] = [
     code: '45',
     name: '전라북도',
     type: 'province',
+    latitude: 35.8242, // 전북도청
+    longitude: 127.1480,
     districts: [
       { code: '45111', name: '전주시', type: 'city', subDistricts: [
         { code: '45113', name: '완산구' },
@@ -303,6 +327,8 @@ export const PROVINCES: Region[] = [
     code: '46',
     name: '전라남도',
     type: 'province',
+    latitude: 34.8166, // 전남도청
+    longitude: 126.4624,
     districts: [
       { code: '46110', name: '목포시', type: 'city' },
       { code: '46130', name: '여수시', type: 'city' },
@@ -332,6 +358,8 @@ export const PROVINCES: Region[] = [
     code: '47',
     name: '경상북도',
     type: 'province',
+    latitude: 36.5759, // 경북도청
+    longitude: 128.5057,
     districts: [
       { code: '47111', name: '포항시', type: 'city', subDistricts: [
         { code: '47113', name: '남구' },
@@ -365,6 +393,8 @@ export const PROVINCES: Region[] = [
     code: '48',
     name: '경상남도',
     type: 'province',
+    latitude: 35.2383, // 경남도청
+    longitude: 128.6924,
     districts: [
       { code: '48121', name: '창원시', type: 'city', subDistricts: [
         { code: '48123', name: '의창구' },
@@ -396,6 +426,8 @@ export const PROVINCES: Region[] = [
     code: '50',
     name: '제주특별자치도',
     type: 'special',
+    latitude: 33.4890,
+    longitude: 126.4983,
     districts: [
       { code: '50110', name: '제주시', type: 'city' },
       { code: '50130', name: '서귀포시', type: 'city' },
@@ -405,6 +437,8 @@ export const PROVINCES: Region[] = [
     code: '36',
     name: '세종특별자치시',
     type: 'special',
+    latitude: 36.4801,
+    longitude: 127.2890,
     districts: [], // 구 없음
   },
 ];

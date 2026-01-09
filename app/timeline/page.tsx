@@ -3,6 +3,7 @@ import LegalNotice from '@/components/timeline/LegalNotice';
 import TimelineContainer from '@/components/timeline/TimelineContainer';
 import FirstVisitBanner from '@/components/timeline/FirstVisitBanner';
 import VideoGuideButton from '@/components/timeline/VideoGuideButton';
+import TimelineHero from '@/components/timeline/TimelineHero';
 
 /**
  * @file page.tsx
@@ -37,53 +38,38 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
   const currentStepNumber = params.step ? parseInt(params.step, 10) : undefined;
 
   return (
-    <div className="min-h-screen w-full relative">
-       {/* 
-        Background Layer: Mesh Gradient for Glassmorphism 
-        - 은은한 빛 효과 추가
+    <div className="container mx-auto px-0 max-w-7xl">
+      {/* 
+        [Hero Section]
+        - Premium brand image background
+        - Clear value proposition
       */}
-      {/* Background: Structured Calm (Grid + Soft Light) */}
-      <div className="fixed inset-0 -z-10 overflow-hidden bg-[#FBFBFB]">
-        {/* 1. Subtle Engineering Grid/Dot Pattern */}
-        <div 
-          className="absolute inset-0 opacity-[0.4]"
-          style={{ 
-            backgroundImage: 'radial-gradient(#E2E8F0 1.5px, transparent 1.5px)', 
-            backgroundSize: '40px 40px' 
-          }}
-        />
-        
-        {/* 2. Top Center Soft Light */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-slate-100/40 blur-[100px] rounded-full mix-blend-multiply" />
-        
-        {/* 3. Bottom Ambient Warmth (Very Subtle) */}
-        <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-slate-100/50 blur-[80px] rounded-full" />
-      </div>
+      <TimelineHero />
 
-      <div className="container relative z-10 mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12 max-w-7xl space-y-8 sm:space-y-10 md:space-y-16">
-        {/* 페이지 헤더 */}
-        <div className="text-center relative">
-          <h1 className="text-senior-title bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-green-800 to-green-600 drop-shadow-sm pb-1">
-            어떻게 치료 받나요?
-          </h1>
-          <p className="mt-3 text-lg font-medium text-gray-900">
-            막막하시죠? 차근차근 따라해 보세요
-          </p>
+      {/* 
+        [Content Section with Full-Width Background]
+        - High contrast background for card visibility
+        - Full-width bleed to match Hero
+      */}
+      <div className="relative w-screen left-[calc(-50vw+50%)] bg-[#eff2f5] py-16 -mt-12 sm:-mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16">
+          
+          {/* 비디오 가이드 버튼 & 첫 방문 안내 */}
+          <div className="space-y-6">
+            <div className="flex justify-end">
+              <VideoGuideButton>전체 과정 영상 보기</VideoGuideButton>
+            </div>
+            <FirstVisitBanner />
+          </div>
 
-          {/* 비디오 가이드 버튼 - 항상 접근 가능, 우측 정렬 */}
-          <div className="mt-4 sm:mt-6 flex justify-end">
-            <VideoGuideButton>전체 과정 영상 보기</VideoGuideButton>
+          {/* 타임라인 컨테이너 */}
+          <TimelineContainer stages={stages} currentStepNumber={currentStepNumber} />
+
+          {/* 법적 고지 (하단) */}
+          <div className="pb-10">
+            <LegalNotice />
           </div>
         </div>
-
-        {/* 첫 방문 안내 배너 */}
-        <FirstVisitBanner />
-
-        {/* 타임라인 컨테이너 */}
-        <TimelineContainer stages={stages} currentStepNumber={currentStepNumber} />
-
-        {/* 법적 고지 (하단) */}
-        <LegalNotice />
       </div>
     </div>
   );

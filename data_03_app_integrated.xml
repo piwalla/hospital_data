@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RESULT>
+	<HEAD>
+		<resultCode>00</resultCode>
+		<resultMsg>NORMAL_SERVICE</resultMsg>
+		<totalCount>1518671</totalCount>
+		<numOfRows>1</numOfRows>
+		<pageNo>1</pageNo>
+	</HEAD>
+	<BODY>
+		<ROW>
+			<rcpr_aply_yr>2023</rcpr_aply_yr>
+			<rcpr_aply_mm>05</rcpr_aply_mm>
+			<rcpr_aply_day>16</rcpr_aply_day>
+			<dstr_ocrn_ymd>20210818</dstr_ocrn_ymd>
+			<ocds_cd>06</ocds_cd>
+			<ocds_nm>난청</ocds_nm>
+			<injds_type_cd>99</injds_type_cd>
+			<injds_type_nm>기타</injds_type_nm>
+			<thsptl_day_cnt>0</thsptl_day_cnt>
+			<tmdexm_day_cnt>243</tmdexm_day_cnt>
+			<tghsp_day_cnt>243</tghsp_day_cnt>
+			<bzmn_type_se_cd>1</bzmn_type_se_cd>
+			<bplc_scl_se_cd>9</bplc_scl_se_cd>
+			<bplc_scl_se_nm>전규모(규모미확인)</bplc_scl_se_nm>
+			<bplc_tpbiz_cd>4</bplc_tpbiz_cd>
+			<bplc_tpbiz_nm>건축건설공사</bplc_tpbiz_nm>
+			<mctpv_sgg_cd>11170</mctpv_sgg_cd>
+			<mctpv_sgg_nm>서울 용산구</mctpv_sgg_nm>
+			<wrkr_se_cd>01</wrkr_se_cd>
+			<ocpt_cd>9</ocpt_cd>
+			<ocpt_nm>건설 및 광업 단순 종사원</ocpt_nm>
+			<age_se_nm>60대 이상</age_se_nm>
+			<gndr_cd>M</gndr_cd>
+			<spwkr_ocpt_cd></spwkr_ocpt_cd>
+			<spwkr_ocpt_nm></spwkr_ocpt_nm>
+		</ROW>
+	</BODY>
+</RESULT>
