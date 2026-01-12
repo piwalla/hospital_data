@@ -75,7 +75,7 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
         "transition-all duration-300 ease-out",
         "cursor-pointer",
         isCurrentStep && "ring-2 ring-primary/25 shadow-[0_12px_40px_rgba(47,110,79,0.15)] bg-primary/[0.01]",
-        "p-6 sm:p-8"
+        "p-4 sm:p-8"
       )}>
         {/* Accent Bar - Vertical line on the left */}
         <div className={cn(
@@ -90,22 +90,18 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
             <div 
               className={cn(
                 "flex items-center justify-center rounded-2xl shadow-sm transition-all duration-300 flex-shrink-0 font-display",
+                "w-10 h-10 text-lg sm:w-14 sm:h-14 sm:text-2xl", // Responsive size classes
                 isCurrentStep 
                   ? "bg-primary text-white shadow-md ring-4 ring-primary/10" 
                   : "bg-gray-100 text-gray-400 group-hover:bg-primary/10 group-hover:text-primary"
               )}
-              style={{ 
-                width: '3.5rem',
-                height: '3.5rem',
-                fontSize: '1.5rem',
-                fontWeight: 800,
-              }}
+              style={{ fontWeight: 800 }}
             >
               {stage.step_number}
             </div>
             
             <h3 className={cn(
-              "text-xl sm:text-2xl font-bold leading-tight transition-colors mt-2",
+              "text-lg sm:text-2xl font-bold leading-tight transition-colors mt-1 sm:mt-2",
               isCurrentStep ? "text-gray-900" : "text-gray-900 group-hover:text-primary"
             )}>
               {title}
@@ -115,18 +111,18 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
           {/* Icon visual cue */}
           <div className={cn(
             "p-2 rounded-full transition-all duration-300 mt-1",
-            "bg-gray-50 text-gray-400 group-hover:bg-primary group-hover:text-white"
+            "bg-primary/10 text-primary sm:bg-gray-50 sm:text-gray-400 sm:group-hover:bg-primary sm:group-hover:text-white"
           )}>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 sm:stroke-2 stroke-[3]" />
           </div>
         </div>
         
-        <p id={`step-${stage.step_number}-description`} className="text-[15px] sm:text-[16px] text-gray-600 font-medium leading-[1.7] mb-6 pl-[4.75rem]">
+        <p id={`step-${stage.step_number}-description`} className="text-[14px] sm:text-[16px] text-gray-600 font-medium leading-[1.6] mb-3 sm:mb-6 pl-[3.5rem] sm:pl-[4.75rem]">
           {description}
         </p>
 
         {/* Tags & Action Row */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mt-auto pl-[4.75rem]">
+        <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4 mt-auto pl-[3.5rem] sm:pl-[4.75rem]">
           {/* Left: Tags */}
           <div className="flex flex-wrap gap-2">
             {isCurrentStep && (

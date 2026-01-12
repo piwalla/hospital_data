@@ -11,15 +11,16 @@ import Link from "next/link";
 
 interface QuickActionGridProps {
   currentStep: number;
+  userName?: string;
 }
 
-export default function QuickActionGrid({ currentStep }: QuickActionGridProps) {
+export default function QuickActionGrid({ currentStep, userName = "유저" }: QuickActionGridProps) {
   
   const getActions = () => {
     switch(currentStep) {
       case 1: // Application
         return [
-          { label: '필수 서류 다운로드', icon: FileText, href: '/documents', disabled: false },
+          { label: '서류 다운로드', icon: FileText, href: '/documents', disabled: false },
           { label: '산재 신청 가이드', icon: AlertCircle, href: '/timeline', disabled: false },
           { label: '병원 찾기', icon: MapPin, href: '/hospitals', disabled: false },
           { label: '급여 계산기', icon: Calculator, href: '/calculator', disabled: false },
@@ -29,7 +30,7 @@ export default function QuickActionGrid({ currentStep }: QuickActionGridProps) {
       case 2: // Treatment
         return [
           { label: '병원 찾기', icon: MapPin, href: '/hospitals', disabled: false },
-          { label: '병원 옮기기 (전원)', icon: ArrowRightLeft, href: '/documents/hospital-transfer-application', disabled: false },
+          { label: '병원 옮기기', icon: ArrowRightLeft, href: '/documents/hospital-transfer-application', disabled: false },
           { label: '휴업급여 청구', icon: FileText, href: '/documents/sick-leave-benefit-application', disabled: false },
           { label: '급여 계산기', icon: Calculator, href: '/calculator', disabled: false },
           { label: '심리 상담', icon: HeartHandshake, href: '/counseling', disabled: false },
@@ -38,7 +39,7 @@ export default function QuickActionGrid({ currentStep }: QuickActionGridProps) {
       case 3: // Disability
         return [
           { label: '병원 찾기', icon: MapPin, href: '/hospitals', disabled: false },
-          { label: '장해 진단서 발급', icon: FileText, href: '/documents/disability-rating-application', disabled: false },
+          { label: '장해진단서 발급', icon: FileText, href: '/documents/disability-rating-application', disabled: false },
           { label: '심사 문의하기', icon: Scale, href: 'https://www.comwel.or.kr/comwel/help/cyber/cyber_list.jsp?req_tp=1', disabled: false },
           { label: '급여 계산기', icon: Calculator, href: '/calculator', disabled: false },
           { label: '심리 상담', icon: HeartHandshake, href: '/counseling', disabled: false },
@@ -61,27 +62,23 @@ export default function QuickActionGrid({ currentStep }: QuickActionGridProps) {
   const actions = getActions();
 
   return (
-    // Mobile: Glassmorphism similar to other widgets. Desktop: Consistent glassmorphism.
-    <div className="bg-white/80 backdrop-blur-md border border-white/40 shadow-premium rounded-[2.5rem] h-full overflow-hidden transition-all hover:shadow-premium-hover"> 
-      <div className="pb-3 px-6 pt-6 sm:px-6 sm:pt-6 mb-2 sm:mb-0 border-b border-emerald-50/50">
-        <h3 className="text-lg font-black text-slate-900 sm:text-base sm:font-bold px-1 flex items-center gap-2">
-            <span className="w-1.5 h-6 bg-emerald-500 rounded-full inline-block shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-            바로가기
+    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm h-full overflow-hidden transition-all hover:shadow-md"> 
+      <div className="pb-4 px-7 pt-7 sm:px-8 sm:pt-8 mb-2 sm:mb-0">
+        <h3 className="text-xl sm:text-2xl font-black text-slate-900 px-1 flex items-center gap-3">
+            <span className="w-2 h-7 bg-emerald-500 rounded-full inline-block shadow-[0_4px_12px_rgba(16,185,129,0.3)]" />
+            {userName}님께 필요한 추가 기능
         </h3>
       </div>
-      <div className="px-4 pb-6 sm:px-6 sm:pb-6 pt-4">
-        <div className="grid grid-cols-3 gap-x-3 gap-y-6 sm:gap-4">
+      <div className="px-6 pb-8 sm:px-8 sm:pb-10 pt-4">
+        <div className="grid grid-cols-3 gap-x-4 gap-y-8 sm:gap-6">
             {actions.map((action, idx) => {
               if (action.disabled) {
                 return (
-                  <div key={idx} className="flex flex-col items-center gap-2.5 cursor-not-allowed opacity-60 grayscale">
-                      <div className="w-[72px] h-[72px] sm:w-[56px] sm:h-[56px] rounded-3xl flex items-center justify-center border border-slate-100 bg-slate-50 text-slate-300 relative shadow-inner">
-                          <action.icon className="w-8 h-8 sm:w-6 sm:h-6" />
-                          <div className="absolute -top-1 -right-1 bg-slate-400 text-white text-xs sm:text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow-sm">
-                            준비중
-                          </div>
+                  <div key={idx} className="flex flex-col items-center gap-3 cursor-not-allowed opacity-40 grayscale">
+                      <div className="w-[72px] h-[72px] sm:w-[64px] sm:h-[64px] rounded-3xl flex items-center justify-center border border-slate-100 bg-slate-50 text-slate-300 relative">
+                          <action.icon className="w-8 h-8 sm:w-7 sm:h-7" />
                       </div>
-                      <span className="text-sm sm:text-xs font-medium text-center leading-tight text-slate-300">
+                      <span className="text-base sm:text-sm font-medium text-center leading-tight text-slate-300">
                           {action.label}
                       </span>
                   </div>
@@ -89,16 +86,14 @@ export default function QuickActionGrid({ currentStep }: QuickActionGridProps) {
               }
               
               return (
-                <Link key={idx} href={action.href} className="flex flex-col items-center gap-3 sm:gap-2.5 group">
-                    {/* Sage Green / Teal Tones for Active State */}
-                    {/* Mobile: Big Touch Target (72px), Line Design (Border-slate-200), Soft Background */}
-                    <div className={`w-[72px] h-[72px] sm:w-[56px] sm:h-[56px] rounded-3xl flex items-center justify-center transition-all duration-300 relative
-                        bg-white border border-slate-100 text-slate-500 shadow-sm
-                        group-hover:bg-emerald-600 group-hover:border-emerald-600 group-hover:text-white group-hover:shadow-[0_8px_16px_-4px_rgba(16,185,129,0.4)] group-hover:-translate-y-1
+                <Link key={idx} href={action.href} className="flex flex-col items-center gap-3 sm:gap-4 group">
+                    <div className={`w-[72px] h-[72px] sm:w-[64px] sm:h-[64px] rounded-3xl flex items-center justify-center transition-all duration-300 relative
+                        bg-slate-50 border border-slate-100 text-slate-900 shadow-sm
+                        group-hover:bg-emerald-600 group-hover:border-emerald-600 group-hover:text-white group-hover:shadow-[0_12px_24px_-8px_rgba(16,185,129,0.5)] group-hover:-translate-y-1.5
                     `}>
-                        <action.icon className="w-8 h-8 sm:w-6 sm:h-6 stroke-[1.5] transition-transform duration-300 group-hover:scale-110" />
+                        <action.icon className="w-8 h-8 sm:w-7 sm:h-7 stroke-[2] transition-transform duration-300 group-hover:scale-110" />
                     </div>
-                    <span className="text-sm sm:text-xs font-bold sm:font-medium text-center leading-tight text-slate-600 transition-colors duration-200 group-hover:text-emerald-700">
+                    <span className="text-lg font-black text-center leading-tight text-slate-800 transition-colors duration-200 group-hover:text-emerald-700">
                         {action.label}
                     </span>
                 </Link>

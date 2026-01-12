@@ -6,11 +6,11 @@ import {
   LayoutDashboard, 
   Users, 
   MessageSquare, 
-  BarChart3, 
   Settings,
   LogOut,
   Megaphone,
-  FileText
+  FileText,
+  Bot
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -41,14 +41,18 @@ const menuItems = [
     icon: FileText,
   },
   {
-    title: "통계 분석",
-    href: "/admin/analytics",
-    icon: BarChart3,
+    title: "챗봇 사용 통계",
+    href: "/admin/chatbot/stats",
+    icon: Bot,
   },
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
+
+  const handleLinkClick = () => {
+    if (onClose) onClose();
+  };
 
   return (
     <div className="flex flex-col h-full bg-slate-900 text-slate-300 w-64 flex-shrink-0">
@@ -68,6 +72,7 @@ export function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={handleLinkClick}
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                 isActive

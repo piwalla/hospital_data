@@ -6,19 +6,25 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, Sparkles, Bot, ShieldCheck, ShieldAlert, BookOpen, AlertCircle, ExternalLink } from 'lucide-react';
+import DocumentBotIcon from './DocumentBotIcon';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import RiuIcon from '@/components/icons/riu-icon';
-import RiuLoader from '@/components/ui/riu-loader';
+
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+  citations?: any[];
+  id?: string;
+}
+
+interface DocumentAssistantProps {
+  documentName?: string;
 }
 
 
-export default function DocumentAssistant() {
+export default function DocumentAssistant({ documentName }: DocumentAssistantProps) {
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -41,7 +47,11 @@ export default function DocumentAssistant() {
       const response = await fetch('/api/documents/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: finalQuestion }),
+        body: JSON.stringify({ 
+          question: finalQuestion,
+          documentContext: documentName,
+          messages: messages.map(m => ({ role: m.role, content: m.content }))
+        }),
       });
 
       const data = await response.json();
@@ -49,9 +59,13 @@ export default function DocumentAssistant() {
         throw new Error(data.error || '응답을 가져오지 못했습니다.');
       }
 
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
+      setMessages((prev) => [...prev, { 
+        role: 'assistant', 
+        content: data.answer,
+        citations: data.citations 
+      }]);
     } catch (err: any) {
-      setMessages((prev) => prev.slice(0, -1)); // 실패 시 user 메시지 제거
+      setMessages((prev) => prev.slice(0, -1));
       setError(err.message || '챗봇 응답 생성 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -60,199 +74,194 @@ export default function DocumentAssistant() {
 
   return (
     <div 
-      className="leaf-section bg-white border border-[var(--border-light)] rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 shadow-canopy"
+      className="leaf-section bg-gradient-to-br from-white to-slate-50 border border-slate-200 rounded-xl p-5 sm:p-7 shadow-sm"
       role="region"
-      aria-label="서류 관련 AI 챗봇"
+      aria-label="서류 관련 AI 전문가 상담"
     >
-      <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-        <RiuIcon variant="question" size={40} className="sm:w-12 sm:h-12" aria-hidden="true" />
-        <h2 className="text-base sm:text-lg md:text-xl text-foreground font-brand">
-          AI에게 서류에 대해 물어보세요
-        </h2>
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+        <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[var(--primary)]/10 text-[var(--primary)] shrink-0">
+          <Sparkles className="w-6 h-6" strokeWidth={1.5} />
+        </div>
+        <div>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+            산재 서류 AI 상담
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-[var(--primary)]/10 text-[var(--primary)]">
+              Beta
+            </span>
+          </h2>
+
+        </div>
       </div>
 
+      {/* Chat Area Container */}
+      <div className="relative min-h-[300px] max-h-[500px] sm:max-h-[600px] overflow-hidden mb-6 flex flex-col">
+        
+        {/* Empty State (with 3D Image & Animation) */}
+        {messages.length === 0 && !loading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center animate-fade-in pointer-events-none">
+            <div className="w-32 h-32 sm:w-40 sm:h-40 mb-2 relative">
+              <DocumentBotIcon className="w-full h-full drop-shadow-2xl" />
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold text-slate-800 mb-2 font-brand">
+              무엇을 도와드릴까요?
+            </h3>
+            <p className="text-sm text-slate-500 max-w-[280px] break-keep leading-relaxed">
+              작성 방법부터 필수 서류까지,<br />
+              <span className="text-primary font-bold">근로복지공단 가이드</span>를 기반으로 답변해 드립니다.
+            </p>
+          </div>
+        )}
+
+        {/* Message List */}
+        <div 
+          className="flex-1 overflow-y-auto space-y-4 px-1 pr-2 custom-scrollbar" 
+          role="log" 
+          aria-label="대화 내역"
+        >
+          {messages.map((message) => (
+            <div
+              key={message.id || Math.random().toString()}
+              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`max-w-[85%] rounded-[1.25rem] p-4 text-sm leading-relaxed shadow-sm relative group ${
+                  message.role === 'user'
+                    ? 'bg-[var(--primary)] text-white'
+                    : 'bg-white border border-slate-100 text-slate-800'
+                }`}
+              >
+                {message.role === 'assistant' && (
+                  <div className="flex items-center gap-2 mb-2 text-primary font-bold text-xs pb-2 border-b border-slate-100">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>AI 서류 전문가</span>
+                  </div>
+                )}
+                <div
+                  dangerouslySetInnerHTML={{ __html: markdownToCustomHtml(message.content) }}
+                  className="prose prose-sm max-w-none break-words"
+                />
+                
+                {/* Citations */}
+                {message.citations && message.citations.length > 0 && (
+                   <div className="mt-3 pt-3 border-t border-slate-100">
+                     <div className="flex items-center gap-1.5 mb-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                       <BookOpen className="w-3 h-3" />
+                       <span>참고 문서</span>
+                     </div>
+                     <div className="space-y-1.5">
+                       {message.citations.map((citation, index) => {
+                          const isObject = typeof citation === 'object' && citation !== null;
+                          const title = isObject ? citation.title : citation;
+                          const uri = isObject ? citation.uri : null;
+                          
+                          return (
+                            <a 
+                              key={index} 
+                              href={uri || '#'} 
+                              target={uri ? "_blank" : undefined}
+                              rel={uri ? "noopener noreferrer" : undefined}
+                              className={`text-xs bg-slate-50 px-2 py-1.5 rounded border border-slate-200 text-slate-600 flex items-start gap-1.5 leading-snug break-all transition-colors ${uri ? 'hover:bg-slate-100 cursor-pointer' : ''}`}
+                              onClick={(e) => !uri && e.preventDefault()}
+                            >
+                              <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-slate-200 text-[9px] font-bold text-slate-600 shrink-0 mt-0.5">{index + 1}</span>
+                              <span className="line-clamp-2 hover:line-clamp-none transition-all flex-1">{title}</span>
+                              {uri && <ExternalLink className="w-3 h-3 text-slate-400 shrink-0 mt-0.5 ml-1" />}
+                            </a>
+                          );
+                       })}
+                     </div>
+                   </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {loading && (
+            <div className="flex justify-start">
+               <div className="max-w-[85%] bg-white border border-slate-100 rounded-[1.25rem] p-4 shadow-sm flex items-center gap-3">
+                 <Loader2 className="w-4 h-4 text-[var(--primary)] animate-spin" />
+                 <span className="text-sm text-slate-500">답변을 생성하고 있습니다...</span>
+               </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Input Area */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           handleAsk();
         }}
-        className="space-y-3"
-        aria-label="질문 입력 폼"
+        className="relative"
       >
         <Textarea
-          placeholder="질문을 입력하세요"
+          placeholder="궁금한 내용을 입력하세요"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           disabled={loading}
-          className="min-h-[80px] sm:min-h-[90px] resize-none text-sm sm:text-base focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          aria-label="질문 입력"
-          aria-describedby="question-help-text"
+          className="min-h-[50px] max-h-[150px] py-4 pl-4 pr-12 resize-none text-sm bg-slate-50 border-slate-200 focus:bg-white focus:border-[var(--primary)] transition-all rounded-xl shadow-inner"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleAsk();
+            }
+          }}
         />
-        <p id="question-help-text" className="sr-only">산재 관련 서류에 대한 질문을 입력하세요. 최소 2자 이상 입력해야 합니다.</p>
-        <div className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={loading}
-            className="flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-            aria-label={loading ? "답변 준비 중" : "질문 전송"}
-          >
-            {loading ? (
-              <>
-                <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" strokeWidth={1.75} aria-hidden="true" />
-                <span className="text-xs sm:text-sm" role="status" aria-live="polite">리우가 답변 중...</span>
-              </>
-            ) : (
-              <>
-                <span className="text-xs sm:text-sm">질문하기</span>
-                <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={1.75} aria-hidden="true" />
-              </>
-            )}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          disabled={loading || !question.trim()}
+          size="icon"
+          className="absolute right-2 bottom-2 w-9 h-9 rounded-lg bg-[var(--primary)] hover:bg-[var(--primary)]/90 transition-colors shadow-sm disabled:opacity-50"
+        >
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-white" />
+          ) : (
+            <Send className="w-4 h-4 text-white ml-0.5" />
+          )}
+          <span className="sr-only">전송</span>
+        </Button>
       </form>
 
       {error && (
-        <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 rounded-lg bg-red-50 border border-red-200" role="alert" aria-live="assertive">
-          <p className="text-xs sm:text-sm text-red-600">{error}</p>
+        <div className="mt-3 text-xs text-red-500 px-1 font-medium flex items-center gap-1">
+          <ShieldAlert className="w-3 h-3" />
+          {error}
         </div>
       )}
 
-      {messages.length > 0 && (
-        <div 
-          className="mt-4 sm:mt-6 space-y-3 sm:space-y-4 max-h-[300px] sm:max-h-[400px] md:max-h-[500px] overflow-y-auto pr-1 sm:pr-2 custom-scrollbar"
-          role="log"
-          aria-live="polite"
-          aria-label="대화 기록"
-        >
-          {messages.map((message, index) => {
-            const baseClasses = 'p-4 rounded-lg border shadow-leaf';
-            const userClasses = 'bg-accent/10 border-accent/30 text-foreground';
-            const assistantClasses =
-              'bg-[var(--background-alt)] border-[var(--border-light)] text-foreground prose prose-sm max-w-none';
-
-            if (message.role === 'assistant') {
-              // 마크다운을 HTML로 변환하는 함수
-              const markdownToHtml = (text: string): string => {
-                let html = text;
-                
-                // 강조 변환 (**텍스트** -> <strong>텍스트</strong>) - 먼저 처리
-                html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-primary font-brand">$1</strong>');
-                
-                // 줄 단위로 분리하여 처리
-                const lines = html.split('\n');
-                const processedLines: string[] = [];
-                let inOrderedList = false;
-                let inUnorderedList = false;
-                
-                for (let i = 0; i < lines.length; i++) {
-                  const line = lines[i].trim();
-                  
-                  // 제목 처리
-                  if (line.startsWith('### ')) {
-                    if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-                    if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-                    processedLines.push(`<h3 class="text-lg font-semibold mt-4 mb-2 text-primary font-brand">${line.substring(4)}</h3>`);
-                    continue;
-                  }
-                  
-                  if (line.startsWith('## ')) {
-                    if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-                    if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-                    processedLines.push(`<h2 class="text-xl font-bold mt-5 mb-3 text-primary font-brand">${line.substring(3)}</h2>`);
-                    continue;
-                  }
-                  
-                  // 인용구 처리
-                  if (line.startsWith('> ')) {
-                    if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-                    if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-                    processedLines.push(`<blockquote class="border-l-4 border-accent pl-4 py-2 my-3 bg-accent/10 italic">${line.substring(2)}</blockquote>`);
-                    continue;
-                  }
-                  
-                  // 번호 목록 처리
-                  const orderedMatch = line.match(/^(\d+)\. (.*)$/);
-                  if (orderedMatch) {
-                    if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-                    if (!inOrderedList) {
-                      processedLines.push('<ol class="list-decimal list-inside space-y-1 my-2">');
-                      inOrderedList = true;
-                    }
-                    processedLines.push(`<li class="ml-4 mb-1">${orderedMatch[2]}</li>`);
-                    continue;
-                  }
-                  
-                  // 불릿 목록 처리
-                  if (line.startsWith('- ')) {
-                    if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-                    if (!inUnorderedList) {
-                      processedLines.push('<ul class="list-disc list-inside space-y-1 my-2">');
-                      inUnorderedList = true;
-                    }
-                    processedLines.push(`<li class="ml-4 mb-1">${line.substring(2)}</li>`);
-                    continue;
-                  }
-                  
-                  // 일반 텍스트 처리
-                  if (inOrderedList) { processedLines.push('</ol>'); inOrderedList = false; }
-                  if (inUnorderedList) { processedLines.push('</ul>'); inUnorderedList = false; }
-                  
-                  if (line.length > 0) {
-                    processedLines.push(`<p class="mb-2">${line}</p>`);
-                  } else {
-                    processedLines.push('<br />');
-                  }
-                }
-                
-                // 열려있는 목록 닫기
-                if (inOrderedList) processedLines.push('</ol>');
-                if (inUnorderedList) processedLines.push('</ul>');
-                
-                return processedLines.join('');
-              };
-
-              return (
-                <div
-                  key={`${message.role}-${index}`}
-                  className={`${baseClasses} ${assistantClasses}`}
-                  dangerouslySetInnerHTML={{
-                    __html: markdownToHtml(message.content),
-                  }}
-                  role="article"
-                  aria-label={`AI 답변 ${index + 1}`}
-                />
-              );
-            }
-
-            return (
-              <div
-                key={`${message.role}-${index}`}
-                className={`${baseClasses} ${userClasses}`}
-                role="article"
-                aria-label={`사용자 질문 ${index + 1}`}
-              >
-                {message.content}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {loading && messages.length === 0 && (
-        <div className="mt-4 sm:mt-6" role="status" aria-live="polite" aria-label="15년차 노무법인 전문가가 답변을 준비 중이에요.">
-          <RiuLoader 
-            message="15년차 노무법인 전문가가 답변을 준비 중이에요..." 
-            iconVariants={['question','smile','cheer']}
-            logId="DocumentAssistant:loading"
-            ariaDescription="답변이 준비되면 자동으로 표시됩니다"
-          />
-        </div>
-      )}
-
-      <p className="mt-3 sm:mt-4 text-[10px] sm:text-xs text-muted-foreground text-center" role="note" aria-label="면책 조항">
-        ※ AI가 제공하는 정보는 참고용이며 법률 자문이 아닙니다.
-      </p>
+      <div className="mt-4 text-[10px] text-slate-400 text-center space-y-1.5">
+        <p className="flex items-center justify-center gap-1.5">
+          <ShieldCheck className="w-3 h-3 shrink-0" />
+          <span>개인정보 보호를 위해 주민등록번호 등 민감정보는 입력하지 마세요.</span>
+        </p>
+        <p className="flex items-center justify-center gap-1.5 text-slate-500">
+          <AlertCircle className="w-3 h-3 shrink-0" />
+          <span>AI 답변은 참고용이며, 정확한 내용은 반드시 근로복지공단에 최종 확인하시기 바랍니다.</span>
+        </p>
+      </div>
     </div>
   );
 }
+
+// Markdown to HTML helper (Internal)
+function markdownToCustomHtml(text: string): string {
+  let html = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^#### (.*$)/gm, '<h4>$1</h4>')
+    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+    .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+    .replace(/^[\-\*] (.*$)/gm, '<ul><li>$1</li></ul>')
+    .replace(/^\d+\. (.*$)/gm, '<ol><li>$1</li></ol>')
+    .replace(/\n/g, '<br />');
+    
+  // Cleanup lists
+  html = html.replace(/<\/ul><br \/><ul>/g, '');
+  html = html.replace(/<\/ol><br \/><ol>/g, '');
+  
+  return html;
+}
+
 

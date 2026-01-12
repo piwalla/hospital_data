@@ -50,7 +50,7 @@ export default function PaymentScheduleCard({ user }: PaymentScheduleCardProps) 
     <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-[2.5rem] overflow-hidden transition-all hover:shadow-premium-hover relative", !wageInfo && "bg-slate-50/50 backdrop-blur-none border-dashed border-slate-200")}>
       <CardHeader className="pb-2 pt-6 px-6 sm:px-8">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-bold flex items-center gap-3 text-slate-800 tracking-tight">
+          <CardTitle className="text-2xl font-bold flex items-center gap-3 text-slate-800 tracking-tight">
             <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-indigo-500" />
             </div>
@@ -157,12 +157,12 @@ export default function PaymentScheduleCard({ user }: PaymentScheduleCardProps) 
             </div>
             
             <div className="flex items-center justify-between px-2">
-               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+               <span className="text-sm text-slate-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-slate-200" />
                  심사 결과에 따라 달라질 수 있음
                </span>
                <div className="flex items-center gap-1 text-indigo-500">
-                  <span className="text-xs font-black">Re:work Care Calculator</span>
+                  <span className="text-sm font-black">Re:work Care Calculator</span>
                </div>
             </div>
           </div>

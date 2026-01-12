@@ -40,7 +40,7 @@ export default function TimelineContainer({ stages, currentStepNumber }: Timelin
             
             {/* Chevron between cards */}
             {index < stages.length - 1 && (
-              <div className="flex justify-center my-6 sm:my-8" aria-hidden="true">
+              <div className="flex justify-center my-2 sm:my-8" aria-hidden="true">
                 <svg 
                   width="32" 
                   height="20" 

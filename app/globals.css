@@ -399,6 +399,20 @@ iframe {
     animation: fade-in 0.6s ease-out;
   }
 
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-float-slow {
+    animation: float-slow 3s ease-in-out infinite;
+  }
+
   /* 스크린 리더 전용 텍스트 (접근성) */
   .sr-only {
     position: absolute;

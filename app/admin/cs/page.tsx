@@ -6,7 +6,8 @@ import {
   Send,
   User,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  ChevronLeft 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -137,6 +138,9 @@ export default function CSCenterPage() {
     await client.from('cs_sessions').update({ status: newStatus }).eq('id', selectedSessionId);
   };
 
+  // Helper to clear selection (Back to list)
+  const handleBackToList = () => setSelectedSessionId(null);
+
   const filteredSessions = sessions.filter(s => 
     filterStatus === "all" || s.status === filterStatus
   );
@@ -146,7 +150,10 @@ export default function CSCenterPage() {
   return (
     <div className="flex bg-white rounded-xl border border-gray-200 shadow-sm h-[calc(100vh-140px)] overflow-hidden">
       {/* 1. Chat List Sidebar */}
-      <div className="w-80 border-r border-gray-200 flex flex-col bg-slate-50/50">
+      <div className={cn(
+        "w-full md:w-80 border-r border-gray-200 flex flex-col bg-slate-50/50 transition-all duration-300",
+        selectedSessionId ? "hidden md:flex" : "flex"
+      )}>
         <div className="p-4 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-slate-900 flex items-center gap-2">
@@ -211,12 +218,20 @@ export default function CSCenterPage() {
       </div>
 
       {/* 2. Chat Conversation Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white">
+      <div className={cn(
+        "flex-1 flex flex-col min-w-0 bg-white transition-all duration-300",
+        !selectedSessionId ? "hidden md:flex" : "flex"
+      )}>
         {selectedSession ? (
            <>
              {/* Chat Header */}
-             <div className="h-16 px-6 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+             <div className="h-16 px-4 md:px-6 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
                <div className="flex items-center gap-3">
+                 {/* Back Button (Mobile Only) */}
+                 <Button variant="ghost" size="icon" className="md:hidden -ml-2" onClick={handleBackToList}>
+                    <ChevronLeft className="w-5 h-5" />
+                 </Button>
+                 
                  <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
                     <User className="w-5 h-5 text-slate-500" />
                  </div>

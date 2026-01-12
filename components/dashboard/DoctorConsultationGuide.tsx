@@ -48,7 +48,7 @@ export default function DoctorConsultationGuide() {
           <Stethoscope className="w-5 h-5" />
           주치의 상담 가이드
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-sm">
           장해 진단서 발급 전, 이 내용은 꼭 확인하세요!
         </CardDescription>
       </CardHeader>
@@ -73,10 +73,10 @@ export default function DoctorConsultationGuide() {
               {checkedItems.includes(item.id) && <ClipboardCheck className="w-3.5 h-3.5" />}
             </div>
             <div>
-              <div className={`font-medium ${checkedItems.includes(item.id) ? 'text-green-900 line-through decoration-green-500' : 'text-slate-900'}`}>
+              <div className={`text-base font-bold ${checkedItems.includes(item.id) ? 'text-green-900 line-through decoration-green-500' : 'text-slate-900'}`}>
                 {item.text}
               </div>
-              <div className="text-xs text-slate-500 mt-1">
+              <div className="text-sm text-slate-500 mt-1">
                 {item.desc}
               </div>
             </div>

@@ -18,7 +18,6 @@ import VocationalTrainingCard from "@/components/dashboard/insights/VocationalTr
 import LocalResourcesCard from "@/components/dashboard/insights/LocalResourcesCard";
 
 import QuickActionGrid from "@/components/dashboard/QuickActionGrid";
-import EmpathyWidget from "@/components/dashboard/EmpathyWidget";
 import VideoCard from "@/components/dashboard/VideoCard";
 
 import CommunityWidget from "@/components/dashboard/CommunityWidget";
@@ -118,7 +117,7 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   // Handle Onboarding/Profile Updates
-  const handleOnboardingComplete = async (data: { role: UserRole; injuryPart: InjuryPart; region: Region; currentStep: number }) => {
+  const handleOnboardingComplete = async (data: { role: UserRole; injuryPart: InjuryPart; region: Region; currentStep: number; agreedToTerms?: boolean; agreedToSensitive?: boolean }) => {
     // Optimistic Update
     const updatedUser = {
       ...user,
@@ -142,6 +141,8 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
         injuryPart: data.injuryPart,
         region: data.region,
         currentStep: data.currentStep,
+        agreedToTerms: data.agreedToTerms,
+        agreedToSensitive: data.agreedToSensitive,
         // wageInfo: user.wageInfo, // Do not save mock/transient wage info
         wageInfo: undefined,
       });
@@ -153,11 +154,11 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
   // --- Dynamic Component Selection Logic ---
   const renderInsightCard = () => {
     switch (user.currentStep) {
-      case 1: return <PersonalizedStatsWidget injury={user.injuryPart} region={getNormalizedRegion(user.region)} className="mb-6" />;
+      case 1: return <PersonalizedStatsWidget userName={user.name} injury={user.injuryPart} region={getNormalizedRegion(user.region)} className="mb-6" />;
       case 2: return <PaymentScheduleCard user={user} />;
       case 3: return <DisabilityGradeCard />;
-      case 4: return <VocationalTrainingCard />;
-      default: return <PersonalizedStatsWidget injury={user.injuryPart} region={getNormalizedRegion(user.region)} className="mb-6" />;
+      case 4: return null; // User requested to hide stats for Return/Rehab stage
+      default: return <PersonalizedStatsWidget userName={user.name} injury={user.injuryPart} region={getNormalizedRegion(user.region)} className="mb-6" />;
     }
   };
 
@@ -193,7 +194,10 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
         isOpen={showOnboarding || isEditingProfile}
         onComplete={handleOnboardingComplete}
         initialData={isEditingProfile ? user : undefined}
-        onClose={() => setIsEditingProfile(false)}
+        onClose={() => {
+          setIsEditingProfile(false);
+          setShowOnboarding(false);
+        }}
       />
 
       {/* 1. Header Section - Full width on mobile, rounded/padded on desktop */}
@@ -220,7 +224,7 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
 
         {/* AREA A-2: Recommended Benefits (Moved to Top) */}
         <section className="animate-in fade-in slide-in-from-bottom-3 duration-500 delay-100">
-            <RecommendedBenefitsWidget currentStep={user.currentStep} averageWage={user.wageInfo?.amount} />
+            <RecommendedBenefitsWidget currentStep={user.currentStep} averageWage={user.wageInfo?.amount} userName={user.name} />
         </section>
 
         {/* AREA A-3: Local Resources & Video (Moved to Top) */}
@@ -265,8 +269,11 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
         {/* AREA B & C: Actions + Checklist (Better ratio on desktop) */}
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
              {/* Quick Actions */}
-             <QuickActionGrid currentStep={user.currentStep} />
+             <QuickActionGrid currentStep={user.currentStep} userName={user.name} />
              
+             {/* 1. Community Widget (맞춤 커뮤니티) - Moved from below */}
+             <CommunityWidget user={user} />
+
              {/* Today's To-Do (Mobile Only - Hybrid View) */}
              <div className="block md:hidden">
                 <ActionChecklist 
@@ -276,30 +283,16 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
              </div>
         </section>
 
-         {/* AREA C & D: Content Grid (2x2 on desktop, now 2x3 with calculator) */}
-         <div className="space-y-3">
-              <h3 className="font-bold text-slate-800 text-lg px-1 flex items-center gap-2">
-                   <Lightbulb className="w-5 h-5 text-amber-500" fill="currentColor" />
-                   {user.name}님을 위한 팁
-               </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                   {/* 1. Community Widget (맞춤 커뮤니티) - Top left */}
-                   <CommunityWidget user={user} />
-                   
-                   {/* 5. Curated Content (Moved to side of Community) */}
-                   <CuratedContent 
-                      documents={currentStage.documents}
-                      warnings={currentStage.warnings} 
-                      stepNumber={user.currentStep}
-                    />
-              </div>
-         </div>
+          {/* AREA C & D: 주요 서류 및 주의사항 (전체 너비) */}
+          <div className="space-y-4">
+               <CuratedContent 
+                  documents={currentStage.documents}
+                  warnings={currentStage.warnings} 
+                  stepNumber={user.currentStep}
+                  userName={user.name}
+                />
+          </div>
 
-         {/* 0. Empathy Widget (Moved to Bottom) */}
-         <div className="animate-in fade-in slide-in-from-bottom-1 duration-500">
-              <EmpathyWidget />
-         </div>
 
        </div>
     </div>

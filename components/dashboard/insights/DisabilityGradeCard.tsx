@@ -19,7 +19,7 @@ export default function DisabilityGradeCard() {
         <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-[2.5rem] overflow-hidden transition-all hover:shadow-premium-hover relative p-1")}>
             <CardHeader className="pb-2 pt-6 px-6 sm:px-8">
                 <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl font-bold flex items-center gap-3 text-slate-800 tracking-tight">
+                    <CardTitle className="text-2xl font-bold flex items-center gap-3 text-slate-800 tracking-tight">
                         <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
                           <UserCheck className="w-5 h-5 text-emerald-500" />
                         </div>
@@ -30,10 +30,10 @@ export default function DisabilityGradeCard() {
             <CardContent className="px-6 sm:px-8 pb-8">
                 <div className="bg-gradient-to-br from-emerald-50/50 to-white/50 p-6 rounded-[2rem] border border-white/60 shadow-sm mb-6 flex items-center justify-center">
                    <div className="text-center">
-                      <p className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-1">분석 결과</p>
+                      <p className="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-1">분석 결과</p>
                       <div className="flex items-baseline justify-center gap-2">
                           <span className="text-5xl font-black text-emerald-600 tracking-tighter">제 {estimatedGrade}급</span>
-                          <span className="text-base font-bold text-slate-400">가능성 높음</span>
+                          <span className="text-lg font-bold text-slate-400">가능성 높음</span>
                       </div>
                    </div>
                 </div>
@@ -79,10 +79,10 @@ export default function DisabilityGradeCard() {
              <Stethoscope className="w-6 h-6 text-emerald-500" />
           </div>
           <div>
-            <CardTitle className="text-xl font-extrabold text-slate-800 tracking-tight">
+            <CardTitle className="text-2xl font-extrabold text-slate-800 tracking-tight">
                 내 장해 등급은 몇 급일까?
             </CardTitle>
-            <CardDescription className="text-sm font-bold text-slate-400 mt-1">
+            <CardDescription className="text-base font-bold text-slate-400 mt-2">
                 치료 종결 후 받을 수 있는 보상금을 미리 확인해보세요.
             </CardDescription>
           </div>

@@ -32,9 +32,7 @@ export default async function CounselingPage() {
                 힘들었던 오늘, 당신의 이야기를 들려주세요
               </h2>
             </div>
-            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-              리워크케어 상담사가 당신의 편에서 따뜻하게 들어드릴게요.
-            </p>
+
             <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/50 border border-white overflow-hidden">
                <PsychologicalChatbot />
             </div>

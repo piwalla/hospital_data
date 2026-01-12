@@ -25,7 +25,7 @@ export default function EmpathyWidget() {
                  <p className="text-sm font-serif font-medium text-stone-800 leading-relaxed italic">
                     &quot;{content.quote}&quot;
                  </p>
-                 <p className="text-xs text-stone-500 mt-2 font-medium">
+                 <p className="text-sm text-stone-500 mt-2 font-medium">
                     - {content.author}
                  </p>
              </div>
@@ -35,12 +35,12 @@ export default function EmpathyWidget() {
          <div className="mt-1 pt-3 border-t border-stone-200/60 flex items-center justify-between cursor-pointer group">
              <div className="flex items-center gap-2">
                  <BookOpen className="w-4 h-4 text-stone-600 group-hover:text-indigo-600 transition-colors" />
-                 <span className="text-xs font-bold text-stone-700 group-hover:text-indigo-700 transition-colors">
+                 <span className="text-sm font-bold text-stone-700 group-hover:text-indigo-700 transition-colors">
                     회복 환우 수기 읽어보기
                  </span>
              </div>
              <div className="flex items-center">
-                 <span className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-100 font-bold">
+                 <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-100 font-bold">
                     New
                  </span>
              </div>

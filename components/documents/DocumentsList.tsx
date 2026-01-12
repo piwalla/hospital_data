@@ -294,13 +294,14 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
             >
               <div
                 className={cn(
-                  'relative h-full bg-white rounded-3xl p-6 md:p-8',
+                  'relative h-full bg-white rounded-3xl p-5 sm:p-6 md:p-8',
                   'border border-gray-200/50',
                   'shadow-[0_8px_30px_rgba(0,0,0,0.04)]',
                   'transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]',
                   'hover:shadow-[0_40px_80px_rgba(0,0,0,0.08)] hover:-translate-y-2',
                   'hover:border-[#14532d]/20',
-                  'flex flex-col overflow-hidden'
+                  'flex flex-col overflow-hidden',
+                  'min-h-[180px]' // Ensure minimum click area
                 )}
                 role="listitem"
               >
@@ -312,15 +313,15 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
 
                 <div className="relative z-10 flex flex-col h-full">
                   {/* 상단: 아이콘 + 제목 */}
-                  <div className="flex items-start gap-4 mb-5">
+                  <div className="flex items-start gap-3 md:gap-4 mb-3 md:mb-5">
                     <div
                       className={cn(
-                        'w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0',
+                        'w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl flex items-center justify-center flex-shrink-0',
                         'bg-[#F8FAFC] border border-gray-100 shadow-sm group-hover:bg-[#14532d] group-hover:border-[#14532d] transition-all duration-300'
                       )}
                       aria-hidden="true"
                     >
-                      <Icon className={cn('w-7 h-7 transition-colors duration-300 group-hover:text-white', iconColor)} strokeWidth={1.5} />
+                      <Icon className={cn('w-5 h-5 md:w-7 md:h-7 transition-colors duration-300 group-hover:text-white', iconColor)} strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0 pt-0.5">
                       {(() => {
@@ -345,11 +346,11 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
                     </div>
                   </div>
 
-                   <p className="text-gray-500 font-medium leading-relaxed mb-6 line-clamp-3 text-sm md:text-[15px] group-hover:text-gray-600 transition-colors">
+                   <p className="text-gray-500 font-medium leading-relaxed mb-4 md:mb-6 line-clamp-2 md:line-clamp-3 text-sm md:text-[15px] group-hover:text-gray-600 transition-colors">
                       {document.description}
                    </p>
 
-                  <div className="mt-auto pt-5 border-t border-gray-100/60 flex items-center justify-between group/link">
+                  <div className="mt-auto pt-3 md:pt-5 border-t border-gray-100/60 flex items-center justify-between group/link">
                      <span className="text-xs font-black uppercase tracking-wider text-gray-400 group-hover:text-[#14532d] transition-colors">
                        Guides & Details
                      </span>

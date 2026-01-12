@@ -63,8 +63,8 @@ export default function AdminNoticePage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden min-h-[400px]">
-        <div className="p-0">
-          <table className="w-full text-sm text-left text-gray-500">
+        <div className="p-0 overflow-x-auto">
+          <table className="w-full text-sm text-left text-gray-500 min-w-[800px]">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-100">
               <tr>
                 <th className="px-6 py-3 font-medium">제목</th>

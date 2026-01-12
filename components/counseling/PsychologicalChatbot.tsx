@@ -218,13 +218,13 @@ export default function PsychologicalChatbot() {
                 
                 {/* 정보 텍스트 - 모바일 최적화 */}
                 <div className="w-full">
-                  <div className="font-bold text-sm sm:text-base text-gray-900 mb-0.5 sm:mb-1">
+                  <div className="font-bold text-lg sm:text-xl text-gray-900 mb-1 sm:mb-2 flex items-center justify-center gap-1.5">
                     {persona.name}
-                    <span className="ml-1.5 text-[9px] sm:text-[10px] font-bold text-rose-500 bg-rose-50 px-1.5 sm:px-2 py-0.5 rounded-full ring-1 ring-rose-100 whitespace-nowrap">
-                      {persona.role}
+                    <span className="text-[10px] sm:text-xs font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full ring-1 ring-rose-100 whitespace-nowrap">
+                      AI 상담사
                     </span>
                   </div>
-                  <p className="text-[10px] sm:text-[11px] md:text-xs text-gray-500 leading-tight sm:leading-relaxed line-clamp-2 sm:line-clamp-3">
+                  <p className="text-xs sm:text-sm text-gray-600 leading-snug sm:leading-relaxed line-clamp-3 sm:line-clamp-4 font-medium">
                     {persona.description}
                   </p>
                 </div>
@@ -266,10 +266,6 @@ export default function PsychologicalChatbot() {
         {messages.length === 0 ? (
           <div className="text-center py-10 sm:py-16">
             <WarmHeartIcon />
-            <p className="text-sm sm:text-lg text-gray-500 mt-8 max-w-md mx-auto leading-relaxed">
-              마음속 깊이 담아두었던 고민들, <br/>
-              리워크케어 상담사가 따뜻하게 들어드릴게요.
-            </p>
           </div>
         ) : (
           messages.map((msg, index) => (
@@ -351,6 +347,9 @@ export default function PsychologicalChatbot() {
             )}
           </Button>
         </div>
+        <p className="text-center text-xs text-gray-400 font-medium">
+          이 상담은 인공지능(AI)에 의해 진행됩니다. 전문적인 의학적 진단을 대신할 수 없습니다.
+        </p>
       </form>
     </div>
   );

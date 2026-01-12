@@ -89,15 +89,15 @@ export default function VideoCard({ video, showPersonalizationBadge = false, che
 
             {/* 영상 길이 */}
             {video.duration && (
-              <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold px-2 py-1 rounded-full">
+              <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md border border-white/10 text-white text-sm font-bold px-3 py-1 rounded-full">
                 {video.duration}
               </div>
             )}
 
             {/* 개인화 배지 */}
             {showPersonalizationBadge && (
-              <div className="absolute top-3 left-3 bg-indigo-600/90 backdrop-blur-md text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1.5 z-10 border border-white/20">
-                <Target className="w-3 h-3 text-indigo-200" /> <span>맞춤 추천</span>
+              <div className="absolute top-3 left-3 bg-indigo-600/90 backdrop-blur-md text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10 border border-white/20">
+                <Target className="w-3.5 h-3.5 text-indigo-200" /> <span>맞춤 추천</span>
               </div>
             )}
           </button>
@@ -109,20 +109,20 @@ export default function VideoCard({ video, showPersonalizationBadge = false, che
         {/* 배지 */}
         <div className="flex items-center gap-2 mb-3">
           {badgeStyle && (
-            <span className={`flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full border bg-opacity-50 backdrop-blur-sm ${badgeStyle.className}`}>
+            <span className={`flex items-center gap-1.5 text-sm font-black px-3 py-1 rounded-full border bg-opacity-50 backdrop-blur-sm ${badgeStyle.className}`}>
               {badgeStyle.icon} {badgeStyle.text}
             </span>
           )}
         </div>
 
         {/* 제목 */}
-        <h4 className="font-extrabold text-slate-900 text-lg leading-tight mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors tracking-tight">
+        <h4 className="font-black text-slate-900 text-2xl leading-tight mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors tracking-tight">
           {video.title}
         </h4>
 
         {/* 설명 */}
         {video.description && (
-          <p className="text-xs font-medium text-slate-500 mb-4 line-clamp-2 leading-relaxed">
+          <p className="text-sm font-medium text-slate-500 mb-4 line-clamp-2 leading-relaxed">
             {video.description}
           </p>
         )}
@@ -130,23 +130,19 @@ export default function VideoCard({ video, showPersonalizationBadge = false, che
         {/* Desktop Only Checklist - Fills the empty space */}
         {checklist && checklist.length > 0 && (
           <div className="hidden md:block mt-auto pt-4 border-t border-indigo-50/50">
-            <h5 className="text-xs font-black text-slate-800 mb-3 flex items-center gap-1.5 uppercase tracking-wider">
-               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-               이 단계 핵심 체크포인트
-            </h5>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {checklist.slice(0, 3).map((item) => (
-                <li key={item.id} className="text-xs bg-indigo-50/50 border border-indigo-100/50 p-3 rounded-2xl hover:bg-white hover:shadow-sm transition-all duration-200">
-                  <div className="flex items-start gap-2">
-                    <div className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-0.5 text-indigo-600">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                <li key={item.id} className="bg-indigo-50/50 border border-indigo-100/50 p-4 rounded-3xl hover:bg-white hover:shadow-sm transition-all duration-200">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-1 text-indigo-600">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
                     </div>
                     <div>
-                      <span className="font-bold text-slate-700 block text-xs tracking-tight">{item.title}</span>
+                      <span className="font-black text-slate-800 block text-lg tracking-tight leading-tight">{item.title}</span>
                       {item.description && (
-                         <span className="text-[10px] text-slate-400 font-medium leading-tight block mt-0.5">{item.description}</span>
+                         <span className="text-base text-slate-500 font-bold leading-snug block mt-1.5">{item.description}</span>
                       )}
                     </div>
                   </div>

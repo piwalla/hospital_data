@@ -96,8 +96,8 @@ export default function Home() {
              </p>
              
              <div className="pt-8">
-               <CTAButton href="/dashboard" variant="primary" className="text-xl px-12 py-6 shadow-2xl hover:shadow-white/20 hover:-translate-y-1 rounded-2xl">
-                 무료로 산재 정보 확인하기
+               <CTAButton href="/chatbot-v2" variant="primary" className="text-xl px-12 py-6 shadow-2xl hover:shadow-white/20 hover:-translate-y-1 rounded-2xl">
+                 산재 AI 무료로 사용하기
                </CTAButton>
              </div>
            </div>

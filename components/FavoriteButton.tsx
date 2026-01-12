@@ -30,7 +30,12 @@ export default function FavoriteButton({
   className,
   size = "md",
 }: FavoriteButtonProps) {
+  // MVP에서는 즐겨찾기 기능을 사용하지 않으므로 숨김 처리
+  return null;
+
+  /*
   const [isFavorite, setIsFavorite] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isToggling, setIsToggling] = useState(false);
 
@@ -149,6 +154,7 @@ export default function FavoriteButton({
       </SignedOut>
     </>
   );
+  */
 }
 
 

@@ -78,14 +78,14 @@ export default function ActionChecklist({ actions, initialCompletedIds }: Action
                     </div>
                     <div className="relative z-10 w-full">
                       <span className={cn(
-                        "font-bold text-base block transition-all duration-300 tracking-tight",
+                        "font-bold text-lg block transition-all duration-300 tracking-tight",
                         isChecked ? "text-slate-400 line-through decoration-2 decoration-slate-200" : "text-slate-800 group-hover:text-emerald-900"
                       )}>
                         {action.title}
                       </span>
                       {action.description && (
                         <span className={cn(
-                          "text-sm block mt-1.5 transition-all duration-300 font-medium leading-relaxed",
+                          "text-base block mt-1.5 transition-all duration-300 font-medium leading-relaxed",
                           isChecked ? "text-slate-300" : "text-slate-500 group-hover:text-slate-600"
                         )}>
                           {action.description}

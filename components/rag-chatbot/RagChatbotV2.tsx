@@ -8,14 +8,18 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 // Original imports
 import { useUser } from '@clerk/nextjs';
 import { Loader2, Send, Sparkles, Share2, CheckCircle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import RiuLoader from '@/components/ui/riu-loader';
+import AiReadingLoader from '@/components/ui/ai-reading-loader';
 import SmartBrainIcon from '@/components/chatbot/SmartBrainIcon';
+import { SignInButton } from '@clerk/nextjs';
+import { X } from 'lucide-react';
 
 
 interface ChatMessage {
@@ -24,7 +28,12 @@ interface ChatMessage {
   citations?: any[];
 }
 
-export default function RagChatbotV2() {
+interface RagChatbotV2Props {
+  mode?: 'full' | 'widget';
+  initialQuestion?: string;
+}
+
+export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChatbotV2Props) {
   const { user } = useUser();
   const recommendedQuestions = useMemo(
     () => [
@@ -34,13 +43,28 @@ export default function RagChatbotV2() {
     ],
     []
   );
-  const [question, setQuestion] = useState('');
+  const [question, setQuestion] = useState(initialQuestion || '');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const isWidget = mode === 'widget';
   const [error, setError] = useState<string | null>(null);
 
   const [isTimeout, setIsTimeout] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  
+  // Guest Limit Logic
+  const [guestCount, setGuestCount] = useState(0);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('guest_chat_count');
+        if (saved) setGuestCount(parseInt(saved));
+    }
+  }, []);
 
   const handleShare = async (text: string, index: number) => {
     try {
@@ -67,8 +91,14 @@ export default function RagChatbotV2() {
     }
 
     if (!user?.id) {
-      setError('로그인이 필요합니다.');
-      return;
+       if (guestCount >= 5) { // Limit reset to 5 for production
+           setShowLoginModal(true);
+           return;
+       }
+       // Increment Guest Count
+       const newCount = guestCount + 1;
+       setGuestCount(newCount);
+       localStorage.setItem('guest_chat_count', newCount.toString());
     }
 
     setError(null);
@@ -97,7 +127,7 @@ export default function RagChatbotV2() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: finalQuestion,
-          sessionId: user.id,
+          sessionId: user?.id || 'guest',
           // Send full history + current question (which is already added to local state but not yet to 'messages' var in this closure)
           // Wait, 'messages' state is stale here?
           // No, I called setMessages above, but 'messages' variable is from render.
@@ -136,12 +166,25 @@ export default function RagChatbotV2() {
     }
   };
 
-  // 마크다운 변환 함수 (기존과 동일)
+  // 마크다운 변환 함수 (기존과 동일 + 링크 버튼 스타일링 추가)
   const markdownToHtml = (text: string): string => {
     let html = text;
     // ... 기존 변환 로직 복사 ...
     // 마크다운 라이브러리를 쓰지 않고 정규식으로 처리하는 기존 방식 유지
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-primary">$1</strong>');
+    
+    // [링크명](/주소) 형태의 내부 링크를 버튼 스타일로 변환
+    html = html.replace(
+      /\[(.*?)\]\((.*?)\)/g, 
+      (match, label, url) => {
+        // 외부 링크는 기존대로 A 태그 (target blank)
+        if (url.startsWith('http')) {
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline inline-flex items-center gap-0.5">${label}<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg></a>`;
+        }
+        // 내부 링크는 버튼 스타일로 강조
+        return `<a href="${url}" class="inline-flex items-center gap-2 px-4 py-2 my-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl transition-all duration-200 font-semibold border border-blue-200 shadow-sm group decoration-0"><span class="bg-white p-1 rounded-full group-hover:scale-110 transition-transform"><svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></span>${label}<svg class="w-4 h-4 text-blue-400 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>`;
+      }
+    );
     
     const lines = html.split('\n');
     const processedLines: string[] = [];
@@ -162,7 +205,7 @@ export default function RagChatbotV2() {
         }
         const orderedMatch = line.match(/^(\d+)\. (.*)$/);
         if (orderedMatch) {
-            processedLines.push(`<li class="ml-4 mb-1 list-decimal">${orderedMatch[2]}</li>`);
+            processedLines.push(`<li class="ml-4 mb-1 list-disc">${orderedMatch[2]}</li>`);
             continue;
         }
         if (line.startsWith('- ') || line.startsWith('* ')) {
@@ -179,14 +222,14 @@ export default function RagChatbotV2() {
   };
 
   return (
-    <div className="bg-white/50 backdrop-blur-xl p-4 sm:p-8 md:p-10" role="region" aria-label="산재 상담 챗봇 V2">
+    <div className={`bg-white/50 backdrop-blur-xl ${isWidget ? 'p-4 h-full flex flex-col' : 'p-4 sm:p-8 md:p-10'}`} role="region" aria-label="산재 상담 챗봇 V2">
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-wrap gap-2 sm:gap-3">
           {recommendedQuestions.map((item) => (
             <button
               key={item}
               type="button"
-              className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[var(--border-light)] bg-gray-50 text-foreground hover:bg-primary/10 hover:border-primary transition-colors duration-200"
+              className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[var(--border-light)] bg-gray-50 text-foreground hover:bg-primary/10 hover:border-primary transition-colors duration-200 ${isWidget ? 'whitespace-nowrap' : ''}`}
               onClick={() => handleAsk(item)}
               disabled={loading}
             >
@@ -196,17 +239,17 @@ export default function RagChatbotV2() {
         </div>
       </div>
 
-      <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6 max-h-[400px] sm:max-h-[500px] md:max-h-[600px] overflow-y-auto pr-2">
+      <div className={`space-y-4 sm:space-y-6 mb-4 sm:mb-6 overflow-y-auto pr-2 ${isWidget ? 'flex-1 min-h-0' : 'max-h-[400px] sm:max-h-[500px] md:max-h-[600px]'}`}>
         {messages.length === 0 ? (
-          <div className="text-center py-16 sm:py-24 space-y-8">
+          <div className={`text-center space-y-8 ${isWidget ? 'py-10' : 'py-16 sm:py-24'}`}>
             <div className="flex justify-center">
-              <SmartBrainIcon className="w-32 h-32 sm:w-48 sm:h-48" />
+              <SmartBrainIcon className={`${isWidget ? 'w-20 h-20' : 'w-32 h-32 sm:w-48 sm:h-48'}`} />
             </div>
             <div className="space-y-3">
-              <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+              <h2 className={`${isWidget ? 'text-xl' : 'text-2xl sm:text-3xl'} font-black text-gray-900 tracking-tight`}>
                 똑똑한 산재 AI 비서
               </h2>
-              <p className="text-gray-500 font-medium max-w-md mx-auto leading-relaxed">
+              <p className={`text-gray-500 font-medium max-w-md mx-auto leading-relaxed ${isWidget ? 'text-xs' : ''}`}>
                 24시간 언제나 곁에서 대기하고 있습니다.<br />
                 궁금한 산재 정보를 지금 바로 물어보세요!
               </p>
@@ -310,11 +353,8 @@ export default function RagChatbotV2() {
 
         {loading && (
           <div className="text-left">
-            <div className="inline-block bg-gray-50 border border-[var(--border-light)] rounded-lg p-3 sm:p-4">
-              <RiuLoader
-                message="Gemini가 산재 규정을 분석하고 있어요..."
-                iconVariants={['question', 'smile', 'cheer']}
-              />
+            <div className="inline-block bg-white/50 border border-[var(--border-light)] rounded-[2rem] p-6 backdrop-blur-sm shadow-sm">
+              <AiReadingLoader />
             </div>
           </div>
         )}
@@ -332,26 +372,78 @@ export default function RagChatbotV2() {
         </div>
       )}
 
-      <form onSubmit={(e) => { e.preventDefault(); handleAsk(); }} className="relative pt-6">
+      <form onSubmit={(e) => { e.preventDefault(); handleAsk(); }} className={`relative ${isWidget ? 'pt-2' : 'pt-6'}`}>
         <div className="relative group">
           <Textarea
             placeholder="산재 관련 질문을 입력해주세요..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             disabled={loading}
-            className="w-full min-h-[100px] sm:min-h-[120px] bg-white border-gray-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 rounded-3xl p-6 pr-20 text-base font-medium resize-none shadow-sm transition-all"
+            className={`w-full bg-white border-gray-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 rounded-3xl p-6 pr-20 text-base font-medium resize-none shadow-sm transition-all ${isWidget ? 'min-h-[80px] pr-14' : 'min-h-[100px] sm:min-h-[120px]'}`}
             aria-label="질문 입력"
           />
           <Button
             type="submit"
             disabled={loading || question.trim().length < 2}
-            className="absolute right-4 bottom-4 h-12 w-12 rounded-2xl bg-[#14532d] hover:bg-[#114023] text-white shadow-lg transition-all active:scale-95"
+            className={`absolute right-4 bottom-4 rounded-2xl bg-[#14532d] hover:bg-[#114023] text-white shadow-lg transition-all active:scale-95 ${isWidget ? 'h-9 w-9 right-3 bottom-3' : 'h-12 w-12'}`}
             aria-label="질문 전송"
           >
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+            {loading ? <Loader2 className={`animate-spin ${isWidget ? 'w-4 h-4' : 'w-5 h-5'}`} /> : <Send className={`${isWidget ? 'w-4 h-4' : 'w-5 h-5'}`} />}
           </Button>
         </div>
+        {!isWidget && (
+            <p className="text-center text-xs text-gray-400 mt-3 font-medium">
+            AI 챗봇의 답변은 부정확할 수 있으며, 법적 효력이 없습니다.
+            </p>
+        )}
       </form>
+
+      {/* Login Requirement Modal */}
+      {/* Login Requirement Modal - Usage of Portal to escape parent stacking context */}
+      {showLoginModal && mounted && createPortal(
+        <>
+        <div className="fixed inset-0 z-[9990] bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" />
+        <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[9999] w-full max-w-sm p-4">
+            <div className="bg-white rounded-[2rem] p-8 w-full shadow-2xl scale-100 animate-in zoom-in-95 duration-200 relative">
+                <button 
+                    onClick={() => setShowLoginModal(false)}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                    <X className="w-6 h-6" />
+                </button>
+
+                <div className="text-center space-y-6">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                         <SmartBrainIcon className="w-10 h-10 text-green-700" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-black text-gray-900">무료 체험이 종료되었습니다</h3>
+                        <p className="text-gray-600 font-medium text-sm leading-relaxed">
+                            로그인하고 <strong>무제한 AI 상담</strong>과<br/>
+                            <strong>나에게 맞는 산재 정보</strong>를 확인해보세요!
+                        </p>
+                    </div>
+
+                    <div className="pt-2">
+                        <SignInButton mode="modal">
+                            <Button size="lg" className="w-full text-base font-bold bg-[#14532d] hover:bg-[#114023] h-12 rounded-xl text-white shadow-lg shadow-green-900/20">
+                                3초 만에 시작하기
+                            </Button>
+                        </SignInButton>
+                        <button 
+                            onClick={() => setShowLoginModal(false)}
+                            className="mt-4 text-xs text-gray-400 hover:text-gray-600 font-medium underline underline-offset-4"
+                        >
+                            나중에 할게요
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </>,
+        document.body
+      )}
     </div>
   );
 }

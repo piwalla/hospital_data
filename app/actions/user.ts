@@ -12,6 +12,8 @@ export interface OnboardingData {
     type: 'monthly' | 'daily';
     amount: number;
   };
+  agreedToTerms?: boolean;
+  agreedToSensitive?: boolean;
 }
 
 export async function updateUserOnboarding(data: OnboardingData) {
@@ -22,7 +24,7 @@ export async function updateUserOnboarding(data: OnboardingData) {
 
   const supabase = createClerkSupabaseClient();
   
-  const payload = {
+  const payload: any = {
     id: userId,
     role: data.role,
     injury_part: data.injuryPart,
@@ -31,6 +33,13 @@ export async function updateUserOnboarding(data: OnboardingData) {
     wage_info: data.wageInfo,
     updated_at: new Date().toISOString(),
   };
+
+  if (data.agreedToTerms) {
+    payload.agreed_to_terms_at = new Date().toISOString();
+  }
+  if (data.agreedToSensitive) {
+    payload.agreed_to_sensitive_at = new Date().toISOString();
+  }
 
   const { error } = await supabase
     .from('user_profiles')
@@ -138,12 +147,54 @@ export async function getUserProfile() {
   
     if (error || !data) return null;
 
+    // Also fetch basic user info (name) from 'users' table
+    const { data: userData } = await supabase
+      .from('users')
+      .select('name')
+      .eq('clerk_id', userId)
+      .single();
+
     return {
         id: data.id,
         role: data.role,
         injuryPart: data.injury_part,
         region: data.region,
         currentStep: data.current_step,
-        wageInfo: data.wage_info
+        wageInfo: data.wage_info,
+        name: userData?.name
     };
+}
+
+export async function deleteUserAccount() {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error('Unauthorized');
+  }
+
+  const supabase = createClerkSupabaseClient();
+  
+  // 1. Delete from users table (cascading might handle favorites/posts depending on FK settings)
+  // But let's be explicit and follow the chain.
+  const { error: userTableError } = await supabase
+    .from('users')
+    .delete()
+    .eq('clerk_id', userId);
+
+  if (userTableError) {
+    console.error('Failed to delete user from users table:', userTableError);
+    // Continue anyway as we want to make sure user_profiles is handled
+  }
+  
+  // 2. Delete from user_profiles
+  const { error: profileError } = await supabase
+    .from('user_profiles')
+    .delete()
+    .eq('id', userId);
+
+  if (profileError) {
+    console.error('Failed to delete user profile:', profileError);
+    throw new Error('Failed to delete profile data');
+  }
+  
+  return { success: true };
 }

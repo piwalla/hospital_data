@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { UserRole, InjuryPart, Region, AdminUser } from "@/lib/mock-admin-data";
-import { MapPin, UserCircle, Edit2 } from "lucide-react";
+import { MapPin, UserCircle, Edit2, ExternalLink } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface OnboardingModalProps {
   isOpen: boolean;
-  onComplete: (data: { role: UserRole; injuryPart: InjuryPart; region: Region; currentStep: number }) => void;
+  onComplete: (data: { role: UserRole; injuryPart: InjuryPart; region: Region; currentStep: number; agreedToTerms?: boolean; agreedToSensitive?: boolean }) => void;
   initialData?: Partial<AdminUser>;
   onClose?: () => void;
 }
@@ -30,10 +32,10 @@ const ROLES = [
 ];
 
 const STATUS_STEPS = [
-  { step: 1, label: '산재 신청 전 / 승인 대기', desc: '아직 산재 승인을 받지 못했어요' },
-  { step: 2, label: '요양 중 (치료 받는 중)', desc: '승인받고 치료 중이며, 휴업급여를 받고 있어요' },
-  { step: 3, label: '요양 종결 / 장해 심사', desc: '치료가 끝났거나, 장해 등급 심사를 준비해야 해요' },
-  { step: 4, label: '직업 복귀 / 재활 훈련', desc: '회사 복귀를 준비하거나 직업 훈련이 필요해요' },
+  { step: 1, label: '산재 신청 준비 단계', desc: '아직 산재 승인을 받지 못했어요' },
+  { step: 2, label: '산재 치료 받는 중', desc: '승인받고 치료 중이며, 휴업급여를 받고 있어요' },
+  { step: 3, label: '산재 치료 종결 단계', desc: '치료가 끝났거나, 장해 등급 심사를 준비해야 해요' },
+  { step: 4, label: '종결 후 직업 복귀 단계', desc: '회사 복귀를 준비하거나 직업 훈련이 필요해요' },
 ];
 
 const INJURY_PARTS = [
@@ -77,6 +79,10 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
   const [injuryPart, setInjuryPart] = useState<InjuryPart | undefined>(initialData?.injuryPart);
   const [region, setRegion] = useState<Region | undefined>(initialData?.region);
 
+  // Agreement states
+  const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
+  const [agreedToSensitive, setAgreedToSensitive] = useState<boolean>(false);
+
   // Sync state when Modal opens or data changes
   useEffect(() => {
     if (isOpen && initialData) {
@@ -96,7 +102,14 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
       setStep(prev => prev + 1);
     } else {
       if (role && statusStep !== undefined && injuryPart && region) {
-        onComplete({ role, injuryPart, region, currentStep: statusStep });
+        onComplete({ 
+          role, 
+          injuryPart, 
+          region, 
+          currentStep: statusStep,
+          agreedToTerms,
+          agreedToSensitive
+        });
         // Reset mode for next open if handled externally, but safer to keep state logic clean
       }
     }
@@ -108,7 +121,7 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
   };
 
   const isStepValid = () => {
-    if (step === 1) return !!role;
+    if (step === 1) return !!role && agreedToTerms && agreedToSensitive;
     if (step === 2) return statusStep !== undefined;
     if (step === 3) return !!injuryPart;
     if (step === 4) return !!region;
@@ -158,7 +171,17 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
     <Dialog open={isOpen} onOpenChange={(open) => {
        if (!open && onClose) onClose();
     }}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" showCloseButton={false}>
+        {/* Custom Close Button to avoid overlaps */}
+        <button 
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-[60]"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+          <span className="sr-only">Close</span>
+        </button>
         {/* === SUMMARY VIEW === */}
         {isSummaryMode ? (
            <>
@@ -201,7 +224,7 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
         /* === WIZARD VIEW === */
            <>
             <DialogHeader>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-2 pr-8">
                 {[1, 2, 3, 4].map((s) => (
                   <div 
                     key={s} 
@@ -242,6 +265,46 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
                     </Label>
                   </div>
                 </RadioGroup>
+              )}
+
+              {/* Legal Agreement (Step 1 Integration) */}
+              {step === 1 && (
+                <div className="mt-8 pt-6 border-t border-slate-100 space-y-4">
+                  <div className="flex items-start space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <Checkbox 
+                      id="terms-agree" 
+                      checked={agreedToTerms} 
+                      onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-1"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <label htmlFor="terms-agree" className="text-sm font-medium leading-none cursor-pointer">
+                        이용약관 및 개인정보 수집 이용 동의 (필수)
+                      </label>
+                      <Link href="/terms" target="_blank" className="text-xs text-blue-600 hover:underline flex items-center gap-0.5">
+                        약관 보기 <ExternalLink className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-3 bg-rose-50/50 p-3 rounded-lg border border-rose-100">
+                    <Checkbox 
+                      id="sensitive-agree" 
+                      checked={agreedToSensitive} 
+                      onChange={(e) => setAgreedToSensitive(e.target.checked)}
+                      className="mt-1"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <label htmlFor="sensitive-agree" className="text-sm font-medium leading-none cursor-pointer text-rose-900">
+                        [민감정보] 건강 관련 정보 수집 및 이용 동의 (필수)
+                      </label>
+                      <Link href="/privacy" target="_blank" className="text-xs text-rose-600 hover:underline flex items-center gap-0.5">
+                        내용 보기 <ExternalLink className="w-3 h-3" />
+                      </Link>
+                      <p className="text-[10px] text-rose-400 mt-1">부상 부위 및 진행 단계 정보를 통한 서비스 제공을 위함</p>
+                    </div>
+                  </div>
+                </div>
               )}
     
               {/* Step 2: Status */}

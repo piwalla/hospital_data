@@ -11,15 +11,15 @@ import {
   Cell,
 } from "recharts";
 
-const data = [
-  { name: "병원 찾기", value: 850, fill: "#3b82f6" },
-  { name: "요양급여신청", value: 620, fill: "#10b981" },
-  { name: "휴업급여신청", value: 480, fill: "#f59e0b" },
-  { name: "심리상담", value: 340, fill: "#8b5cf6" },
-  { name: "1:1 채팅", value: 290, fill: "#ec4899" },
-];
+// ... imports
 
-export function FeatureUsageChart() {
+interface FeatureData {
+  name: string;
+  value: number;
+  fill: string;
+}
+
+export function FeatureUsageChart({ data }: { data: FeatureData[] }) {
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">

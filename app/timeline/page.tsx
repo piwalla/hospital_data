@@ -1,7 +1,7 @@
 import { getAllStagesWithDetails } from '@/lib/api/timeline';
 import LegalNotice from '@/components/timeline/LegalNotice';
 import TimelineContainer from '@/components/timeline/TimelineContainer';
-import FirstVisitBanner from '@/components/timeline/FirstVisitBanner';
+
 import VideoGuideButton from '@/components/timeline/VideoGuideButton';
 import TimelineHero from '@/components/timeline/TimelineHero';
 
@@ -51,15 +51,15 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
         - High contrast background for card visibility
         - Full-width bleed to match Hero
       */}
-      <div className="relative w-screen left-[calc(-50vw+50%)] bg-[#eff2f5] py-16 -mt-12 sm:-mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-16">
+      <div className="relative w-screen left-[calc(-50vw+50%)] bg-[#eff2f5] py-8 md:py-16 -mt-12 sm:-mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8 md:space-y-16">
           
           {/* 비디오 가이드 버튼 & 첫 방문 안내 */}
           <div className="space-y-6">
             <div className="flex justify-end">
               <VideoGuideButton>전체 과정 영상 보기</VideoGuideButton>
             </div>
-            <FirstVisitBanner />
+
           </div>
 
           {/* 타임라인 컨테이너 */}

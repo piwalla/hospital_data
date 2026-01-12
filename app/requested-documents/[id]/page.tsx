@@ -79,9 +79,14 @@ export default async function RequestedDocumentDetailPage({ params }: RequestedD
           <h2 id="how-to-request" className="text-base sm:text-lg font-semibold text-foreground">
             어떻게 요청하나요?
           </h2>
-          <p className="text-sm sm:text-base text-foreground leading-relaxed">
-            {document.guide}
-          </p>
+          <div
+            className="text-sm sm:text-base text-foreground leading-relaxed prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{
+              __html: document.guide
+                .replace(/\n/g, '<br />')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'),
+            }}
+          />
         </section>
 
         {/* 안내 문구 */}

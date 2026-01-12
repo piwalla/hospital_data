@@ -17,10 +17,10 @@ export default function VocationalTrainingCard() {
                     <GraduationCap className="w-6 h-6 text-orange-500" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl font-bold text-slate-800 tracking-tight">
+                  <CardTitle className="text-2xl font-bold text-slate-800 tracking-tight">
                       새로운 시작, 직업 재활
                   </CardTitle>
-                  <CardDescription className="text-xs font-bold text-slate-400">
+                  <CardDescription className="text-sm font-bold text-slate-400">
                       훈련 수당과 복귀 지원금을 확인하세요
                   </CardDescription>
                 </div>
@@ -33,21 +33,21 @@ export default function VocationalTrainingCard() {
       <CardContent className="px-6 sm:px-8 pb-8 pt-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <div className="bg-gradient-to-br from-orange-50/50 to-white/50 p-5 rounded-[2rem] border border-white/60 shadow-sm space-y-2">
-                <div className="flex items-center gap-2 text-orange-500 font-black text-[10px] uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-orange-500 font-black text-xs uppercase tracking-widest">
                     <Coins className="w-3.5 h-3.5" /> 훈련 수당
                 </div>
-                <div className="flex items-baseline gap-1">
+                <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-black text-slate-900 tracking-tighter">최대 120</span>
-                    <span className="text-base font-bold text-slate-400">만원/월</span>
+                    <span className="text-lg font-bold text-slate-400">만원/월</span>
                 </div>
             </div>
             <div className="bg-gradient-to-br from-indigo-50/50 to-white/50 p-5 rounded-[2rem] border border-white/60 shadow-sm space-y-2">
-                 <div className="flex items-center gap-2 text-indigo-500 font-black text-[10px] uppercase tracking-widest">
+                 <div className="flex items-center gap-2 text-indigo-500 font-black text-xs uppercase tracking-widest">
                     <Briefcase className="w-3.5 h-3.5" /> 복귀 지원금
                 </div>
-                <div className="flex items-baseline gap-1">
+                <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-black text-slate-900 tracking-tighter">최대 80</span>
-                    <span className="text-base font-bold text-slate-400">만원/월</span>
+                    <span className="text-lg font-bold text-slate-400">만원/월</span>
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@ export default function VocationalTrainingCard() {
                 <GraduationCap className="w-5 h-5 text-orange-400" /> 내게 맞는 훈련 과정 찾기 <ArrowRight className="w-4 h-4" />
              </Button>
              <div className="text-center">
-                <span className="text-[11px] font-bold text-slate-400 underline underline-offset-4 cursor-pointer hover:text-orange-500 transition-colors">
+                <span className="text-sm font-bold text-slate-400 underline underline-offset-4 cursor-pointer hover:text-orange-500 transition-colors">
                     직장 복귀 지원금 제도 안내문 보기
                 </span>
              </div>

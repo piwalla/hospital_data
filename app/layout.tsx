@@ -4,10 +4,11 @@ import { koKR } from "@clerk/localizations";
 
 import Navbar from "@/components/Navbar";
 import ResponsiveNavigation from "@/components/ResponsiveNavigation";
-import SwipeNavigation from "@/components/SwipeNavigation";
+
 
 import Footer from "@/components/Footer";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
+import FloatingChatbotButton from "@/components/chatbot/FloatingChatbotButton";
 import "./globals.css";
 
 const description = "AI기반 산재 도우미 리워크케어에서 도와드립니다.";
@@ -70,12 +71,13 @@ export default function RootLayout({
           suppressHydrationWarning={true}
         >
           <SyncUserProvider>
-            <SwipeNavigation />
+
             <div className="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
               <Navbar />
               <ResponsiveNavigation />
               <main className="flex-1 w-full max-w-full overflow-x-hidden min-w-0 pb-16 md:pb-0">{children}</main>
               <Footer />
+              <FloatingChatbotButton />
             </div>
           </SyncUserProvider>
         </body>

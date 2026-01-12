@@ -44,12 +44,17 @@ function CompensationReportContent() {
   
   // State for fetched data (fallback if URL param missing)
   const [fetchedWage, setFetchedWage] = useState<number | null>(null);
+  const [userName, setUserName] = useState<string>('회원'); // State for user name
   const [isLoading, setIsLoading] = useState(true);
 
   // Modal States
   const [activeModal, setActiveModal] = useState<'TREATMENT' | 'NURSING_TX' | 'TRANSPORT' | 'SICK_LEAVE' | 'LOAN' | 'DISABILITY' | 'NURSING' | 'REHAB' | 'DEATH' | null>(null);
   const [disabilityTab, setDisabilityTab] = useState<'CRITERIA' | 'PROCEDURE'>('CRITERIA');
   const [transportTab, setTransportTab] = useState<'BASIC' | 'TIPS' | 'SUBMIT'>('BASIC'); // New State for Transport Modal
+  const [treatmentTab, setTreatmentTab] = useState<'BASIC' | 'ITEMS' | 'CLAIM'>('BASIC'); // New State for Treatment Modal
+  const [nursingTab, setNursingTab] = useState<'CRITERIA' | 'AMOUNT' | 'CLAIM'>('CRITERIA'); // New State for Nursing Modal
+
+  const [rehabTab, setRehabTab] = useState<'COST' | 'ALLOWANCE' | 'SPORTS' | 'GRANT'>('COST'); // New State for Rehab Modal
 
   // Fetch user profile if wage param is missing
   React.useEffect(() => {
@@ -59,6 +64,9 @@ function CompensationReportContent() {
           const profile = await getUserProfile();
           if (profile?.wageInfo?.amount) {
             setFetchedWage(profile.wageInfo.amount);
+          }
+          if (profile?.name) {
+              setUserName(profile.name);
           }
         } catch (error) {
           console.error("Failed to fetch user profile", error);
@@ -75,10 +83,36 @@ function CompensationReportContent() {
   // Effect to handle deep linking to modals via URL
   React.useEffect(() => {
     const modalParam = searchParams.get('modal');
+    const tabParam = searchParams.get('tab');
+
     if (modalParam) {
         const validKeys = ['TREATMENT', 'NURSING_TX', 'TRANSPORT', 'SICK_LEAVE', 'LOAN', 'DISABILITY', 'NURSING', 'REHAB', 'DEATH'];
         if (validKeys.includes(modalParam)) {
             setActiveModal(modalParam as any);
+
+            // Handle Tab Selection
+            if (tabParam) {
+                switch(modalParam) {
+                    case 'REHAB':
+                        if (['COST', 'ALLOWANCE', 'SPORTS', 'GRANT'].includes(tabParam)) {
+                            setRehabTab(tabParam as any);
+                        }
+                        break;
+                    case 'TRANSPORT':
+                        if (['BASIC', 'TIPS', 'SUBMIT'].includes(tabParam)) {
+                            setTransportTab(tabParam as any);
+                        }
+                        break;
+                    case 'TREATMENT':
+                        if (['BASIC', 'ITEMS', 'CLAIM'].includes(tabParam)) {
+                           setTreatmentTab(tabParam as any);
+                        }
+                        break;
+                    case 'NURSING': // For Nursing Benefit (Post-treatment) if it had tabs
+                        // Add logic here if nursing modal gets tabs later
+                        break;
+                }
+            }
         }
     }
   }, [searchParams]);
@@ -126,7 +160,7 @@ function CompensationReportContent() {
           <div>
             <span className="text-xs font-bold text-emerald-600 tracking-wider uppercase mb-1 block">Compensation Report</span>
             <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-              산재 보상금 리포트
+              {(userName !== '회원' && userName.length >= 2 && /^[가-힣]+$/.test(userName)) ? userName.slice(1) : userName}님이 받을 수 있는 모든 산재 보상 내역이에요
             </h1>
           </div>
           <div className="text-right hidden md:block">
@@ -152,15 +186,15 @@ function CompensationReportContent() {
             <span className="bg-emerald-100 text-emerald-700 p-2 rounded-xl">
               <Stethoscope className="w-5 h-5" />
             </span>
-            <h2 className="text-xl font-black text-slate-900 tracking-tight">1. 치료와 생활 지원</h2>
-            <Badge variant="outline" className="ml-auto text-xs text-slate-500 font-normal border-slate-200">치료 기간 중</Badge>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">1. 요양 기간 (치료 및 생활 안정)</h2>
+            <Badge variant="outline" className="ml-auto text-xs text-slate-500 font-normal border-slate-200">요양 중</Badge>
           </div>
 
           {/* Grid Layout: Row 1 (3 items), Row 2 (2 items) */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
              
              {/* 1-1. 치료비 (Medical + Drug + Assistive) */}
-             <Card className="rounded-2xl border-slate-100 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 hover:border-emerald-200 transition-all duration-300 cursor-pointer group bg-white"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-900/5 hover:border-emerald-500/30 cursor-pointer group bg-white"
                    onClick={() => setActiveModal('TREATMENT')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
@@ -180,7 +214,7 @@ function CompensationReportContent() {
              </Card>
 
              {/* 1-2. 간병료 */}
-             <Card className="rounded-2xl border-slate-100 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 hover:border-emerald-200 transition-all duration-300 cursor-pointer group bg-white"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-900/5 hover:border-emerald-500/30 cursor-pointer group bg-white"
                    onClick={() => setActiveModal('NURSING_TX')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
@@ -200,7 +234,7 @@ function CompensationReportContent() {
              </Card>
 
              {/* 1-3. 이송비 */}
-             <Card className="rounded-2xl border-slate-100 shadow-[0_2px_10px_-2px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 hover:border-emerald-200 transition-all duration-300 cursor-pointer group bg-emerald-50/30"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-900/5 hover:border-emerald-500/30 cursor-pointer group bg-white"
                    onClick={() => setActiveModal('TRANSPORT')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
@@ -220,13 +254,8 @@ function CompensationReportContent() {
              </Card>
 
              {/* 1-4. 휴업급여 */}
-             <Card className="rounded-2xl border-emerald-100 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-sm relative overflow-hidden group cursor-pointer hover:shadow-lg transition-all lg:col-span-2 hover:-translate-y-1"
+             <Card className="rounded-[2rem] border-emerald-200/60 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.1)] relative overflow-hidden group cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-emerald-900/10 hover:border-emerald-500/40 lg:col-span-2"
                    onClick={() => setActiveModal('SICK_LEAVE')}>
-                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="bg-white text-emerald-600 rounded-full p-2 shadow-sm">
-                        <ChevronRight className="w-5 h-5" />
-                    </div>
-                </div>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-emerald-900 flex justify-between items-center">
                         휴업급여 (월급 대체)
@@ -251,7 +280,7 @@ function CompensationReportContent() {
              </Card>
 
              {/* 1-5. 융자 Card */}
-             <Card className="border-slate-200 shadow-sm hover:border-amber-300 transition-colors cursor-pointer group"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-900/5 hover:border-emerald-500/30 cursor-pointer group bg-white"
                    onClick={() => setActiveModal('LOAN')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
@@ -280,13 +309,13 @@ function CompensationReportContent() {
              <span className="bg-purple-100 text-purple-700 p-1.5 rounded-lg">
               <Activity className="w-5 h-5" />
             </span>
-            <h2 className="text-xl font-bold text-slate-900">2. 치료 후 후유증 보상</h2>
-            <Badge variant="outline" className="ml-auto text-xs text-slate-500 font-normal">치료 종결 후</Badge>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">2. 치료 종결 (장해 심사 및 보상)</h2>
+            <Badge variant="outline" className="ml-auto text-xs text-slate-500 font-normal">종결 후</Badge>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
             {/* 2-1. 장해급여 */}
-            <Card className="md:col-span-2 border-purple-200 bg-white shadow-sm cursor-pointer hover:shadow-md transition-all group"
+            <Card className="md:col-span-2 rounded-[2rem] border-slate-200/60 bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-purple-900/5 hover:border-purple-300 group"
                     onClick={() => setActiveModal('DISABILITY')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-bold text-slate-900 flex justify-between items-center">
@@ -314,7 +343,7 @@ function CompensationReportContent() {
             </Card>
 
             {/* 2-2. 간병급여 */}
-            <Card className="border-slate-200 hover:border-pink-300 transition-colors cursor-pointer group"
+            <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-pink-900/5 hover:border-pink-300 cursor-pointer group bg-white"
                   onClick={() => setActiveModal('NURSING')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
@@ -343,12 +372,12 @@ function CompensationReportContent() {
              <span className="bg-green-100 text-green-700 p-1.5 rounded-lg">
               <Briefcase className="w-5 h-5" />
             </span>
-            <h2 className="text-xl font-bold text-slate-900">3. 사회 복귀 및 기타</h2>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">3. 직업 복귀 (재활 및 훈련)</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
              {/* 3-1. 재활지원 */}
-             <Card className="border-slate-200 cursor-pointer hover:border-green-300 transition-colors group"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-green-900/5 hover:border-green-300 group bg-white"
                    onClick={() => setActiveModal('REHAB')}>
                  <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
@@ -371,7 +400,7 @@ function CompensationReportContent() {
              </Card>
 
              {/* 3-2. 유족보상 */}
-             <Card className="border-slate-200 cursor-pointer hover:border-gray-400 transition-colors group"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-slate-900/5 hover:border-slate-400 group bg-white"
                     onClick={() => setActiveModal('DEATH')}>
                  <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
@@ -410,135 +439,218 @@ function CompensationReportContent() {
         title="치료비 및 보조기구 상세"
         description="가장 기본적인 치료 비용과 재활에 필요한 기구 구입 비용을 지원합니다."
       >
-        <ModalSection title="진료비 및 수술비 (요양급여)">
-            <p className="mb-2">공단이 병원에 직접 지급하므로 <strong>본인 부담이 없는 것이 원칙</strong>입니다.</p>
-            <div className="bg-slate-50 p-3 rounded border border-slate-100 text-sm">
-                <span className="font-bold text-red-600 block mb-1">⚠️ 지원되지 않는 비급여 항목 (본인 부담)</span>
-                <ul className="list-disc pl-4 space-y-1 text-slate-600">
-                    <li>상급병실료 (단, 일반실이 없어 부득이한 경우 등 예외 있음)</li>
-                    <li>선택진료비 (특진비)</li>
-                    <li>업무와 무관한 질병 치료비</li>
-                    <li>성형/미용 목적의 시술 등</li>
-                </ul>
-            </div>
-        </ModalSection>
+        {/* Tab Navigation */}
+        <div className="flex w-full bg-slate-100 p-1 rounded-xl mb-6">
+             <button 
+                onClick={() => setTreatmentTab('BASIC')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    treatmentTab === 'BASIC' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                기본 안내
+             </button>
+             <button 
+                onClick={() => setTreatmentTab('ITEMS')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    treatmentTab === 'ITEMS' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                보조기구
+             </button>
+             <button 
+                onClick={() => setTreatmentTab('CLAIM')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    treatmentTab === 'CLAIM' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                청구 방법
+             </button>
+        </div>
 
-         <ModalSection title="재활 보조기구 (내구연한 및 한도)">
-            <p className="mb-2 text-sm text-slate-600">치료 및 재활에 필요한 보조기구를 구입 시 기준 금액 내에서 실비 지원합니다.</p>
-            <div className="overflow-hidden border border-slate-200 rounded-lg">
-                <table className="w-full text-sm text-center">
-                    <thead className="bg-slate-100 text-slate-700 font-medium">
-                        <tr>
-                            <th className="p-2 border-r border-slate-200">품목</th>
-                            <th className="p-2 border-r border-slate-200">내구연한</th>
-                            <th className="p-2">비고 (기준)</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        <tr>
-                            <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">휠체어</td>
-                            <td className="p-2 border-r border-slate-100">5년</td>
-                            <td className="p-2 text-xs">약 48만원 한도</td>
-                        </tr>
-                         <tr>
-                            <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">보청기</td>
-                            <td className="p-2 border-r border-slate-100">5년</td>
-                            <td className="p-2 text-xs">편측 131만원 (양측 가능)</td>
-                        </tr>
-                        <tr>
-                            <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">의수/의족</td>
-                            <td className="p-2 border-r border-slate-100">-</td>
-                            <td className="p-2 text-xs">장해 등급별 &apos;일반형&apos; 기준</td>
-                        </tr>
-                    </tbody>
-                </table>
+        {/* Tab 1: Basic Info */}
+        {treatmentTab === 'BASIC' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="진료비 및 수술비 (요양급여)">
+                    <p className="mb-2">공단이 병원에 직접 지급하므로 <strong>본인 부담이 없는 것이 원칙</strong>입니다.</p>
+                    <div className="bg-slate-50 p-3 rounded border border-slate-100 text-sm">
+                        <span className="font-bold text-red-600 block mb-1">⚠️ 지원되지 않는 비급여 항목 (본인 부담)</span>
+                        <ul className="list-disc pl-4 space-y-1 text-slate-600">
+                            <li>상급병실료 (단, 일반실이 없어 부득이한 경우 등 예외 있음)</li>
+                            <li>선택진료비 (특진비)</li>
+                            <li>업무와 무관한 질병 치료비</li>
+                            <li>성형/미용 목적의 시술 등</li>
+                        </ul>
+                    </div>
+                </ModalSection>
             </div>
-             <p className="text-xs text-slate-500 mt-2 text-right">* 구체적인 금액은 공단 고시에 따름</p>
-        </ModalSection>
+        )}
 
-        <ModalSection title="📋 보조기구 청구 방법 (필수 서류)">
-            <ul className="list-decimal pl-4 space-y-1 text-sm text-slate-700 bg-slate-50 p-3 rounded border border-slate-200">
-                <li><strong>보조기구 처방전</strong> (담당 의사 발급)</li>
-                <li><strong>구입 영수증</strong> (세금계산서 등 증빙)</li>
-                <li><strong>보조기구 검수 확인서</strong> (구입 후 의사 확인)</li>
-            </ul>
-        </ModalSection>
+        {/* Tab 2: Assistive Devices */}
+        {treatmentTab === 'ITEMS' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                 <ModalSection title="재활 보조기구 (내구연한 및 한도)">
+                    <p className="mb-2 text-sm text-slate-600">치료 및 재활에 필요한 보조기구를 구입 시 기준 금액 내에서 실비 지원합니다.</p>
+                    <div className="overflow-hidden border border-slate-200 rounded-lg">
+                        <table className="w-full text-sm text-center">
+                            <thead className="bg-slate-100 text-slate-700 font-medium">
+                                <tr>
+                                    <th className="p-2 border-r border-slate-200">품목</th>
+                                    <th className="p-2 border-r border-slate-200">내구연한</th>
+                                    <th className="p-2">비고 (기준)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                <tr>
+                                    <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">휠체어</td>
+                                    <td className="p-2 border-r border-slate-100">5년</td>
+                                    <td className="p-2 text-xs">약 48만원 한도</td>
+                                </tr>
+                                 <tr>
+                                    <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">보청기</td>
+                                    <td className="p-2 border-r border-slate-100">5년</td>
+                                    <td className="p-2 text-xs">편측 131만원 (양측 가능)</td>
+                                </tr>
+                                <tr>
+                                    <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">의수/의족</td>
+                                    <td className="p-2 border-r border-slate-100">-</td>
+                                    <td className="p-2 text-xs">장해 등급별 &apos;일반형&apos; 기준</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     <p className="text-xs text-slate-500 mt-2 text-right">* 구체적인 금액은 공단 고시에 따름</p>
+                </ModalSection>
+            </div>
+        )}
+
+        {/* Tab 3: Claim Method */}
+        {treatmentTab === 'CLAIM' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="📋 보조기구 청구 방법 (필수 서류)">
+                    <ul className="list-decimal pl-4 space-y-1 text-sm text-slate-700 bg-slate-50 p-3 rounded border border-slate-200">
+                        <li><strong>보조기구 처방전</strong> (담당 의사 발급)</li>
+                        <li><strong>구입 영수증</strong> (세금계산서 등 증빙)</li>
+                        <li><strong>보조기구 검수 확인서</strong> (구입 후 의사 확인)</li>
+                    </ul>
+                </ModalSection>
+            </div>
+        )}
       </BenefitDetailModal>
 
       {/* A-2. Nursing (Treatment) Modal (New) */}
-       <BenefitDetailModal
+      <BenefitDetailModal
         isOpen={activeModal === 'NURSING_TX'}
         onClose={() => setActiveModal(null)}
         title="간병료 상세 (치료 중)"
         description="요양 기간 중 거동이 불편하여 타인의 도움이 필요한 경우 지원합니다."
       >
-        <ModalSection title="지원 기준 (간병 필요 등급)">
-             <div className="space-y-3">
-                <div className="bg-slate-50 p-3 rounded border border-slate-100">
-                    <span className="font-bold text-slate-800 block mb-1">1등급 (상시 간병)</span>
-                    <p className="text-xs text-slate-600">두 손/두 눈 상실, 뇌 손상, 35% 이상 화상 등 일상생활 전반을 스스로 할 수 없는 상태</p>
-                </div>
-                <div className="bg-slate-50 p-3 rounded border border-slate-100">
-                    <span className="font-bold text-slate-800 block mb-1">2등급 (수시 간병)</span>
-                    <p className="text-xs text-slate-600">신경/정신/흉복부 장해 등으로 일상생활 대부분에 수시로 도움이 필요한 상태</p>
-                </div>
-                <div className="bg-slate-50 p-3 rounded border border-slate-100">
-                    <span className="font-bold text-slate-800 block mb-1">3등급 (부분 간병)</span>
-                    <p className="text-xs text-slate-600">골반 골절 등 수술 직후 거동이 제한되어 부분적 도움이 필요한 상태</p>
-                </div>
+        {/* Tab Navigation */}
+        <div className="flex w-full bg-slate-100 p-1 rounded-xl mb-6">
+             <button 
+                onClick={() => setNursingTab('CRITERIA')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    nursingTab === 'CRITERIA' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                지원 기준
+             </button>
+             <button 
+                onClick={() => setNursingTab('AMOUNT')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    nursingTab === 'AMOUNT' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                지원 금액
+             </button>
+             <button 
+                onClick={() => setNursingTab('CLAIM')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    nursingTab === 'CLAIM' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                청구 방법
+             </button>
+        </div>
+
+        {/* Tab 1: Criteria */}
+        {nursingTab === 'CRITERIA' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="지원 기준 (간병 필요 등급)">
+                    <p className="mb-2 text-sm text-slate-600">주치의의 소견에 따라 <strong>상시 간병</strong>과 <strong>수시 간병</strong>으로 나뉩니다.</p>
+                    <ul className="list-disc pl-4 space-y-2 text-sm text-slate-700">
+                        <li>
+                            <span className="font-bold text-slate-900">상시 간병 (1등급)</span>: 
+                            식사, 배변, 옷 입기 등 일상생활 동작(ADL)을 혼자서 전혀 할 수 없는 상태
+                        </li>
+                        <li>
+                            <span className="font-bold text-slate-900">수시 간병 (2등급)</span>: 
+                            일정 시간 도움이 필요한 상태 (하루 중 일부 시간만 도움이 필요함)
+                        </li>
+                    </ul>
+                    <div className="mt-3 bg-yellow-50 p-3 rounded border border-yellow-100 text-xs text-yellow-800">
+                        * 가족이 간병하는 경우에도 간병료를 받을 수 있습니다. (전문 간병인 비용과 동일하게 지급)
+                    </div>
+                </ModalSection>
+            </div>
+        )}
+
+        {/* Tab 2: Amount Table */}
+        {nursingTab === 'AMOUNT' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="지원 금액표 (2024년 1일 기준)">
+                     <div className="overflow-hidden border border-slate-200 rounded-lg">
+                        <table className="w-full text-sm text-center">
+                            <thead className="bg-slate-100 text-slate-700 font-medium">
+                                <tr>
+                                    <th className="p-2 border-r border-slate-200">구분</th>
+                                    <th className="p-2 border-r border-slate-200">전문 간병인</th>
+                                    <th className="p-2">가족 간병</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                <tr>
+                                    <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">상시 (1등급)</td>
+                                    <td className="p-2 border-r border-slate-100">약 7만 6천원</td>
+                                    <td className="p-2 text-slate-600">동일</td>
+                                </tr>
+                                 <tr>
+                                    <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">수시 (2등급)</td>
+                                    <td className="p-2 border-r border-slate-100">약 5만 1천원</td>
+                                    <td className="p-2 text-slate-600">동일</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2 text-right">* 매년 고용노동부 고시에 따라 금액 변동 가능</p>
+                </ModalSection>
+            </div>
+        )}
+
+        {/* Tab 3: Claim Method */}
+        {nursingTab === 'CLAIM' && (
+             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="📋 간병료 청구 방법 (필수 서류)">
+                    <ul className="list-decimal pl-4 space-y-1 text-sm text-slate-700 bg-slate-50 p-3 rounded border border-slate-200">
+                        <li><strong>간병료 청구서</strong> (공단 양식)</li>
+                        <li><strong>간병 소견서</strong> (주치의 작성 - 간병 필요성 입증)</li>
+                        <li><strong>간병비 영수증</strong> (전문 간병인 고용 시)</li>
+                        <li>(가족 간병 시) <strong>가족관계증명서</strong> 및 통장사본</li>
+                    </ul>
+                </ModalSection>
              </div>
-        </ModalSection>
-        <ModalSection title="지원 금액표 (2024년 1일 기준)">
-            <div className="overflow-hidden border border-slate-200 rounded-lg">
-                <table className="w-full text-sm text-center">
-                    <thead className="bg-slate-100 text-slate-700 font-medium">
-                        <tr>
-                            <th className="p-2 border-r border-slate-200">등급</th>
-                            <th className="p-2 border-r border-slate-200">전문 간병인</th>
-                            <th className="p-2">가족/기타</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        <tr>
-                            <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">1등급</td>
-                            <td className="p-2 border-r border-slate-100">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_TREATMENT.PROFESSIONAL.GRADE_1)}</td>
-                            <td className="p-2">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_TREATMENT.FAMILY.GRADE_1)}</td>
-                        </tr>
-                        <tr>
-                            <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">2등급</td>
-                            <td className="p-2 border-r border-slate-100">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_TREATMENT.PROFESSIONAL.GRADE_2)}</td>
-                            <td className="p-2">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_TREATMENT.FAMILY.GRADE_2)}</td>
-                        </tr>
-                        <tr>
-                            <td className="p-2 bg-slate-50 font-medium border-r border-slate-100">3등급</td>
-                            <td className="p-2 border-r border-slate-100">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_TREATMENT.PROFESSIONAL.GRADE_3)}</td>
-                            <td className="p-2">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_TREATMENT.FAMILY.GRADE_3)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </ModalSection>
-         <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded mt-2">
-             * 주치의의 소견(간병 필요성 인정)이 필수입니다. <br/>
-             * 실제 간병을 받은 날짜만큼 지급됩니다.
-         </p>
-
-        <ModalSection title="📋 간병료 청구 방법 (필수 서류)">
-            <div className="bg-slate-50 p-3 rounded border border-slate-200 text-sm">
-                <p className="font-bold text-slate-800 mb-2">기본 서류</p>
-                <ul className="list-disc pl-4 space-y-1 text-slate-700 mb-3">
-                    <li><strong>요양비 청구서</strong> (공단 양식)</li>
-                    <li><strong>의사 소견서</strong> (간병 필요 등급 및 기간 명시 필수)</li>
-                    <li><strong>간병료 영수증</strong> (간병인 서명 또는 계좌이체 내역)</li>
-                </ul>
-
-                <p className="font-bold text-slate-800 mb-2 mt-4 pt-3 border-t border-slate-200">추가 서류 (유형별)</p>
-                <ul className="list-disc pl-4 space-y-1 text-slate-700">
-                    <li><strong>전문 간병인:</strong> 간병인 자격증 또는 전문교육 이수증 사본</li>
-                    <li><strong>가족 간병인:</strong> 가족관계증명서 (수급권자와의 관계 증빙)</li>
-                </ul>
-            </div>
-        </ModalSection>
+        )}
       </BenefitDetailModal>
 
       {/* A-3. Transport Modal (Enhanced) */}
@@ -852,9 +964,9 @@ function CompensationReportContent() {
                     <p className="font-bold text-slate-800 mb-1">💡 계산 방법</p>
                     <p>평균임금({formatCurrency(averageWage)}) x <strong>등급별 지급일수</strong></p>
                 </div>
-                <div className="overflow-x-auto rounded-lg border border-slate-200">
-                    <table className="w-full text-sm">
-                        <thead className="bg-slate-100 text-slate-700">
+                <div className="max-h-[55vh] overflow-y-auto overflow-x-auto rounded-lg border border-slate-200 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
+                    <table className="w-full text-sm relative">
+                        <thead className="bg-slate-100 text-slate-700 sticky top-0 z-10 shadow-sm">
                             <tr>
                                 <th className="p-3 text-left whitespace-nowrap">등급</th>
                                 <th className="p-3 text-right whitespace-nowrap">연금 (1년분)</th>
@@ -943,20 +1055,183 @@ function CompensationReportContent() {
         title="직업재활 및 스포츠 지원 상세"
         description="사회 복귀를 돕기 위한 다양한 훈련 비용과 수당을 지원합니다."
       >
-         <ModalSection title="직업훈련비용">
-            <p className="mt-1 text-green-700 font-bold">1인당 최대 600만원 한도</p>
-         </ModalSection>
-         <ModalSection title="직업훈련수당">
-             <div className="mt-2 bg-slate-50 p-3 rounded">
-                <p>1일 지급액 = <strong>최저임금 x 훈련시간</strong> (1일 8시간 한도)</p>
+        {/* Tab Navigation */}
+        <div className="flex w-full bg-slate-100 p-1 rounded-xl mb-6">
+             <button 
+                onClick={() => setRehabTab('COST')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    rehabTab === 'COST' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                훈련 비용
+             </button>
+             <button 
+                onClick={() => setRehabTab('ALLOWANCE')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    rehabTab === 'ALLOWANCE' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                훈련 수당
+             </button>
+             <button 
+                onClick={() => setRehabTab('SPORTS')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    rehabTab === 'SPORTS' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                재활 스포츠
+             </button>
+             <button 
+                onClick={() => setRehabTab('GRANT')}
+                className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                    rehabTab === 'GRANT' 
+                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+             >
+                복귀지원금
+             </button>
+        </div>
+
+        {/* Tab 1: Cost */}
+        {rehabTab === 'COST' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="직업훈련비용 지원">
+                   <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 mb-4 text-center">
+                       <p className="text-sm text-emerald-800 font-medium mb-1">1인당 지원 한도</p>
+                       <p className="text-2xl font-black text-emerald-700">최대 600만원</p>
+                       <p className="text-xs text-emerald-600 mt-1">(공단 위탁 훈련 시 최대 800만원)</p>
+                   </div>
+                   
+                   <div className="space-y-4">
+                       <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                            <span className="font-bold text-slate-900 block mb-1">신청 자격</span>
+                            <ul className="list-disc pl-4 space-y-1 text-sm text-slate-700">
+                                <li>장해정보 제1급 ~ 제12급 판정자 중 미취업자</li>
+                                <li>장해 판정일로부터 <strong>3년 이내</strong> 신청</li>
+                            </ul>
+                       </div>
+                       
+                       <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                            <span className="font-bold text-slate-900 block mb-1">지원 조건</span>
+                            <ul className="list-disc pl-4 space-y-1 text-sm text-slate-700">
+                                <li><strong>횟수/기간:</strong> 최대 2회, 총 12개월 한도</li>
+                                <li><strong>지급 방식:</strong> 훈련기관에 직접 지급 (본인 부담 없음)</li>
+                            </ul>
+                       </div>
+                   </div>
+                </ModalSection>
+            </div>
+        )}
+
+        {/* Tab 2: Allowance */}
+        {rehabTab === 'ALLOWANCE' && (
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="직업훈련수당 (생계비 지원)">
+                    <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-4">
+                        <span className="font-bold text-indigo-900 block mb-2">💰 지급 기준 (계산식)</span>
+                        <p className="text-sm text-indigo-800 leading-relaxed bg-white/60 p-2 rounded border border-indigo-100/50">
+                            (월 총 훈련시간 ÷ 8) × 최저임금액
+                        </p>
+                        <p className="text-xs text-indigo-600 mt-2">
+                            * 사실상 <strong>시간당 최저임금</strong>을 훈련 시간만큼 지급합니다. (1일 8시간 한도)
+                        </p>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                            <span className="font-bold text-slate-900 block mb-1">예시 계산 (2025년 기준)</span>
+                             <p className="text-sm text-slate-700 mb-2">하루 5시간씩, 한 달(22일) 훈련 시:</p>
+                             <ul className="list-decimal pl-4 space-y-1 text-sm text-slate-600 bg-white p-2 rounded border border-slate-100">
+                                <li>총 시간: 5시간 × 22일 = 110시간</li>
+                                <li><strong>월 수령액: 약 110만원</strong> 예상</li>
+                             </ul>
+                        </div>
+
+                         <div className="text-sm bg-yellow-50 p-3 rounded border border-yellow-100 text-yellow-800">
+                            <strong>⚠️ 주의사항</strong><br/>
+                            훈련 출석률 <strong>80% 이상</strong>이어야 지급됩니다.<br/>
+                            (장해연금 수령액이 많을 경우 감액될 수 있음)
+                        </div>
+                    </div>
+                </ModalSection>
+            </div>
+        )}
+
+        {/* Tab 3: Sports */}
+        {rehabTab === 'SPORTS' && (
+             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="재활스포츠비 지원">
+                     <p className="mb-4 text-sm text-slate-600">
+                        신체 기능 회복과 사회 복귀를 위해 스포츠 활동 비용을 지원합니다.
+                     </p>
+                     
+                     <div className="grid gap-3">
+                         <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                             <div>
+                                 <span className="font-bold text-slate-900 block">일반 스포츠</span>
+                                 <span className="text-xs text-slate-500">헬스, 수영, 요가 등</span>
+                             </div>
+                             <div className="text-right">
+                                 <span className="font-bold text-emerald-600 block">월 10만원</span>
+                                 <span className="text-xs text-slate-400">최대 3개월</span>
+                             </div>
+                         </div>
+                         
+                         <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                             <div>
+                                 <span className="font-bold text-slate-900 block">특수 스포츠</span>
+                                 <span className="text-xs text-slate-500">전문 재활 프로그램</span>
+                             </div>
+                             <div className="text-right">
+                                 <span className="font-bold text-emerald-600 block">월 60만원</span>
+                                 <span className="text-xs text-slate-400">최대 1개월</span>
+                             </div>
+                         </div>
+                     </div>
+
+                     <div className="bg-slate-50 p-3 rounded border border-slate-200 mt-4">
+                        <span className="font-bold text-slate-900 block mb-1 text-sm">지원 대상</span>
+                        <ul className="list-disc pl-4 space-y-1 text-xs text-slate-600">
+                            <li>요양 중인 산재 근로자</li>
+                            <li>또는 요양 종결 후 <strong>6개월 이내</strong>인 분</li>
+                            <li>(주치의 소견이나 공단 자문의 인정 필요)</li>
+                        </ul>
+                   </div>
+                </ModalSection>
              </div>
-         </ModalSection>
-         <ModalSection title="재활스포츠 지원">
-             <ul className="list-disc mt-2 pl-4 space-y-1">
-                 <li>일반 스포츠: 월 <strong>{formatCurrency(COMPENSATION_CONSTANTS.REHAB_SPORTS.GENERAL_MONTHLY_LIMIT)}</strong> (3개월)</li>
-                 <li>특수 스포츠: 월 <strong>{formatCurrency(COMPENSATION_CONSTANTS.REHAB_SPORTS.SPECIAL_MONTHLY_LIMIT)}</strong> (1개월)</li>
-             </ul>
-         </ModalSection>
+        )}
+        {/* Tab 4: Return Grant */}
+        {rehabTab === 'GRANT' && (
+             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ModalSection title="직장복귀지원금">
+                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4 text-center">
+                       <p className="text-sm text-blue-800 font-medium mb-1">월 최대 지원 금액</p>
+                       <p className="text-2xl font-black text-blue-700">80만원</p>
+                       <p className="text-xs text-blue-600 mt-1">(최대 12개월간 지원)</p>
+                   </div>
+                   
+                   <p className="mb-4 text-sm text-slate-600">
+                        산재 근로자가 원직장에 복귀하여 고용이 유지될 수 있도록 사업주(또는 근로자)에게 지원되는 지원금입니다.
+                     </p>
+
+                   <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                        <span className="font-bold text-slate-900 block mb-1 text-sm">유의사항</span>
+                        <ul className="list-disc pl-4 space-y-1 text-xs text-slate-600">
+                            <li>장해 1~12급 판정자 대상</li>
+                            <li>원직장에 복귀하고 6개월 이상 고용 유지 시 지급</li>
+                            <li>(사업주에게 지급되는 경우가 많으므로 회사와 상의 필요)</li>
+                        </ul>
+                   </div>
+                </ModalSection>
+             </div>
+        )}
       </BenefitDetailModal>
 
        {/* G. Death Modal */}

@@ -23,11 +23,17 @@ import type { RehabilitationCenter } from "@/lib/api/rehabilitation-centers";
 interface LocalResourcesCardProps {
   user: {
     region?: string;
+    name?: string;
   };
   isGuest?: boolean;
 }
 
 export default function LocalResourcesCard({ user, isGuest = false }: LocalResourcesCardProps) {
+// ...
+// (I need to be careful with replace_file_content not to delete the whole file content if I select a large range.
+// The interface is at lines 23-28. The title is at line 281.)
+// I will do 2 separate edits using multi_replace_file_content for safety and correctness.
+
   const router = useRouter();
   const [regionSelection, setRegionSelection] = useState<RegionSelection>({
     provinceCode: null,
@@ -274,11 +280,11 @@ export default function LocalResourcesCard({ user, isGuest = false }: LocalResou
     )}>
       <CardHeader className="pb-4 pt-6 px-6 sm:px-8">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-bold flex items-center gap-3 text-slate-800 tracking-tight">
+          <CardTitle className="text-2xl font-bold flex items-center gap-3 text-slate-800 tracking-tight">
             <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
                 <MapPin className="w-5 h-5 text-emerald-500" />
             </div>
-            내 주변 산재 병원
+            {user.name || '회원'}님 지역 산재 치료기관
           </CardTitle>
           {hasRegion && (
              <Button variant="ghost" size="sm" onClick={() => setIsDialogOpen(true)} className="text-slate-400 hover:text-emerald-600 transition-colors bg-white/50 hover:bg-white h-10 px-4 rounded-2xl flex gap-2 font-bold shadow-sm border border-white/60">
@@ -353,17 +359,14 @@ export default function LocalResourcesCard({ user, isGuest = false }: LocalResou
           <div className="space-y-6">
             <div className="flex items-end justify-between">
               <div className="space-y-1">
-                <div className="text-[10px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-1.5">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                   위치 기반 실시간 조회 중
-                </div>
+
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-black text-slate-900 tracking-tight">{displayRegionName()}</span>
                 </div>
               </div>
               <Link href={getLinkUrl()}>
-                <Button variant="outline" className="h-10 px-4 rounded-2xl bg-white border-slate-100 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 font-bold text-xs shadow-sm transition-all group">
-                  전체 화면 보기 <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform group-hover:translate-x-1" />
+                <Button variant="outline" className="h-10 px-4 rounded-2xl bg-white border-slate-100 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 font-bold text-sm shadow-sm transition-all group">
+                  전체 화면 보기 <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
             </div>
@@ -379,7 +382,7 @@ export default function LocalResourcesCard({ user, isGuest = false }: LocalResou
                     onMapChange={handleMapChange}
                 />
                 <div className="absolute top-4 left-4 z-10">
-                   <div className="bg-black/50 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase border border-white/20">
+                   <div className="bg-black/50 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm font-bold tracking-widest uppercase border border-white/20">
                       Smart Map Tracking
                    </div>
                 </div>
@@ -413,15 +416,18 @@ export default function LocalResourcesCard({ user, isGuest = false }: LocalResou
                        <div className={`w-1.5 h-1.5 rounded-full bg-${item.color}-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]`} />
                     )}
                   </div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{item.label}</p>
-                  <div className="flex items-baseline gap-1">
+                  <p className={cn(
+                    "text-sm font-black uppercase tracking-widest mb-0.5",
+                    selectedFilter === item.id ? `text-${item.color}-700` : `text-${item.color}-600/80`
+                  )}>{item.label}</p>
+                  <div className="flex items-baseline gap-1.5">
                     <span className={cn(
-                      "text-2xl font-black tracking-tight transition-colors",
+                      "text-3xl font-black tracking-tight transition-colors",
                       selectedFilter === item.id ? `text-${item.color}-600` : "text-slate-800 group-hover:text-slate-900"
                     )}>
                       {item.count}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-300">건</span>
+                    <span className="text-sm font-bold text-slate-400">건</span>
                   </div>
                 </div>
               ))}

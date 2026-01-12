@@ -27,7 +27,7 @@ export default function HospitalsHero() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
       </div>
 
-      <div className="container px-4 mx-auto text-center z-10">
+      <div className="container px-4 mx-auto text-center z-10 pt-12 md:pt-0">
         <div className="max-w-4xl mx-auto space-y-6">
           
           {/* Headlines */}

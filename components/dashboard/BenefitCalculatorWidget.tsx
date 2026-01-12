@@ -113,7 +113,7 @@ export default function BenefitCalculatorWidget() {
             <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-emerald-600" />
-                <p className="text-xs text-emerald-700">평균임금</p>
+                <p className="text-sm text-emerald-700">평균임금</p>
               </div>
               <p className="text-xl font-bold text-emerald-900">{formatCurrency(averageWage)}/일</p>
             </div>
@@ -122,7 +122,7 @@ export default function BenefitCalculatorWidget() {
             <div className="p-3 bg-teal-50 rounded-lg border border-teal-200">
               <div className="flex items-center gap-2 mb-1">
                 <Calendar className="w-4 h-4 text-teal-600" />
-                <p className="text-xs text-teal-700">휴업급여 (30일)</p>
+                <p className="text-sm text-teal-700">휴업급여 (30일)</p>
               </div>
               <p className="text-xl font-bold text-teal-900">
                 {formatCurrency(sickLeaveResult?.totalAmount || 0)}
@@ -133,7 +133,7 @@ export default function BenefitCalculatorWidget() {
             <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
               <div className="flex items-center gap-2 mb-1">
                 <Scale className="w-4 h-4 text-slate-500" />
-                <p className="text-xs text-slate-600">장해급여 범위</p>
+                <p className="text-sm text-slate-600">장해급여 범위</p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-slate-800">

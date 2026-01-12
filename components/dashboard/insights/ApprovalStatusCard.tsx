@@ -27,7 +27,7 @@ export default function ApprovalStatusCard() {
             </div>
             {stats.label} 승인 정밀 분석
          </CardTitle>
-         <CardDescription className="text-xs font-bold text-slate-400 mt-1">
+         <CardDescription className="text-sm font-bold text-slate-400 mt-2">
             2023년 공단 공식 통계 기반 데이터
          </CardDescription>
       </CardHeader>
@@ -36,7 +36,7 @@ export default function ApprovalStatusCard() {
         {/* Metric 1: Approval Rate */}
         <div className="bg-blue-50/30 p-5 rounded-[2rem] border border-blue-100/50 shadow-sm space-y-3">
             <div className="flex justify-between items-end">
-                <span className="text-xs font-black text-blue-500 uppercase tracking-widest">유사 사례 승인률</span>
+                <span className="text-sm font-black text-blue-500 uppercase tracking-widest">유사 사례 승인률</span>
                 <span className="text-3xl font-black text-blue-600 tracking-tighter">{status.probability}%</span>
             </div>
             <div className="w-full h-2.5 bg-white/60 rounded-full overflow-hidden border border-blue-50">
@@ -61,7 +61,7 @@ export default function ApprovalStatusCard() {
              </div>
         </div>
         
-        <p className="text-[10px] text-slate-400 font-medium text-center leading-relaxed">
+        <p className="text-xs text-slate-400 font-medium text-center leading-relaxed">
           * 상기 데이터는 통계치이며 개인별 상황에 따라 상이할 수 있습니다.
         </p>
       </CardContent>

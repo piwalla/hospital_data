@@ -7,7 +7,7 @@
 
 'use client';
 
-import { ExternalLink, FileText, Youtube } from 'lucide-react';
+import { ExternalLink, FileText, Youtube, Maximize2 } from 'lucide-react';
 import type { Document } from '@/lib/types/document';
 import { Button } from '@/components/ui/button';
 import { getDisclaimer } from '@/lib/utils/disclaimer';
@@ -53,61 +53,21 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
         </div>
       </div>
 
-      {/* 다운로드 링크 (CTA 위치 이동) */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4" role="group" aria-label="서류 다운로드 및 예시 링크">
-        {document.officialDownloadUrl && (
-          <Button
-            asChild
-            className="w-full sm:w-auto flex-1 h-12 sm:h-10 text-base"
-            aria-label="공식 서류 보기 (새 창에서 열림)"
-          >
-            <a
-              href={
-                document.officialDownloadUrl.endsWith('.pdf')
-                  ? `/view-pdf?file=${encodeURIComponent(document.officialDownloadUrl)}`
-                  : document.officialDownloadUrl
-              }
-              target={document.officialDownloadUrl.endsWith('.pdf') ? undefined : '_blank'}
-              rel={document.officialDownloadUrl.endsWith('.pdf') ? undefined : 'noopener noreferrer'}
-              className="flex items-center justify-center gap-2"
-            >
-              <span className="font-bold">공식 서류 보기</span>
-              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} aria-hidden="true" />
-            </a>
-          </Button>
-        )}
-        {document.exampleUrl && (
-          <Button 
-            variant="outline" 
-            asChild 
-            className="w-full sm:w-auto flex-1 h-12 sm:h-10 text-base border-primary/20 text-primary hover:bg-primary/5"
-            aria-label="작성 예시 보기 (새 창에서 열림)"
-          >
-            <a
-              href={
-                document.exampleUrl.endsWith('.pdf')
-                  ? `/view-pdf?file=${encodeURIComponent(document.exampleUrl)}`
-                  : document.exampleUrl
-              }
-              target={document.exampleUrl.endsWith('.pdf') ? undefined : '_blank'}
-              rel={document.exampleUrl.endsWith('.pdf') ? undefined : 'noopener noreferrer'}
-              className="flex items-center justify-center gap-2"
-            >
-              <span className="font-bold">작성 예시 보기</span>
-              <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} aria-hidden="true" />
-            </a>
-          </Button>
-        )}
-      </div>
+
 
       {/* 유튜브 영상 임베드 */}
       {document.youtubeUrl && (
         <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
-          <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" aria-hidden="true" />
-            <h3 className="text-base sm:text-lg font-semibold text-foreground">
-              영상으로 쉽게 알아보기
-            </h3>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-3 sm:mb-4">
+            <div className="flex items-center gap-2">
+              <Youtube className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" aria-hidden="true" />
+              <h3 className="text-base sm:text-lg font-semibold text-foreground">
+                영상으로 쉽게 알아보기
+              </h3>
+            </div>
+            <span className="text-[10px] sm:text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full w-fit">
+              ※ 본 영상은 AI 기술을 활용하여 제작되었습니다.
+            </span>
           </div>
           <div className="relative w-full aspect-video rounded-lg overflow-hidden">
             <iframe
@@ -125,16 +85,39 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
         </div>
       )}
 
-      {/* PDF 가이드 임베드 */}
+      {/* PDF 가이드 임베드 (데스크톱 복원) */}
       {document.guidePdfPath && (
         <div className="bg-white rounded-lg border border-[var(--border-light)] p-4 sm:p-6 shadow-sm">
-          <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-primary" aria-hidden="true" />
-            <h3 className="text-base sm:text-lg font-semibold text-foreground">
-              진행 과정 안내
-            </h3>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-3 sm:mb-4">
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-primary" aria-hidden="true" />
+              <h3 className="text-base sm:text-lg font-semibold text-foreground">
+                진행 과정 안내
+              </h3>
+            </div>
+            <span className="text-[10px] sm:text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full w-fit">
+              ※ 본 문서는 AI 기술을 활용하여 작성되었습니다.
+            </span>
           </div>
-          <div className="relative w-full" style={{ height: '600px' }}>
+          
+          {/* 모바일: 전체화면 버튼 */}
+          <div className="block sm:hidden text-center py-6 bg-slate-50 rounded-lg border border-slate-200">
+             <p className="text-sm text-slate-500 mb-4">
+               진행 과정 안내 문서를 확인하세요.<br/>
+               버튼을 누르면 전체화면으로 볼 수 있습니다.
+             </p>
+             <Button variant="outline" className="gap-2" asChild>
+               <a href={`/view-pdf?file=${encodeURIComponent(
+                 `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${encodeURIComponent(document.guidePdfPath)}`
+               )}`}>
+                 <Maximize2 className="w-4 h-4" />
+                 가이드 전체화면으로 보기
+               </a>
+             </Button>
+          </div>
+
+          {/* 데스크톱: iframe 뷰어 */}
+          <div className="hidden sm:block relative w-full" style={{ height: '600px' }}>
             <iframe
               src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${encodeURIComponent(document.guidePdfPath)}#toolbar=0&navpanes=0&scrollbar=0`}
               title="서류 진행 과정 안내 PDF"
@@ -143,6 +126,7 @@ export default function DocumentSummary({ document }: DocumentSummaryProps) {
           </div>
         </div>
       )}
+
 
       {/* 기본 설명 섹션 */}
       <div className="space-y-4 sm:space-y-6">

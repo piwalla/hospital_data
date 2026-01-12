@@ -56,6 +56,39 @@ This plan details the steps to implement the "My Rehabilitation Journey" dashboa
 - Add a "나의 여정" (My Journey) link to the navigation bar.
 - Add a notification badge (optional, static for now).
 
+#### [MODIFY] [components/Navbar.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/components/Navbar.tsx)
+
+### Admin Monitoring
+
+#### [NEW] [app/admin/chatbot/stats/page.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/app/admin/chatbot/stats/page.tsx)
+
+- Implementation of a simple dashboard to view chatbot usage statistics.
+- Metrics: Total Questions, Unique Users, Daily Usage.
+
+- Implementation of a simple dashboard to view chatbot usage statistics.
+- Metrics: Total Questions, Unique Users, Daily Usage.
+
+### Real User Activity (MVP Monitoring)
+
+#### [MODIFY] [app/admin/users/page.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/app/admin/users/page.tsx)
+
+- Replace `MOCK_USERS` with real `supabase.from('users').select('*')`.
+- Display Name, Email (via Clerk), Joined Date.
+
+#### [MODIFY] [app/admin/page.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/app/admin/page.tsx)
+
+- Connect "Total Users" and "Recent Users" to real DB.
+
+## Guest Chat Limit Implementation
+
+- [x] Update Landing Page CTA to point to `/chatbot-v2` with text "산재 AI 무료로 사용하기"
+- [x] Modify `app/chatbot-v2/page.tsx` (Guest Mode)
+  - [x] Implement `localStorage` message counter (Limit: 5)
+  - [x] Add Limit Reached Modal with Sign Up CTA
+- [x] Chatbot V2 Enhancements
+  - [x] Inject "Website Feature Guide" into System Prompt (`route.ts`)
+  - [x] Style internal markdown links as "Shortcut Buttons" (`RagChatbotV2.tsx`)
+
 ## Verification Plan
 
 ### Automated Tests

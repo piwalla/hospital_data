@@ -11,7 +11,7 @@ export default function HeroSection() {
     // Removed bg-gradient-to-b to allow image to show through
     // Added w-screen and left-[calc(-50vw+50%)] to break out of parent container width
     // Added -mt-16 to counteract the global main pt-16 padding
-    <section className="relative w-screen left-[calc(-50vw+50%)] min-h-[100vh] -mt-16 flex items-center justify-center overflow-hidden">
+    <section className="relative w-screen left-[calc(-50vw+50%)] min-h-[100vh] -mt-16 flex items-center justify-center overflow-hidden pt-12 md:pt-0">
       {/* Background Decor */}
       <div className="absolute inset-0 -z-10 w-full h-full overflow-hidden">
         <Image
@@ -52,7 +52,7 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-base sm:text-lg md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] px-4"
+              className="text-base sm:text-lg md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] px-4 hidden md:block"
             >
               누구에게 물어봐야 할지 막막하셨죠? 산재 신청부터 보상까지,<br className="hidden md:block"/>
               엉킨 실타래를 풀듯 <span className="text-[#4ADE80] font-bold">리워크케어가 차근차근 알려드릴께요.</span>
@@ -67,8 +67,8 @@ export default function HeroSection() {
             className="flex flex-col items-center justify-center gap-4 pt-4 md:pt-8"
           >
             {/* Primary CTA - 강조 */}
-            <CTAButton href="/dashboard" variant="primary" className="w-auto text-base sm:text-lg px-6 py-3 sm:px-8 sm:py-4 shadow-xl hover:shadow-2xl hover:-translate-y-0.5">
-              무료로 산재 정보 확인하기
+            <CTAButton href="/chatbot-v2" variant="primary" className="w-auto text-base sm:text-lg px-6 py-3 sm:px-8 sm:py-4 shadow-xl hover:shadow-2xl hover:-translate-y-0.5">
+              산재 AI 무료로 사용하기
             </CTAButton>
           </motion.div>
         </div>

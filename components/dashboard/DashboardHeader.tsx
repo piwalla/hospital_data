@@ -9,11 +9,11 @@ interface DashboardHeaderProps {
 }
 
 const STEP_NAMES = [
-  "산재 신청 준비", // Step 1 (index 0 for convenience if needed, but our steps are 1-based)
-  "산재 신청 및 승인", // Step 1
-  "요양 및 치료",     // Step 2
-  "장해 평가 및 보상", // Step 3
-  "직업 복귀 및 재활"  // Step 4
+  "산재 신청 준비 단계", // Step 0/Fallback
+  "산재 신청 준비 단계", // Step 1
+  "산재 치료 받는 중",   // Step 2
+  "산재 치료 종결 단계", // Step 3
+  "종결 후 직업 복귀 단계" // Step 4
 ];
 
 export default function DashboardHeader({ user, onEditProfile }: DashboardHeaderProps) {
@@ -31,7 +31,7 @@ export default function DashboardHeader({ user, onEditProfile }: DashboardHeader
             <span className="px-3 py-1 rounded-full bg-white/80 border border-emerald-100/50 text-emerald-700 text-[11px] font-bold uppercase tracking-wider shadow-sm backdrop-blur-sm">
               Level {user.currentStep}
             </span>
-            <span className="text-slate-400 text-[11px] font-medium tracking-wide">
+            <span className="text-slate-500 text-sm font-black tracking-wide">
               {new Date().toLocaleDateString()} 기준
             </span>
           </div>
@@ -51,28 +51,21 @@ export default function DashboardHeader({ user, onEditProfile }: DashboardHeader
             </div>
             
             <div className="mt-2 sm:mt-1">
-              <span className="text-slate-400/80 font-medium text-lg sm:text-2xl mr-2">현재</span>
+              <span className="text-slate-600 font-black text-lg sm:text-2xl mr-2">현재</span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 pb-1">
                 {currentStepName}
               </span>
-              <span className="text-slate-800"> 단계입니다.</span>
+              <span className="text-slate-800">입니다.</span>
             </div>
           </h1>
           
-          <p className="mt-5 text-[15px] sm:text-lg text-slate-500 max-w-xl leading-relaxed font-medium">
-            재활과 회복에만 집중하세요. <br className="block sm:hidden" />
-            복잡한 절차는 <span className="text-emerald-600 font-semibold">리워크케어</span>가 챙겨드릴게요.
-          </p>
         </div>
 
         {/* Improved Progress Section */}
         <div className="w-full lg:w-auto min-w-[280px] bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-white/50 shadow-sm relative overflow-hidden group/card hover:bg-white/80 transition-colors">
-           <div className="absolute top-0 right-0 p-3 opacity-20">
-              <Gauge className="w-16 h-16 text-emerald-900 rotate-12" />
-           </div>
 
           <div className="flex justify-between items-end mb-3 relative z-10">
-            <span className="text-sm font-bold text-slate-500 flex items-center gap-1.5">
+            <span className="text-base font-black text-emerald-700 flex items-center gap-1.5">
               전체 진행률
             </span>
             <span className="text-3xl font-black text-slate-800 tracking-tight">
@@ -90,7 +83,7 @@ export default function DashboardHeader({ user, onEditProfile }: DashboardHeader
           </div>
           
           <div className="mt-3 flex justify-end relative z-10">
-             <span className="text-[11px] font-semibold text-slate-400 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+             <span className="text-sm font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 shadow-sm">
                완료까지 {100 - user.progress}% 남음
              </span>
           </div>

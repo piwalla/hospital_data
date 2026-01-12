@@ -9,6 +9,7 @@ import { RadialBarChart, RadialBar, ResponsiveContainer, PolarAngleAxis } from '
 import { cn } from "@/lib/utils";
 
 interface PersonalizedStatsWidgetProps {
+  userName?: string;
   injury?: string;
   region?: string;
   className?: string;
@@ -26,7 +27,7 @@ interface StatsData {
 
 import { LATEST_OFFICIAL_STAT } from '@/lib/data/official-stats-2023';
 
-export default function PersonalizedStatsWidget({ injury, region, className }: PersonalizedStatsWidgetProps) {
+export default function PersonalizedStatsWidget({ userName, injury, region, className }: PersonalizedStatsWidgetProps) {
   const [data, setData] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -115,18 +116,13 @@ export default function PersonalizedStatsWidget({ injury, region, className }: P
 
   return (
     <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-[2.5rem] overflow-hidden transition-all hover:shadow-premium-hover", className)}>
-      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-emerald-50/50 relative px-6 sm:px-8">
+      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-emerald-50/50 relative px-6 sm:px-8 pt-7">
         <div className="flex items-center gap-3">
-           <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
-             <Info className="w-5 h-5 text-emerald-500" />
-           </div>
+           <span className="w-2 h-7 bg-emerald-500 rounded-full inline-block shadow-[0_4px_12px_rgba(16,185,129,0.3)]" />
            <div>
-             <CardTitle className="text-xl font-bold text-slate-800 tracking-tight">
-               산재 신청 통계
+             <CardTitle className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+               {userName ? `${userName}님과 유사한 분들의 치료 통계예요` : '나와 유사한 분들의 치료 통계예요'}
              </CardTitle>
-              <CardDescription className="text-sm text-slate-500 font-medium">
-                {data.regionName} 기반 맞춤형 가이드
-              </CardDescription>
            </div>
         </div>
         
@@ -139,7 +135,7 @@ export default function PersonalizedStatsWidget({ injury, region, className }: P
           </button>
           <button
             onClick={() => setType('disease')}
-            className={cn("px-4 py-1.5 text-xs font-bold rounded-lg transition-all", !isAccident ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700')}
+            className={cn("px-4 py-1.5 text-sm font-bold rounded-lg transition-all", !isAccident ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700')}
           >
             질병
           </button>
@@ -164,12 +160,12 @@ export default function PersonalizedStatsWidget({ injury, region, className }: P
                     </span>
                  </div>
              </div>
-             <div>
-               <p className="text-sm font-bold text-slate-400 mb-1">평균 승인 확률</p>
-               <p className="text-base font-extrabold text-slate-800 leading-tight">
-                 10명 중 {approvalCount}명이<br/>승인받고 있어요
-               </p>
-             </div>
+              <div>
+                <p className="text-lg font-black text-emerald-700 mb-1">평균 승인 확률</p>
+                <p className="text-lg font-black text-slate-800 leading-tight">
+                  10명 중 {approvalCount}명이<br/>승인받고 있어요
+                </p>
+              </div>
           </div>
 
           {/* 2. Processing Time */}
@@ -177,12 +173,12 @@ export default function PersonalizedStatsWidget({ injury, region, className }: P
              <div className="w-20 h-20 rounded-[2rem] bg-orange-50 flex items-center justify-center mb-2">
                 <Clock className="w-10 h-10 text-orange-400" />
              </div>
-             <div>
-               <p className="text-sm font-bold text-slate-400 mb-1">결과 소요 기간</p>
-               <p className="text-base font-extrabold text-slate-800 leading-tight">
-                 접수 후 {processingText} 이상<br/>소요될 수 있어요
-               </p>
-             </div>
+              <div>
+                <p className="text-lg font-black text-emerald-700 mb-1">결과 소요 기간</p>
+                <p className="text-lg font-black text-slate-800 leading-tight">
+                  접수 후 {processingText} 이상<br/>소요될 수 있어요
+                </p>
+              </div>
           </div>
 
           {/* 3. Treatment Duration */}
@@ -190,24 +186,18 @@ export default function PersonalizedStatsWidget({ injury, region, className }: P
              <div className="w-20 h-20 rounded-[2rem] bg-emerald-50 flex items-center justify-center mb-2">
                 <Calendar className="w-10 h-10 text-emerald-400" />
              </div>
-             <div>
-               <p className="text-sm font-bold text-slate-400 mb-1">집중 치료 기간</p>
-               <p className="text-base font-extrabold text-slate-800 leading-tight">
-                 보통 {treatmentText} 동안<br/>회복에 전념해요
-               </p>
-             </div>
+              <div>
+                <p className="text-lg font-black text-emerald-700 mb-1">집중 치료 기간</p>
+                <p className="text-lg font-black text-slate-800 leading-tight">
+                  보통 {treatmentText} 동안<br/>회복에 전념해요
+                </p>
+              </div>
           </div>
 
         </div>
         
         <div className="mt-8 pt-6 border-t border-slate-100/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-           <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-full border border-slate-100">
-             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-bold text-slate-500">
-                {data.regionName} {injury === 'hand_arm' ? '팔/손' : injury === 'foot_leg' ? '다리/발' : injury === 'spine' ? '척추' : injury === 'brain_neuro' ? '뇌/신경' : '신체'} 부위 분석 완료
-              </span>
-           </div>
-            <p className="text-xs font-bold text-slate-300 uppercase tracking-widest">
+            <p className="text-xs font-black text-emerald-600 uppercase tracking-widest">
               Source: Official Stats 2023
             </p>
         </div>

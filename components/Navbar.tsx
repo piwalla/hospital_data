@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Star, ShieldCheck } from "lucide-react";
+import { Star, ShieldCheck, User } from "lucide-react";
 
 // Admin Check Component
 // Admin Check Component
@@ -124,7 +124,7 @@ const Navbar = () => {
                 priority
               />
             </div>
-            리워크케어
+            <span className="text-sm md:text-xl">리워크케어</span>
           </Link>
           
           {/* 네비게이션 메뉴 */}
@@ -165,6 +165,7 @@ const Navbar = () => {
                   </SignInButton>
                 </SignedOut>
                 <SignedIn>
+                  {/* MVP에서는 즐겨찾기 기능을 사용하지 않으므로 숨김 처리
                   <Link
                     href="/favorites"
                     className={cn(
@@ -181,6 +182,7 @@ const Navbar = () => {
                     />
                     <span className="hidden sm:inline">즐겨찾기</span>
                   </Link>
+                  */}
                   
                   {/* Admin Link */}
                   <AdminLink className={navTextColor} />
@@ -191,7 +193,15 @@ const Navbar = () => {
                         avatarBox: "w-8 h-8 bg-pink-500"
                       }
                     }}
-                  />
+                  >
+                    <UserButton.MenuItems>
+                      <UserButton.Link
+                        label="내 정보 관리"
+                        labelIcon={<User className="w-4 h-4" />}
+                        href="/profile"
+                      />
+                    </UserButton.MenuItems>
+                  </UserButton>
                 </SignedIn>
               </>
             ) : (

@@ -10,17 +10,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { name: "월", users: 140 },
-  { name: "화", users: 230 },
-  { name: "수", users: 180 },
-  { name: "목", users: 290 },
-  { name: "금", users: 350 },
-  { name: "토", users: 210 },
-  { name: "일", users: 160 },
-];
+// ... imports
 
-export function WeeklyActiveUsersChart() {
+interface WAUData {
+  name: string;
+  users: number;
+}
+
+export function WeeklyActiveUsersChart({ data }: { data: WAUData[] }) {
   return (
     <div className="h-[300px] w-full">
       <ResponsiveContainer width="100%" height="100%">

@@ -173,11 +173,16 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
             {/* 유튜브 가이드 영상 */}
             {youtubeVideoId && (
               <div className="w-full space-y-3 sm:space-y-4 max-w-full overflow-hidden">
-                <div className="flex items-center gap-2 sm:gap-3 px-0 sm:px-0">
-                  <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
-                  <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
-                    영상으로 쉽게 설명해 드려요
-                  </h2>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 px-0 sm:px-0">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
+                    <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
+                      영상으로 쉽게 설명해 드려요
+                    </h2>
+                  </div>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full w-fit">
+                    ※ 본 영상은 AI 기술을 활용하여 제작되었습니다.
+                  </span>
                 </div>
                 <div className="relative w-full max-w-full rounded-xl overflow-hidden border border-[var(--border-medium)] bg-white shadow-sm">
                   <div className="relative w-full max-w-full" style={{ paddingBottom: '56.25%' }}>
@@ -205,23 +210,28 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
 
             {/* PDF 가이드 */}
             <div className="w-full space-y-3 sm:space-y-4 max-w-full overflow-hidden">
-              <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5">
-                <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
-                <div className="flex items-center justify-between flex-1">
-                  <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
-                    이렇게 진행하시면 됩니다.
-                  </h2>
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2"
-                  >
-                    <a href={pdfUrl ?? '#'} download target="_blank" rel="noreferrer">
-                      PDF 다운로드
-                    </a>
-                  </Button>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-5">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
+                    <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
+                      이렇게 진행하시면 됩니다.
+                    </h2>
+                  </div>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full w-fit">
+                    ※ 본 문서는 AI 기술을 활용하여 작성되었습니다.
+                  </span>
                 </div>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 w-full sm:w-auto justify-center"
+                >
+                  <a href={pdfUrl ?? '#'} download target="_blank" rel="noreferrer">
+                    PDF 다운로드
+                  </a>
+                </Button>
               </div>
               {/* PDF 뷰어 (모바일: WebP 이미지, 데스크톱: PDF iframe) */}
               <ConditionalPDFViewer stepNumber={stage.step_number} pdfUrl={pdfUrl} />

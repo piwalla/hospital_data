@@ -108,16 +108,16 @@ export default function CompensationEstimator({ wageInfo, estimatedGrade }: Comp
             <div className="text-xl md:text-2xl font-bold text-slate-900">
               {formatCurrency(lumpSumAmount)}
             </div>
-            <div className="text-xs text-slate-500 mt-1">
+            <div className="text-sm text-slate-500 mt-2">
               (평균임금 × {benefit.lumpSum}일분)
             </div>
             {benefit.pension > 0 && (
-              <Badge variant="secondary" className="mt-2 text-[10px] bg-white text-slate-500 border-slate-200">
+              <Badge variant="secondary" className="mt-2 text-sm bg-white text-slate-500 border-slate-200">
                 선택 가능 (4급~7급)
               </Badge>
             )}
             {grade <= 3 && (
-               <Badge variant="destructive" className="mt-2 text-[10px]">
+               <Badge variant="destructive" className="mt-2 text-sm">
                 선택 불가 (연금 원칙)
               </Badge>
             )}
@@ -135,7 +135,7 @@ export default function CompensationEstimator({ wageInfo, estimatedGrade }: Comp
                    {formatCurrency(pensionAmount)}
                    <span className="text-sm font-normal text-slate-500"> /월</span>
                 </div>
-                 <div className="text-xs text-slate-500 mt-1">
+                 <div className="text-sm text-slate-500 mt-2">
                   (연간 {benefit.pension}일분 ÷ 12)
                 </div>
               </>
@@ -147,8 +147,8 @@ export default function CompensationEstimator({ wageInfo, estimatedGrade }: Comp
           </div>
         </div>
         
-        <div className="text-[11px] text-slate-400 flex items-start gap-1 bg-slate-50 p-2 rounded">
-          <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
+        <div className="text-sm text-slate-400 flex items-start gap-2 bg-slate-50 p-2.5 rounded">
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
           <span>
             개인의 구체적인 평균임금 산정 방식에 따라 실제 수령액은 차이가 있을 수 있습니다. (2025년 기준)
           </span>

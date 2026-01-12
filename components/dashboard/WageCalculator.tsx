@@ -57,7 +57,7 @@ export default function WageCalculator({ initialWage }: WageCalculatorProps) {
                 </div>
                 <div>
                     <CardTitle className="text-base font-bold text-slate-800">휴업급여 모의 계산기</CardTitle>
-                    <CardDescription className="text-xs text-slate-500">내 월급의 70%를 미리 확인해보세요</CardDescription>
+                    <CardDescription className="text-sm text-slate-500">내 월급의 70%를 미리 확인해보세요</CardDescription>
                 </div>
             </div>
             <TooltipProvider>
@@ -66,7 +66,7 @@ export default function WageCalculator({ initialWage }: WageCalculatorProps) {
                         <Info className="w-4 h-4 text-slate-400" />
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p className="text-xs">평균임금의 70%를 요양기간 동안 지급합니다.</p>
+                        <p className="text-sm">평균임금의 70%를 요양기간 동안 지급합니다.</p>
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
@@ -78,7 +78,7 @@ export default function WageCalculator({ initialWage }: WageCalculatorProps) {
         <div className="flex gap-2 p-1 bg-slate-100 rounded-lg">
           <button
             onClick={() => setWageType('monthly')}
-            className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-all ${
+            className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-all ${
               wageType === 'monthly' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
@@ -86,7 +86,7 @@ export default function WageCalculator({ initialWage }: WageCalculatorProps) {
           </button>
           <button
             onClick={() => setWageType('daily')}
-            className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-all ${
+            className={`flex-1 text-sm font-medium py-1.5 rounded-md transition-all ${
               wageType === 'daily' ? 'bg-white shadow text-slate-900' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
@@ -96,7 +96,7 @@ export default function WageCalculator({ initialWage }: WageCalculatorProps) {
 
         {/* Amount Input */}
         <div className="space-y-2">
-          <Label htmlFor="wage-amount" className="text-xs font-semibold text-slate-600">
+          <Label htmlFor="wage-amount" className="text-sm font-semibold text-slate-600">
             {wageType === 'monthly' ? '평균 세전 월급' : '평균 일당'} (원)
           </Label>
           <Input
@@ -112,8 +112,8 @@ export default function WageCalculator({ initialWage }: WageCalculatorProps) {
         {/* Days Slider */}
         <div className="space-y-3">
             <div className="flex justify-between items-center">
-                <Label className="text-xs font-semibold text-slate-600">인정 요양 일수</Label>
-                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{days}일</span>
+                <Label className="text-sm font-semibold text-slate-600">인정 요양 일수</Label>
+                <span className="text-sm font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{days}일</span>
             </div>
             <Slider
                 value={[days]}
@@ -127,14 +127,14 @@ export default function WageCalculator({ initialWage }: WageCalculatorProps) {
 
         {/* Result Area */}
         <div className="mt-4 pt-4 border-t border-dashed border-slate-200">
-            <p className="text-xs text-slate-500 text-center mb-1">이번 달 예상 수령액</p>
+            <p className="text-sm text-slate-500 text-center mb-1">이번 달 예상 수령액</p>
             <div className="flex items-center justify-center gap-1 text-slate-900">
                 <span className="text-2xl font-black font-brand text-blue-600">
                     {result.toLocaleString()}
                 </span>
                 <span className="text-sm font-medium text-slate-600">원</span>
             </div>
-             <p className="text-[10px] text-slate-400 text-center mt-2">
+             <p className="text-sm text-slate-400 text-center mt-2">
                 ※ 실제 지급액은 근로복지공단 심사 결과에 따라 달라질 수 있습니다.
             </p>
         </div>

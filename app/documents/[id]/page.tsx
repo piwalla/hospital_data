@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import { findDocumentById } from '@/lib/data/documents';
 import { findRequestedDocumentById } from '@/lib/data/requested-documents';
-import DocumentSummary from '@/components/documents/DocumentSummary';
-import DocumentAssistant from '@/components/documents/DocumentAssistant';
+import DocumentTabs from '@/components/documents/DocumentTabs';
 import type { Document } from '@/lib/types/document';
 
 interface DocumentDetailPageProps {
@@ -70,10 +69,9 @@ export default async function DocumentDetailPage({ params }: DocumentDetailPageP
 
       {/* 본문 */}
       <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12 max-w-4xl space-y-6 sm:space-y-8">
-        <DocumentSummary document={document} />
-        <DocumentAssistant />
+        <DocumentTabs document={document} />
       </div>
+
     </div>
   );
 }
-
