@@ -51,7 +51,7 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
         - High contrast background for card visibility
         - Full-width bleed to match Hero
       */}
-      <div className="relative w-full md:w-screen md:left-[calc(-50vw+50%)] bg-[#eff2f5] py-8 md:py-16 -mt-12 sm:-mt-12">
+      <div className="relative w-[calc(100%+2rem)] -mx-4 md:w-screen md:left-[calc(-50vw+50%)] md:mx-0 bg-[#eff2f5] py-8 md:py-16 -mt-12 sm:-mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8 md:space-y-16">
           
           {/* 비디오 가이드 버튼 & 첫 방문 안내 */}
