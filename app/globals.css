@@ -534,3 +534,38 @@ iframe {
     transform: translateX(0) !important;
   }
 }
+
+/* Clerk Kakao Custom Icon Override - 사용자 요청 */
+/* 타겟팅: 리스트형 버튼과 그리드형(아이콘만 있는) 버튼 모두 포함 */
+.cl-socialButtonsBlockButton[data-provider="oauth_kakao"] .cl-socialButtonsBlockButton__providerIcon,
+.cl-socialButtonsIconButton[data-provider="oauth_kakao"] .cl-socialButtonsIconButton__providerIcon,
+button[data-strategy="oauth_kakao"] .cl-internal-1b1e10p,
+button[data-strategy="oauth_kakao"] svg, 
+button[data-strategy="oauth_kakao"] img {
+  display: none !important;
+}
+
+/* 커스텀 아이콘 오버레이 */
+.cl-socialButtonsBlockButton[data-provider="oauth_kakao"]::after,
+.cl-socialButtonsIconButton[data-provider="oauth_kakao"]::after,
+button[data-strategy="oauth_kakao"]::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px; /* 아이콘 크기 */
+  height: 24px;
+  background-image: url('/kko.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* 리스트형 버튼(글자가 있는 경우)에서의 위치 조정 */
+.cl-socialButtonsBlockButton[data-provider="oauth_kakao"]::after {
+  left: 28px;
+  transform: translateY(-50%);
+}

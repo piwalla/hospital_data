@@ -378,6 +378,12 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
             placeholder="산재 관련 질문을 입력해주세요..."
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleAsk();
+              }
+            }}
             disabled={loading}
             className={`w-full bg-white border-gray-200 focus:border-primary/50 focus:ring-4 focus:ring-primary/5 rounded-3xl p-6 pr-20 text-base font-medium resize-none shadow-sm transition-all ${isWidget ? 'min-h-[80px] pr-14' : 'min-h-[100px] sm:min-h-[120px]'}`}
             aria-label="질문 입력"

@@ -134,7 +134,7 @@ export default function CommunityMain({ userInjury, userRegion }: CommunityMainP
               <Link key={type} href={`/community/injury/${type}`}>
                 <Card className="h-full hover:shadow-premium-hover transition-all cursor-pointer border-white/60 bg-white/80 backdrop-blur-md shadow-premium rounded-[2rem] overflow-hidden group">
                   <CardContent className="p-6 text-center space-y-4 flex flex-col items-center justify-center h-full">
-                    <p className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{label}</p>
+                    <p className="font-bold text-slate-900 group-hover:text-[#14532d] transition-colors">{label}</p>
                   </CardContent>
                 </Card>
               </Link>
@@ -246,7 +246,7 @@ export default function CommunityMain({ userInjury, userRegion }: CommunityMainP
         {/* 글쓰기 버튼 */}
         <div className="fixed bottom-6 right-6 z-50">
           <Link href="/community/write">
-            <Button size="lg" className="rounded-full shadow-premium-hover bg-indigo-600 hover:bg-indigo-700 h-14 px-8 text-lg font-bold transition-transform hover:scale-105">
+            <Button size="lg" className="rounded-full shadow-premium-hover bg-[#14532d] hover:bg-[#14532d]/90 h-14 px-8 text-lg font-bold transition-transform hover:scale-105">
               <MessageSquare className="w-5 h-5 mr-2" />
               글쓰기
             </Button>

@@ -63,7 +63,7 @@ export default function Footer() {
               </p>
               <Link
                 href="/about"
-                className="inline-block text-sm font-semibold text-emerald-600 hover:text-emerald-700 mt-2 transition-colors"
+                className="inline-block text-sm font-semibold text-slate-900 hover:text-slate-700 mt-2 transition-colors"
               >
                 서비스 소개 보기 →
               </Link>
@@ -82,7 +82,7 @@ export default function Footer() {
                 className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors flex items-center gap-1"
                 aria-label="공지사항"
               >
-                📢 공지사항
+                공지사항
               </Link>
 
               <div className="h-4 w-px bg-slate-200" />

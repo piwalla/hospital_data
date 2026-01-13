@@ -118,7 +118,7 @@ export default function BoardList({ category, categoryValue, title, description 
           </Select>
 
           <Link href={`/community/write?category=${category}&value=${categoryValue || ''}`}>
-            <Button className="rounded-xl bg-indigo-600 hover:bg-indigo-700 font-bold shadow-md hover:shadow-lg transition-all">
+            <Button className="rounded-xl bg-[#14532d] hover:bg-[#14532d]/90 font-bold shadow-md hover:shadow-lg transition-all">
               <MessageSquare className="w-4 h-4 mr-2" />
               글쓰기
             </Button>
@@ -129,7 +129,7 @@ export default function BoardList({ category, categoryValue, title, description 
         {loading ? (
           <div className="flex items-center justify-center py-20 min-h-[400px]">
              <div className="flex flex-col items-center gap-4">
-                <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
+                <Loader2 className="w-10 h-10 animate-spin text-[#14532d]" />
                 <p className="text-slate-400 font-medium">게시글을 불러오고 있습니다...</p>
              </div>
           </div>
@@ -141,7 +141,7 @@ export default function BoardList({ category, categoryValue, title, description 
              <h3 className="text-lg font-bold text-slate-700 mb-2">아직 작성된 글이 없습니다</h3>
              <p className="text-slate-500 mb-6">가장 먼저 이야기를 시작해보세요!</p>
              <Link href={`/community/write?category=${category}&value=${categoryValue || ''}`}>
-              <Button size="lg" className="rounded-full px-8 bg-indigo-600 hover:bg-indigo-700">첫 게시글 작성하기</Button>
+              <Button size="lg" className="rounded-full px-8 bg-[#14532d] hover:bg-[#14532d]/90">첫 게시글 작성하기</Button>
             </Link>
           </div>
         ) : (

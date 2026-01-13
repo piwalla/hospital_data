@@ -183,8 +183,18 @@ export async function POST(request: NextRequest) {
 
     const result = await chat.sendMessage(finalQuestion);
     const response = await result.response;
-    const answer = response.text();
+    let answer = response.text();
     
+    // Clean up internal thought traces (ool_code, thought, etc.) which might leak from the model
+    // Pattern: ool_code ... output or thought ...
+    // We want to remove everything up to the final actual response.
+    // Usually the actual response comes last or after the thought block.
+    // Simple regex to remove known artifacts:
+    answer = answer.replace(/ool_code[\s\S]*?print\(.*?\)[\s\S]*?thought[\s\S]*?(?=\S)/gi, '').trim();
+    answer = answer.replace(/^thought[\s\S]*?(?=\S)/gi, '').trim();
+    // Also remove any remaining 'model' label if it appears at the start
+    answer = answer.replace(/^model\s*/i, '');
+
     // 인용구(Citation) 메타데이터 추출
     const candidates = response.candidates;
     const candidate = candidates?.[0];
@@ -226,9 +236,15 @@ export async function POST(request: NextRequest) {
         const metadata = await import('@/lib/utils/rag-registry-db').then(mod => mod.getRagMetadataFromDb(rawTitle));
         
         if (!metadata) {
-            // If not found in DB, try to display raw title (better than nothing)
-            // But usually we want to filter out known bad/temp files.
-            return null;
+            // If not found in DB, fallback to raw title or filename
+            // This ensures we always show a citation if the model used a file, 
+            // even if our explicit DB mapping is missing.
+            return {
+                koreanTitle: rawTitle || "관련 문서",
+                downloadUrl: null,
+                rawTitle: rawTitle,
+                uri: uri || "#"
+            };
         }
 
         const koreanTitle = metadata.korean_title;

@@ -62,8 +62,7 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
       {/* 안내 문구 */}
       <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
         <p className="text-sm md:text-base text-gray-600 leading-relaxed font-medium">
-          이 서류들은 환자가 직접 작성하는 것이 아닙니다. <strong className="text-[#14532d] font-black">&quot;의사 선생님께 말씀하세요&quot;</strong> 또는{' '}
-          <strong className="text-[#14532d] font-black">&quot;원무과에서 발급받으세요&quot;</strong>라고 요청해야 합니다.
+          이 서류들은 환자가 직접 작성하는 것이 아닙니다. 병원 원무과나 담당 의사 선생님께 <strong className="text-[#14532d] font-black">&quot;발급해 주세요&quot;</strong>라고 요청하시면 됩니다.
         </p>
       </div>
 

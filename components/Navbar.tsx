@@ -151,7 +151,7 @@ const Navbar = () => {
             {isMounted ? (
               <>
                 <SignedOut>
-                  <SignInButton mode="modal">
+                  <SignInButton>
                     <Button 
                       className={cn(
                         "font-medium transition-colors",

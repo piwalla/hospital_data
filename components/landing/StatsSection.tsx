@@ -41,7 +41,7 @@ interface StatItemProps {
 function StatCard({ imageSrc, value, label, description }: StatItemProps) {
   return (
     <div 
-      className="flex flex-col items-center justify-center text-center p-8 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 z-10 h-full"
+      className="flex flex-col items-center justify-center text-center p-4 md:p-8 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 z-10 h-full"
     >
       <div className="mb-6 shrink-0 z-10">
         <Image 
@@ -53,7 +53,7 @@ function StatCard({ imageSrc, value, label, description }: StatItemProps) {
         />
       </div>
       
-      <div className="text-4xl font-bold text-gray-900 mb-2 w-full break-words">
+      <div className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 w-full break-normal">
         <AnimatedCounter value={value} />
       </div>
       <div className="text-lg font-bold text-gray-800 mb-1 w-full break-keep">{label}</div>

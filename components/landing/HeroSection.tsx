@@ -5,6 +5,8 @@ import Image from "next/image";
 
 import CTAButton from "./CTAButton";
 
+import { ChevronDown } from "lucide-react";
+
 
 export default function HeroSection() {
   return (
@@ -52,10 +54,10 @@ export default function HeroSection() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-base sm:text-lg md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] px-4 hidden md:block"
+              className="text-base sm:text-lg md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] px-4"
             >
               누구에게 물어봐야 할지 막막하셨죠? 산재 신청부터 보상까지,<br className="hidden md:block"/>
-              엉킨 실타래를 풀듯 <span className="text-[#4ADE80] font-bold">리워크케어가 차근차근 알려드릴께요.</span>
+              엉킨 실타래를 풀듯 <span className="text-[#4ADE80] font-bold">리워크케어가 차근차근 알려드릴게요.</span>
             </motion.p>
           </div>
 
@@ -73,6 +75,15 @@ export default function HeroSection() {
           </motion.div>
         </div>
       </div>
+
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, y: [0, 10, 0] }}
+        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+        className="absolute bottom-24 left-1/2 -translate-x-1/2 text-white z-30 drop-shadow-md"
+      >
+        <ChevronDown className="w-10 h-10 animate-bounce" />
+      </motion.div>
     </section>
   );
 }

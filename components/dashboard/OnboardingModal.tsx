@@ -212,7 +212,7 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
                </div>
              </div>
              <div className="flex flex-col gap-2 mt-4">
-               <Button onClick={handleModifyStart} className="w-full bg-blue-600 hover:bg-blue-700 gap-2 py-6 text-lg">
+               <Button onClick={handleModifyStart} className="w-full bg-[#14532d] hover:bg-[#14532d]/90 gap-2 py-6 text-lg">
                  <Edit2 className="w-4 h-4" /> 정보 수정하기
                </Button>
                <Button variant="ghost" onClick={onClose} className="w-full text-slate-500 hover:bg-slate-100 py-4">
@@ -270,12 +270,11 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
               {/* Legal Agreement (Step 1 Integration) */}
               {step === 1 && (
                 <div className="mt-8 pt-6 border-t border-slate-100 space-y-4">
-                  <div className="flex items-start space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <div className="flex items-center space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
                     <Checkbox 
                       id="terms-agree" 
                       checked={agreedToTerms} 
                       onChange={(e) => setAgreedToTerms(e.target.checked)}
-                      className="mt-1"
                     />
                     <div className="grid gap-1.5 leading-none">
                       <label htmlFor="terms-agree" className="text-sm font-medium leading-none cursor-pointer">
@@ -287,12 +286,11 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
                     </div>
                   </div>
 
-                  <div className="flex items-start space-x-3 bg-rose-50/50 p-3 rounded-lg border border-rose-100">
+                  <div className="flex items-center space-x-3 bg-rose-50/50 p-3 rounded-lg border border-rose-100">
                     <Checkbox 
                       id="sensitive-agree" 
                       checked={agreedToSensitive} 
                       onChange={(e) => setAgreedToSensitive(e.target.checked)}
-                      className="mt-1"
                     />
                     <div className="grid gap-1.5 leading-none">
                       <label htmlFor="sensitive-agree" className="text-sm font-medium leading-none cursor-pointer text-rose-900">

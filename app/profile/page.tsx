@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { getUserProfile, deleteUserAccount } from "@/app/actions/user";
+import { getUserProfile, deleteUserAccount, updateUserOnboarding } from "@/app/actions/user";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, User, MapPin, Gauge, ShieldAlert, LogOut, Trash2, Loader2 } from "lucide-react";
+import { ChevronLeft, User, MapPin, Gauge, ShieldAlert, LogOut, Trash2, Loader2, Edit2 } from "lucide-react";
 import Link from "next/link";
+import OnboardingModal from "@/components/dashboard/OnboardingModal";
+import { UserRole, InjuryPart, Region } from "@/lib/mock-admin-data";
 
 export default function ProfilePage() {
   const { user, isLoaded } = useUser();
@@ -17,6 +19,9 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  // Edit State
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -35,6 +40,35 @@ export default function ProfilePage() {
       loadProfile();
     }
   }, [isLoaded, user]);
+
+  const handleEditComplete = async (data: { role: UserRole; injuryPart: InjuryPart; region: Region; currentStep: number; agreedToTerms?: boolean; agreedToSensitive?: boolean }) => {
+    // 1. Optimistic Update
+    setProfile((prev: any) => ({
+      ...prev,
+      role: data.role,
+      injuryPart: data.injuryPart,
+      region: data.region,
+      currentStep: data.currentStep,
+    }));
+    
+    setIsEditing(false);
+
+    // 2. Server Update
+    try {
+      await updateUserOnboarding({
+        role: data.role,
+        injuryPart: data.injuryPart,
+        region: data.region,
+        currentStep: data.currentStep,
+        agreedToTerms: data.agreedToTerms,
+        agreedToSensitive: data.agreedToSensitive,
+        wageInfo: profile?.wageInfo, // Keep existing wage info if any
+      });
+    } catch (error) {
+      console.error("Failed to update profile", error);
+      alert("정보 수정에 실패했습니다.");
+    }
+  };
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
@@ -87,13 +121,24 @@ export default function ProfilePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Personalization Info */}
-          <Card className="border-none shadow-sm h-full">
-            <CardHeader className="pb-3 px-6 pt-7">
-              <CardTitle className="text-lg font-black flex items-center gap-2">
-                <span className="w-1.5 h-6 bg-emerald-500 rounded-full" />
-                나의 맞춤 정보
-              </CardTitle>
-              <CardDescription>개인정보 처리방침에 따라 동의하신 정보입니다.</CardDescription>
+          <Card className="border-none shadow-sm h-full relative">
+            <CardHeader className="pb-3 px-6 pt-7 flex flex-row items-start justify-between">
+              <div>
+                <CardTitle className="text-lg font-black flex items-center gap-2">
+                  <span className="w-1.5 h-6 bg-emerald-500 rounded-full" />
+                  나의 맞춤 정보
+                </CardTitle>
+                <CardDescription className="mt-1">개인정보 처리방침에 따라 동의하신 정보입니다.</CardDescription>
+              </div>
+              <Button 
+                onClick={() => setIsEditing(true)} 
+                variant="outline" 
+                size="sm" 
+                className="h-8 gap-1 text-emerald-700 border-emerald-200 hover:bg-emerald-50 hover:text-emerald-800"
+              >
+                <Edit2 className="w-3.5 h-3.5" />
+                <span className="text-xs font-bold">수정</span>
+              </Button>
             </CardHeader>
             <CardContent className="px-6 pb-8 space-y-4">
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100/50">
@@ -185,6 +230,21 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {profile && (
+        <OnboardingModal
+          isOpen={isEditing}
+          onClose={() => setIsEditing(false)}
+          onComplete={handleEditComplete}
+          initialData={{
+            userRole: profile.role,
+            injuryPart: profile.injuryPart,
+            region: profile.region,
+            currentStep: profile.currentStep,
+          }}
+        />
+      )}
     </div>
   );
 }

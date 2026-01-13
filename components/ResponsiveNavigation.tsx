@@ -42,6 +42,8 @@ const ResponsiveNavigation = () => {
     },
   ];
 
+  if (pathname === "/") return null;
+
   return (
     <>
       {/* 모바일 전용: 하단 탭 바 (< 768px) */}

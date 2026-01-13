@@ -85,7 +85,7 @@ export default function Home() {
          <div className="container mx-auto px-4 relative z-10 text-center">
            <div className="space-y-10 max-w-4xl mx-auto">
              
-             <h2 className="text-4xl md:text-6xl font-extrabold text-white leading-tight tracking-tight drop-shadow-lg">
+             <h2 className="text-2xl sm:text-3xl md:text-6xl font-extrabold text-white leading-tight tracking-tight drop-shadow-lg">
                나에게 필요한 산재 정보,<br/>
                <span className="text-[#4ADE80]">개인 대시보드</span>에 다 모았습니다.
              </h2>
@@ -96,7 +96,7 @@ export default function Home() {
              </p>
              
              <div className="pt-8">
-               <CTAButton href="/chatbot-v2" variant="primary" className="text-xl px-12 py-6 shadow-2xl hover:shadow-white/20 hover:-translate-y-1 rounded-2xl">
+               <CTAButton href="/chatbot-v2" variant="primary" className="text-lg px-8 py-4 md:text-xl md:px-12 md:py-6 shadow-2xl hover:shadow-white/20 hover:-translate-y-1 rounded-2xl">
                  산재 AI 무료로 사용하기
                </CTAButton>
              </div>
