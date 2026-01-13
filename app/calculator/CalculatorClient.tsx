@@ -5,13 +5,9 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {  ChevronLeft,
-  ChevronRight,
   TrendingUp, 
-  Calendar, 
-  Scale, 
-  Edit2, 
   Save, 
   Loader2,
   ShieldAlert,
@@ -83,7 +79,7 @@ export default function CalculatorClient() {
   // Derived calculations for display
   const sickLeaveResult = averageWage > 0 ? calculateSickLeave(averageWage, parseInt(sickLeaveDays) || 30, isOver61 ? parseInt(age) : undefined) : null;
   const disabilityMin = averageWage > 0 ? calculateDisability(averageWage, 14) : null;
-  const disabilityMax = averageWage > 0 ? calculateDisability(averageWage, 1) : null;
+
 
   // Navigate to Compensation Guide Report
   const handleNavigateToReport = () => {

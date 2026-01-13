@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { SignInButton } from "@clerk/nextjs";
-import { Lightbulb } from "lucide-react";
+
 import { AdminUser, UserRole, InjuryPart, Region } from "@/lib/mock-admin-data";
 import { StageWithDetails } from "@/lib/types/timeline";
 import { updateUserOnboarding } from "@/app/actions/user";
@@ -14,7 +14,6 @@ import OnboardingModal from "@/components/dashboard/OnboardingModal";
 // V2 Components (Insights & Actions)
 import PaymentScheduleCard from "@/components/dashboard/insights/PaymentScheduleCard";
 import DisabilityGradeCard from "@/components/dashboard/insights/DisabilityGradeCard";
-import VocationalTrainingCard from "@/components/dashboard/insights/VocationalTrainingCard";
 import LocalResourcesCard from "@/components/dashboard/insights/LocalResourcesCard";
 
 import QuickActionGrid from "@/components/dashboard/QuickActionGrid";

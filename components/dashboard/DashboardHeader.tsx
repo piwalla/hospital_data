@@ -1,7 +1,7 @@
 "use client";
 
 import { AdminUser } from "@/lib/mock-admin-data";
-import { Gauge, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 interface DashboardHeaderProps {
   user: AdminUser;

@@ -2,18 +2,19 @@
 import { auth } from '@clerk/nextjs/server';
 import RagChatbotV2 from '@/components/rag-chatbot/RagChatbotV2';
 import ChatbotHero from '@/components/chatbot/ChatbotHero';
-import { SignInButton } from '@clerk/nextjs';
-import { Button } from '@/components/ui/button';
+
 import { Shield, CheckCircle } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ChatbotV2Page() {
-  const { userId } = await auth();
+  await auth();
 
   return (
     <>
       <ChatbotHero />
 
-      <div className="relative w-screen left-[calc(-50vw+50%)] bg-[#eff2f5] min-h-screen -mt-12">
+      <div className="relative w-screen left-[calc(-50vw+50%)] bg-[#eff2f5] min-h-[100dvh] -mt-12">
         <div className="container mx-auto px-4 sm:px-6 pb-20 pt-12 max-w-6xl">
           <div className="space-y-12">
             {/* 챗봇 메인 컨테이너 */}

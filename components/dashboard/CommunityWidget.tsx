@@ -6,8 +6,7 @@ import { getUserInjuryType, getUserRegionType, INJURY_TYPES, REGIONS } from "@/l
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-import { 
-  Users2, 
+import {   
   ArrowRight, 
   Bone, 
   Brain, 

@@ -7,7 +7,7 @@
 
 'use client';
 
-import { ExternalLink, FileText, Youtube, Maximize2 } from 'lucide-react';
+import { FileText, Youtube, Maximize2 } from 'lucide-react';
 import type { Document } from '@/lib/types/document';
 import { Button } from '@/components/ui/button';
 import { getDisclaimer } from '@/lib/utils/disclaimer';

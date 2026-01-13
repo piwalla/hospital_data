@@ -10,12 +10,7 @@
  * 3. 로그인 상태 확인 및 로그인 모달 표시
  */
 
-import { useState, useEffect } from "react";
-import { Star } from "lucide-react";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { addFavorite, removeFavorite, checkFavorite } from "@/lib/api/favorites";
 import type { EntityType } from "@/lib/types/favorites";
-import { cn } from "@/lib/utils";
 
 interface FavoriteButtonProps {
   entityType: EntityType;
@@ -25,10 +20,10 @@ interface FavoriteButtonProps {
 }
 
 export default function FavoriteButton({
-  entityType,
-  entityId,
-  className,
-  size = "md",
+// entityType,
+  // entityId,
+  // className,
+  // size = "md",
 }: FavoriteButtonProps) {
   // MVP에서는 즐겨찾기 기능을 사용하지 않으므로 숨김 처리
   return null;

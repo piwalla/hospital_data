@@ -275,6 +275,8 @@ iframe {
       system-ui,
       sans-serif;
     letter-spacing: -0.02em;
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   main {
     @apply max-w-7xl mx-auto pt-16 px-4;

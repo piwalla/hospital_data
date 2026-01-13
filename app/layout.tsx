@@ -74,6 +74,11 @@ export default function RootLayout({
             title: "리워크케어 이용하기",
           },
         },
+        unstable__errors: {
+          password_complexity_minimum_length: "비밀번호는 8자 이상이어야 합니다.",
+          form_password_length_too_short: "비밀번호는 8자 이상이어야 합니다.",
+          form_password_pwned: "이 비밀번호는 데이터 침해에 노출된 적이 있어 사용할 수 없습니다.",
+        } as any,
       }}
       appearance={{
         variables: {

@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Star, ShieldCheck, User } from "lucide-react";
+import { ShieldCheck, User } from "lucide-react";
 
 // Admin Check Component
 // Admin Check Component
@@ -95,8 +95,7 @@ const Navbar = () => {
   const logoColor = (isTransparentPage && isScrolled) ? "text-gray-900" : "text-white";
   const navTextColor = (isTransparentPage && isScrolled) ? "text-gray-600 hover:text-primary" : "text-white/80 hover:text-white";
   const navActiveColor = (isTransparentPage && isScrolled) ? "text-primary font-bold" : "text-white font-bold";
-  const iconColor = (isTransparentPage && isScrolled) ? "text-gray-600" : "text-white/80";
-  const iconActiveColor = (isTransparentPage && isScrolled) ? "text-primary fill-primary" : "text-white fill-white";
+
 
   return (
     <header className={headerClass}>
@@ -151,7 +150,7 @@ const Navbar = () => {
             {isMounted ? (
               <>
                 <SignedOut>
-                  <SignInButton>
+                  <SignInButton mode="modal">
                     <Button 
                       className={cn(
                         "font-medium transition-colors",

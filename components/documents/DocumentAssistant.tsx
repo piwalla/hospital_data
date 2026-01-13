@@ -6,7 +6,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Loader2, Send, Sparkles, Bot, ShieldCheck, ShieldAlert, BookOpen, AlertCircle, ExternalLink } from 'lucide-react';
+import { Loader2, Send, Sparkles, ShieldCheck, ShieldAlert, BookOpen, AlertCircle, ExternalLink } from 'lucide-react';
 import DocumentBotIcon from './DocumentBotIcon';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';

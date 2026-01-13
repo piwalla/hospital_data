@@ -9,7 +9,6 @@ import {
   Stethoscope, 
   Activity, 
   Briefcase, 
-  ChevronRight,
   AlertCircle,
   PiggyBank,
   HeartPulse,

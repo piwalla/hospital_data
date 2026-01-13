@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, MessageCircle } from 'lucide-react';
+import { X } from 'lucide-react';
 import RagChatbotV2 from '@/components/rag-chatbot/RagChatbotV2';
 import SimpleBotIcon from '@/components/chatbot/SimpleBotIcon';
 

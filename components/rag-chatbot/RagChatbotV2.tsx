@@ -11,14 +11,12 @@
 import { useMemo, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 // Original imports
-import { useUser } from '@clerk/nextjs';
 import { Loader2, Send, Sparkles, Share2, CheckCircle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import RiuLoader from '@/components/ui/riu-loader';
 import AiReadingLoader from '@/components/ui/ai-reading-loader';
 import SmartBrainIcon from '@/components/chatbot/SmartBrainIcon';
-import { SignInButton } from '@clerk/nextjs';
+import { SignInButton, useUser } from '@clerk/nextjs';
 import { X } from 'lucide-react';
 
 
@@ -239,7 +237,7 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
         </div>
       </div>
 
-      <div className={`space-y-4 sm:space-y-6 mb-4 sm:mb-6 overflow-y-auto pr-2 ${isWidget ? 'flex-1 min-h-0' : 'max-h-[400px] sm:max-h-[500px] md:max-h-[600px]'}`}>
+      <div className={`space-y-4 sm:space-y-6 mb-4 sm:mb-6 overflow-y-auto pr-2 ${isWidget ? 'flex-1 min-h-0' : 'max-h-[60dvh] sm:max-h-[500px] md:max-h-[600px]'}`}>
         {messages.length === 0 ? (
           <div className={`text-center space-y-8 ${isWidget ? 'py-10' : 'py-16 sm:py-24'}`}>
             <div className="flex justify-center">

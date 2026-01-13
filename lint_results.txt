@@ -1,0 +1,77 @@
+﻿
+> saas-mini-course@0.1.0 lint C:\Users\highs\OneDrive\Desktop\crusor\hospital_data
+> next lint
+
+
+./app/calculator/CalculatorClient.tsx
+8:33  Warning: 'DialogDescription' is defined but never used.  @typescript-eslint/no-unused-vars
+8:52  Warning: 'DialogHeader' is defined but never used.  @typescript-eslint/no-unused-vars
+10:3  Warning: 'ChevronRight' is defined but never used.  @typescript-eslint/no-unused-vars
+12:3  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+13:3  Warning: 'Scale' is defined but never used.  @typescript-eslint/no-unused-vars
+14:3  Warning: 'Edit2' is defined but never used.  @typescript-eslint/no-unused-vars
+86:9  Warning: 'disabilityMax' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/chatbot-v2/page.tsx
+5:10  Warning: 'SignInButton' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+10:11  Warning: 'userId' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/compensation/guide/page.tsx
+12:3  Warning: 'ChevronRight' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/chatbot/FloatingChatbotButton.tsx
+5:13  Warning: 'MessageCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/dashboard/CommunityWidget.tsx
+10:3  Warning: 'Users2' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/dashboard/DashboardClient.tsx
+5:10  Warning: 'Lightbulb' is defined but never used.  @typescript-eslint/no-unused-vars
+17:8  Warning: 'VocationalTrainingCard' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/dashboard/DashboardHeader.tsx
+4:10  Warning: 'Gauge' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/dashboard/PersonalizedStatsWidget.tsx
+5:52  Warning: 'CardDescription' is defined but never used.  @typescript-eslint/no-unused-vars
+7:10  Warning: 'Info' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/dashboard/RecommendedBenefitsWidget.tsx
+5:52  Warning: 'CardDescription' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/documents/DocumentAssistant.tsx
+9:35  Warning: 'Bot' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/documents/DocumentSummary.tsx
+10:10  Warning: 'ExternalLink' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/documents/DocumentTabs.tsx
+8:41  Warning: 'ExternalLink' is defined but never used.  @typescript-eslint/no-unused-vars
+36:9  Warning: 'previewFilename' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+39:10  Warning: 'isMobile' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./components/FavoriteButton.tsx
+13:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+13:20  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+14:10  Warning: 'Star' is defined but never used.  @typescript-eslint/no-unused-vars
+15:10  Warning: 'SignedIn' is defined but never used.  @typescript-eslint/no-unused-vars
+15:20  Warning: 'SignedOut' is defined but never used.  @typescript-eslint/no-unused-vars
+15:31  Warning: 'SignInButton' is defined but never used.  @typescript-eslint/no-unused-vars
+16:10  Warning: 'addFavorite' is defined but never used.  @typescript-eslint/no-unused-vars
+16:23  Warning: 'removeFavorite' is defined but never used.  @typescript-eslint/no-unused-vars
+16:39  Warning: 'checkFavorite' is defined but never used.  @typescript-eslint/no-unused-vars
+18:10  Warning: 'cn' is defined but never used.  @typescript-eslint/no-unused-vars
+28:3  Warning: 'entityType' is defined but never used.  @typescript-eslint/no-unused-vars
+29:3  Warning: 'entityId' is defined but never used.  @typescript-eslint/no-unused-vars
+30:3  Warning: 'className' is defined but never used.  @typescript-eslint/no-unused-vars
+31:3  Warning: 'size' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./components/Navbar.tsx
+10:10  Warning: 'Star' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./components/rag-chatbot/RagChatbotV2.tsx
+18:8  Warning: 'RiuLoader' is defined but never used.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

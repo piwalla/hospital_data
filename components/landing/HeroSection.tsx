@@ -13,7 +13,7 @@ export default function HeroSection() {
     // Removed bg-gradient-to-b to allow image to show through
     // Added w-screen and left-[calc(-50vw+50%)] to break out of parent container width
     // Added -mt-16 to counteract the global main pt-16 padding
-    <section className="relative w-screen left-[calc(-50vw+50%)] min-h-[100vh] -mt-16 flex items-center justify-center overflow-hidden pt-12 md:pt-0">
+    <section className="relative w-screen left-[calc(-50vw+50%)] min-h-[100dvh] -mt-16 flex items-center justify-center overflow-hidden pt-12 md:pt-0">
       {/* Background Decor */}
       <div className="absolute inset-0 -z-10 w-full h-full overflow-hidden">
         <Image

@@ -5,6 +5,8 @@ import { SignInButton } from '@clerk/nextjs';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Shield, CheckCircle } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * @file page.tsx
  * @description 산재 상담 챗봇 페이지

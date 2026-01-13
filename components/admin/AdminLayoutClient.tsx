@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,7 @@ export function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
              
             <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden border border-slate-100">
                {user.imageUrl ? (
-                   <img src={user.imageUrl} alt="Profile" className="w-full h-full object-cover" />
+                   <Image src={user.imageUrl} alt="Profile" fill className="object-cover" />
                ) : (
                   <div className="h-full w-full bg-slate-900 flex items-center justify-center text-white font-bold text-xs">A</div>
                )}

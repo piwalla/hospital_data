@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, User, MapPin, Gauge, ShieldAlert, LogOut, Trash2, Loader2, Edit2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import OnboardingModal from "@/components/dashboard/OnboardingModal";
 import { UserRole, InjuryPart, Region } from "@/lib/mock-admin-data";
 
@@ -105,7 +106,7 @@ export default function ProfilePage() {
           <div className="h-32 bg-gradient-to-r from-emerald-600 to-teal-600 relative">
             <div className="absolute -bottom-10 left-8 p-1 bg-white rounded-3xl shadow-sm">
               {user?.imageUrl ? (
-                <img src={user.imageUrl} alt="Profile" className="w-24 h-24 rounded-[1.4rem] object-cover" />
+                <Image src={user.imageUrl} alt="Profile" width={96} height={96} className="rounded-[1.4rem] object-cover" />
               ) : (
                 <div className="w-24 h-24 rounded-[1.4rem] bg-emerald-50 flex items-center justify-center">
                   <User className="w-12 h-12 text-emerald-600" />

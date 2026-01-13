@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DocumentSummary from "./DocumentSummary";
 import DocumentAssistant from "./DocumentAssistant";
 import { Document } from "@/lib/types/document";
-import { FileText, Maximize2, Download, ExternalLink, FileSearch } from "lucide-react";
+import { FileText, Maximize2, Download, FileSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface DocumentTabsProps {
@@ -33,16 +33,6 @@ export default function DocumentTabs({ document }: DocumentTabsProps) {
       : null;
 
   const previewTitle = isFormPdf ? "서식 미리보기" : "진행 과정 안내";
-  const previewFilename = isFormPdf ? document.officialDownloadUrl?.split('/').pop() : document.guidePdfPath;
-
-  // 모바일 여부 확인 (클라이언트 사이드)
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   return (
     <Tabs defaultValue="guide" value={activeTab} onValueChange={setActiveTab} className="w-full">

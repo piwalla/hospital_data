@@ -14,7 +14,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";
-import { useUser } from "@clerk/nextjs";
+import { useUser, SignInButton } from "@clerk/nextjs";
 import { useClerkSupabaseClient } from "@/lib/supabase/clerk-client";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 
@@ -201,9 +201,11 @@ export default function ChatPage() {
     return (
       <div className="flex h-screen items-center justify-center flex-col gap-4">
         <p className="text-gray-600">로그인이 필요합니다.</p>
-        <a href="/sign-in" className="text-sky-500 hover:underline">
-          로그인하기
-        </a>
+        <SignInButton mode="modal">
+          <button className="text-sky-500 hover:underline">
+            로그인하기
+          </button>
+        </SignInButton>
       </div>
     );
   }

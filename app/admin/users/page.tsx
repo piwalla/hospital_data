@@ -1,5 +1,6 @@
 import { createClerkSupabaseClient } from '@/lib/supabase/server';
 import { clerkClient } from "@clerk/nextjs/server";
+import Image from "next/image";
 import {
   User,
 } from "lucide-react";
@@ -74,7 +75,7 @@ export default async function UserListPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {clerkInfo.imageUrl ? (
-                          <img src={clerkInfo.imageUrl} className="w-10 h-10 rounded-full" alt="profile" />
+                          <Image src={clerkInfo.imageUrl} width={40} height={40} className="rounded-full" alt="profile" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
                             <User className="w-5 h-5" />
