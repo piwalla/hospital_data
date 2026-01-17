@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Locale } from "@/lib/i18n/config";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PostCard from "@/components/community/PostCard";
@@ -34,9 +35,34 @@ interface BoardListProps {
 }
 
 export default function BoardList({ category, categoryValue, title, description }: BoardListProps) {
+  const [locale, setLocale] = useState<Locale>('ko');
   const [posts, setPosts] = useState<CommunityPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [sort, setSort] = useState<'latest' | 'popular' | 'comments'>('latest');
+
+  useEffect(() => {
+    // 1. Initial Locale Load
+    const savedLocale = localStorage.getItem('user_locale') as Locale;
+    if (savedLocale) {
+      setLocale(savedLocale);
+    }
+
+    // 2. Event Listeners for Sync
+    const handleLocaleUpdate = () => {
+      const updated = localStorage.getItem('user_locale') as Locale;
+      if (updated) {
+        setLocale(updated);
+      }
+    };
+
+    window.addEventListener('storage', handleLocaleUpdate);
+    window.addEventListener('localeChange', handleLocaleUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleLocaleUpdate);
+      window.removeEventListener('localeChange', handleLocaleUpdate);
+    };
+  }, []);
 
   useEffect(() => {
     async function loadPosts() {

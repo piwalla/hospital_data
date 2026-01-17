@@ -79,7 +79,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'accident-report',
-    name: '사고 경위서 (재해발생경위서)',
+    name: '사고 경위서',
     description: '어떻게 다쳤는지 상황을 자세히 설명하는 서류입니다.',
     searchKeywords: ['경위', '사고', '다친 과정', '어떻게', '상황', '설명', '재해', '발생', '경위서', '사고 내용', '목격자', '증거', '승인'],
     category: 'application',
@@ -153,7 +153,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'medical-benefit-application',
-    name: '요양비 청구서 (병원비 환급 신청서)',
+    name: '요양비 청구서',
     description: '내 돈으로 먼저 낸 병원비와 약값을 돌려받는 신청서입니다.',
     searchKeywords: ['병원비', '치료비', '환급', '돌려받기', '영수증', '자비', '요양비', '의료비', '약값', '약국', '내 돈', '먼저 냄', '상세내역서', '청구'],
     category: 'benefit',
@@ -236,7 +236,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'sick-leave-benefit-application',
-    name: '휴업급여 청구서 (쉬는 기간 월급 신청서)',
+    name: '휴업급여 청구서',
     description: '치료 때문에 일을 못 한 기간의 생활비를 받는 신청서입니다.',
     searchKeywords: ['급여', '월급', '생활비', '임금', '쉬는 기간', '휴업', '일 못함', '출근 못함', '돈', '지원금', '70%', '평균임금', '쉬는 동안', '치료 기간', '매달'],
     category: 'benefit',
@@ -291,7 +291,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'disability-rating-application',
-    name: '장해급여 청구서 (장해 보상금 신청서)',
+    name: '장해급여 청구서',
     description: '치료 후 남은 후유증에 대한 보상금을 받는 신청서입니다.',
     searchKeywords: ['장해', '후유증', '보상금', '등급', '연금', '일시금', '장애', '불편', '남은 증상', '완치 안됨', '장해급여', '장해진단', '심사', '1급', '14급'],
     category: 'compensation',
@@ -348,7 +348,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'employment-support-application',
-    name: '취업지원서비스 신청서 (재취업/직업훈련 신청서)',
+    name: '취업지원서비스 신청서',
     description: '다친 후 새로운 일자리를 찾거나 직업교육을 받을 때 지원받는 신청서입니다.',
     searchKeywords: ['재취업', '직업훈련', '교육', '자격증', '학원비', '취업', '일자리', '새 직장', '직업', '훈련', '배움', '기술', '사회복귀', '복직'],
     category: 'benefit',
@@ -419,7 +419,7 @@ export const DOCUMENTS: Document[] = [
 
   {
     id: 're-treatment-application',
-    name: '재요양신청서 (재치료 신청서)',
+    name: '재요양신청서',
     description: '치료가 끝난 후 다시 아프거나 핀을 빼야 할 때 재치료를 신청하는 서류입니다.',
     searchKeywords: ['재요양', '재치료', '다시 아픔', '핀 제거', '악화', '재발', '또 아픔', '핀 빼기', '철심', '금속', '수술', '다시 치료', '종결 후'],
     category: 'application',
@@ -480,7 +480,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'hospital-transfer-application',
-    name: '전원요양 신청서 (병원 옮기기 신청서)',
+    name: '전원요양 신청서',
     description: '치료받는 병원을 다른 곳으로 옮기고 싶을 때 내는 신청서입니다.',
     searchKeywords: ['전원', '병원 옮기기', '이동', '다른 병원', '병원 바꾸기', '집 근처', '재활병원', '한방병원', '옮김', '전원요양'],
     category: 'application',
@@ -534,7 +534,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'additional-disease-application',
-    name: '추가상병 신청서 (아픈 곳 추가 신청서)',
+    name: '추가상병 신청서',
     description: '처음 신청할 때 몰랐던 다른 부상이나 질병을 추가로 인정받는 신청서입니다.',
     searchKeywords: ['추가', '다른 곳', '합병증', '새로운 부상', '추가상병', '아픈 곳 추가', '또 다른 곳', '신청 안 한 곳', '발견', '새로 아픔'],
     category: 'application',
@@ -596,7 +596,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'nursing-care-benefit-application',
-    name: '간병급여 청구서 (간병비 신청서)',
+    name: '간병급여 청구서',
     description: '혼자 거동이 어려워 간병인이 필요할 때 간병비를 받는 신청서입니다.',
     searchKeywords: ['간병비', '간병인', '가족 간병', '돌봄', '수발', '간호', '거동 불편', '혼자 못함', '도움 필요', '간병급여', '4만원'],
     category: 'benefit',
@@ -662,7 +662,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'concurrent-treatment-application',
-    name: '병행진료 신청서 (두 곳에서 치료받기 신청서)',
+    name: '병행진료 신청서',
     description: '현재 병원에 없는 진료를 다른 병원에서 함께 받고 싶을 때 내는 신청서입니다.',
     searchKeywords: ['병행', '두 곳', '동시', '한방', '침', '양방', '치과', 'MRI', '검사', '다른 병원', '같이', '병행진료', '협진'],
     category: 'application',
@@ -735,7 +735,7 @@ export const DOCUMENTS: Document[] = [
   },
   {
     id: 'transportation-expense-application',
-    name: '이송비 청구서 (교통비 신청서)',
+    name: '이송비 청구서',
     description: '병원 갈 때 쓴 택시비, 앰뷸런스 비용, 버스비도 산재에서 돌려받으세요! 자동으로 안 주니 꼭 청구하세요.',
     category: 'benefit',
     officialDownloadUrl: 'https://uanhvrgezlkwfnkvidtf.supabase.co/storage/v1/object/public/uploads/Transportation%20Expense%20Claim.pdf',

@@ -20,6 +20,8 @@
 
 ## 📋 목차
 
+> **👋 인수인계를 받으셨나요?** [**☞ 여기를 눌러 인수인계 가이드(Handover Guide)를 먼저 읽어보세요!**](./docs/프로젝트%20결산/인수인계_가이드_메인.md)
+
 1. [소개](#소개)
 2. [기술 스택](#기술-스택)
 3. [주요 기능](#주요-기능)
@@ -32,6 +34,7 @@
 Next.js 15, Clerk, Supabase를 활용한 모던 SaaS 애플리케이션 템플릿입니다.
 
 **핵심 특징:**
+
 - ✨ Next.js 15 + React 19 최신 기능 활용
 - 🔐 Clerk와 Supabase 네이티브 통합 (2025년 권장 방식)
 - 🎨 Tailwind CSS v4 + shadcn/ui
@@ -72,12 +75,14 @@ Next.js 15, Clerk, Supabase를 활용한 모던 SaaS 애플리케이션 템플�
 ## 주요 기능
 
 ### 🔐 인증 시스템
+
 - Clerk를 통한 안전한 사용자 인증
 - 소셜 로그인 지원 (Google 등)
 - Clerk 사용자 자동으로 Supabase DB에 동기화
 - 한국어 UI 지원
 
 ### 🗄️ 데이터베이스 통합
+
 - Clerk 토큰 기반 Supabase 인증 (JWT 템플릿 불필요)
 - 환경별 Supabase 클라이언트 분리:
   - Client Component용 (`useClerkSupabaseClient`)
@@ -86,12 +91,14 @@ Next.js 15, Clerk, Supabase를 활용한 모던 SaaS 애플리케이션 템플�
 - SQL 마이그레이션 시스템
 
 ### 🎨 UI/UX
+
 - shadcn/ui 기반 모던 컴포넌트
 - 완전한 반응형 디자인
 - 다크/라이트 모드 지원 가능
 - 접근성 준수 (WCAG)
 
 ### 🏗️ 아키텍처
+
 - Server Actions 우선 사용
 - 타입 안전성 보장
 - 모듈화된 코드 구조
@@ -155,12 +162,13 @@ npm install -g pnpm
 3. 페이지 하단으로 스크롤하여 **"Third-Party Auth"** 섹션 찾기
 4. **"Enable Custom Access Token"** 또는 **"Add Provider"** 클릭
 5. 다음 정보 입력:
-
    - **Provider Name**: `Clerk` (또는 원하는 이름)
    - **JWT Issuer (Issuer URL)**:
+
      ```
      https://your-app-12.clerk.accounts.dev
      ```
+
      (`your-app-12` 부분을 실제 Clerk Frontend API URL로 교체)
 
    - **JWKS Endpoint (JWKS URI)**:
@@ -195,6 +203,7 @@ npm install -g pnpm
 5. 성공 메시지 확인 (`Success. No rows returned`)
 
 **생성되는 테이블:**
+
 - `users`: Clerk 사용자와 동기화되는 사용자 정보 테이블
 
 #### 6. 환경 변수 설정
@@ -283,6 +292,7 @@ pnpm dev
 브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인합니다.
 
 **테스트 페이지:**
+
 - `/auth-test`: Clerk + Supabase 인증 통합 테스트
 - `/storage-test`: Supabase Storage 업로드 테스트
 
@@ -403,9 +413,11 @@ saas-template/
 
 ## 추가 리소스
 
+- **[📂 프로젝트 상세 문서 모음 (Documentation Index)](./docs/DOCUMENT_INDEX.md)** - 이 프로젝트의 기획, 설계, 가이드 등 모든 문서를 찾아볼 수 있습니다.
 - [Next.js 15 문서](https://nextjs.org/docs)
 - [Clerk 문서](https://clerk.com/docs)
 - [Supabase 문서](https://supabase.com/docs)
 - [shadcn/ui 문서](https://ui.shadcn.com/)
 - [Tailwind CSS v4 문서](https://tailwindcss.com/docs)
+
 # hospital_data

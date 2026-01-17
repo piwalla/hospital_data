@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SignInButton } from "@clerk/nextjs";
 
 import { AdminUser, UserRole, InjuryPart, Region } from "@/lib/mock-admin-data";
@@ -10,6 +10,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ActionChecklist from "@/components/dashboard/ActionChecklist";
 import CuratedContent from "@/components/dashboard/CuratedContent";
 import OnboardingModal from "@/components/dashboard/OnboardingModal"; 
+import { Locale, dashboardTranslations } from "@/lib/i18n/config";
 
 // V2 Components (Insights & Actions)
 import PaymentScheduleCard from "@/components/dashboard/insights/PaymentScheduleCard";
@@ -31,32 +32,12 @@ interface DashboardClientProps {
   isGuest?: boolean;
 }
 
-// Stage-specific action items (frontend-only, bypassing database)
-const STAGE_ACTIONS: Record<number, Array<{ id: string; title: string; description?: string }>> = {
-  1: [ // 산재 신청 및 승인
-    { id: 'stage1-1', title: '진료 시 "일하다 다쳤음" 말하기', description: '의무기록에 남겨야 유리합니다.' },
-    { id: 'stage1-2', title: '원무과에 "산재로 처리" 요청', description: '건강보험이 아닌 산재보험으로 접수하세요.' },
-    { id: 'stage1-3', title: '현장 사진·목격자 확보', description: '치우기 전에 빨리 찍어두세요.' },
-    { id: 'stage1-5', title: '요양급여신청서 제출', description: '근로복지공단에 사고를 알리는 서류입니다.' },
-  ],
-  2: [ // 요양 및 치료
-    { id: 'stage2-1', title: '정기적으로 병원 방문하여 치료 지속하기', description: '치료를 중단하면 요양 중단 판정을 받을 수 있습니다.' },
-    { id: 'stage2-2', title: '매월 휴업급여 청구서 제출하기', description: '치료 기간 동안 매월 휴업급여를 청구하세요.' },
-    { id: 'stage2-3', title: '진료비 영수증 보관하기', description: '나중에 요양비 청구 시 필요할 수 있습니다.' },
-    { id: 'stage2-4', title: '치료 중 무단 근로 절대 금지', description: '무단 근로 적발 시 급여가 환수될 수 있습니다.' },
-  ],
-  3: [ // 장해 심사
-    { id: 'stage3-1', title: '치료 종결 후 장해급여 청구 여부 결정', description: '영구적인 장해가 남았다면 장해급여를 청구하세요.' },
-    { id: 'stage3-2', title: '장해진단서 및 MRI/X-ray CD 준비', description: '영상 자료 없이는 심사가 불가능합니다.' },
-    { id: 'stage3-3', title: '간편심사로 장해 등급 확정', description: '장해급여 청구서를 제출하고 결과를 기다리세요.' },
-    { id: 'stage3-4', title: '불인정 시 이의 제기 준비', description: '등급이 낮거나 불인정되면 심사 청구를 고려하세요.' },
-  ],
-  4: [ // 직업 복귀
-    { id: 'stage4-1', title: '원직장 복귀 상담', description: '원래 직장으로 돌아갈 수 있는지 상담하세요.' },
-    { id: 'stage4-2', title: '새로운 직업 훈련 신청', description: '재활 훈련을 통해 새로운 직업을 준비하세요.' },
-    { id: 'stage4-3', title: '직업재활급여 신청서 제출', description: '직업 재활 지원을 받기 위한 신청서를 제출하세요.' },
-    { id: 'stage4-4', title: '재취업 지원 프로그램 참여', description: '공단의 재취업 지원 프로그램을 활용하세요.' },
-  ],
+// Stage-specific action IDs only (content comes from translation config)
+const STAGE_ACTION_IDS: Record<number, string[]> = {
+  1: ['stage1-1', 'stage1-2', 'stage1-3', 'stage1-5'], // Application
+  2: ['stage2-1', 'stage2-2', 'stage2-3', 'stage2-4'], // Treatment
+  3: ['stage3-1', 'stage3-2', 'stage3-3', 'stage3-4'], // Disability
+  4: ['stage4-1', 'stage4-2', 'stage4-3', 'stage4-4'], // Return
 };
 
 
@@ -110,27 +91,65 @@ function getNormalizedRegion(region: any): string {
 
 export default function DashboardClient({ initialUser, currentStage, isGuest = false }: DashboardClientProps) {
   const [user, setUser] = useState<AdminUser>(initialUser);
-  const [showOnboarding, setShowOnboarding] = useState(
-    !initialUser.region || !initialUser.userRole || !initialUser.injuryPart
-  );
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  
+  const [locale, setLocale] = useState<Locale>('ko');
 
-  // Handle Onboarding/Profile Updates
-  const handleOnboardingComplete = async (data: { role: UserRole; injuryPart: InjuryPart; region: Region; currentStep: number; agreedToTerms?: boolean; agreedToSensitive?: boolean }) => {
+  useEffect(() => {
+    // Initial load
+    const savedLocale = localStorage.getItem('user_locale') as Locale;
+    if (savedLocale && dashboardTranslations[savedLocale]) {
+      setLocale(savedLocale);
+    }
+
+    // Event listener for dynamic updates
+    const handleLocaleChange = () => {
+      const updatedLocale = localStorage.getItem('user_locale') as Locale;
+      if (updatedLocale && dashboardTranslations[updatedLocale]) {
+        setLocale(updatedLocale);
+      }
+    };
+
+    window.addEventListener('user_locale', handleLocaleChange);
+    window.addEventListener('localeChange', handleLocaleChange);
+    window.addEventListener('storage', handleLocaleChange);
+
+    return () => {
+      window.removeEventListener('user_locale', handleLocaleChange);
+      window.removeEventListener('localeChange', handleLocaleChange);
+      window.removeEventListener('storage', handleLocaleChange);
+    };
+  }, []);
+
+
+
+  const t = dashboardTranslations[locale] || dashboardTranslations['ko'];
+
+  // Derive actions from IDs and current locale
+  const currentActionIds = STAGE_ACTION_IDS[user.currentStep] || [];
+  const actions = currentActionIds.map(id => {
+    const item = t.checklist.items[id];
+    return {
+      id,
+      title: item?.title || id,
+      description: item?.description
+    };
+  });
+  
+  // Also pass locale to widgets if they need specific control (User name logic needs to be localized too inside them)
+
+  // Handlers for Onboarding
+  const handleOnboardingComplete = async (data: any) => {
     // Optimistic Update
-    const updatedUser = {
-      ...user,
-      userRole: data.role,
-      injuryPart: data.injuryPart,
-      region: data.region,
-      currentStep: data.currentStep,
-      progress: Math.min(10 + (data.currentStep * 20), 100),
-    } as AdminUser;
-
+    const updatedUser = { 
+      ...user, 
+      ...data,
+      userRole: data.role // Explicitly map role -> userRole
+    };
     setUser(updatedUser);
     setShowOnboarding(false);
-    setIsEditingProfile(false);
 
+    // Persist to Server (Server Action)
     // Skip server update for guest users
     if (isGuest) return;
 
@@ -168,36 +187,23 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
         <div className="bg-gradient-to-r from-emerald-950 to-teal-900 text-white px-4 py-3 shadow-md relative z-20 border-b border-emerald-800">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="font-medium text-sm sm:text-base flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-200">
+              <span className="w-6 h-6 rounded-full bg-primary/30 flex items-center justify-center border border-primary/40">
+                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-secondary">
                     <path d="M2 12h20M12 2v20M12 12l5-5M12 12l-5 5" />
                  </svg>
               </span>
-              <span>
-                현재 <strong>체험 모드</strong>입니다. 내 정보를 저장하고 맞춤형 가이드를 계속 받으시려면?
-              </span>
+              <span dangerouslySetInnerHTML={{ __html: t.guest.banner.mode }} />
             </p>
             <SignInButton mode="modal">
               <button 
-                className="whitespace-nowrap bg-white text-emerald-900 px-4 py-1.5 rounded-full text-sm font-bold hover:bg-emerald-50 transition-colors shadow-sm"
+                className="whitespace-nowrap bg-white text-primary px-4 py-1.5 rounded-full text-sm font-bold hover:bg-emerald-50 transition-colors shadow-sm"
               >
-                3초 만에 시작하기
+                {t.guest.banner.start}
               </button>
             </SignInButton>
           </div>
         </div>
       )}
-
-      {/* Profile Modal */}
-      <OnboardingModal
-        isOpen={showOnboarding || isEditingProfile}
-        onComplete={handleOnboardingComplete}
-        initialData={isEditingProfile ? user : undefined}
-        onClose={() => {
-          setIsEditingProfile(false);
-          setShowOnboarding(false);
-        }}
-      />
 
       {/* 1. Header Section - Full width on mobile, rounded/padded on desktop */}
       {/* 1. Header Section - Full width on mobile, rounded/padded on desktop */}
@@ -205,13 +211,13 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
       <div className="max-w-7xl mx-auto sm:px-6 sm:py-6 mb-0 mt-0 pt-0">
         <DashboardHeader
           user={user}
-          onEditProfile={() => setIsEditingProfile(true)}
+          onEditProfile={() => window.dispatchEvent(new CustomEvent('open-profile-edit'))}
         />
       </div>
 
       {/* 2. Main Content Section - Padded on mobile */}
       {/* Mobile: px-5 (20px) for standard alignment. pt-6 for breathing room after header. */}
-      <div className="max-w-7xl mx-auto px-5 pt-6 sm:px-6 sm:pt-0 pb-20 space-y-8 sm:space-y-5">
+      <div className="max-w-7xl mx-auto px-0 pt-6 sm:px-6 sm:pt-0 pb-20 space-y-8 sm:space-y-5">
 
 
 
@@ -223,7 +229,7 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
 
         {/* AREA A-2: Recommended Benefits (Moved to Top) */}
         <section className="animate-in fade-in slide-in-from-bottom-3 duration-500 delay-100">
-            <RecommendedBenefitsWidget currentStep={user.currentStep} averageWage={user.wageInfo?.amount} userName={user.name} />
+            <RecommendedBenefitsWidget currentStep={user.currentStep} averageWage={user.wageInfo?.amount} userName={user.name} isGuest={isGuest} />
         </section>
 
         {/* AREA A-3: Local Resources & Video (Moved to Top) */}
@@ -234,12 +240,14 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
             {/* 2. Recommended Video */}
             {(() => {
                 const recommendedVideos = getRecommendedVideos(
-                user.currentStep,
-                user.userRole === 'patient' ? 'patient' : 'family',
-                user.injuryPart === 'hand_arm' ? 'hand_arm' :
-                user.injuryPart === 'foot_leg' ? 'foot_leg' :
-                user.injuryPart === 'spine' ? 'spine' :
-                user.injuryPart === 'brain_neuro' ? 'brain_neuro' : 'other',
+                isGuest ? 1 : user.currentStep, // Guest defaults to Step 1 (Application)
+                isGuest ? 'patient' : (user.userRole === 'patient' ? 'patient' : 'family'),
+                isGuest ? 'hand_arm' : ( // Guest defaults to hand_arm (common) or any valid type to get results
+                    user.injuryPart === 'hand_arm' ? 'hand_arm' :
+                    user.injuryPart === 'foot_leg' ? 'foot_leg' :
+                    user.injuryPart === 'spine' ? 'spine' :
+                    user.injuryPart === 'brain_neuro' ? 'brain_neuro' : 'other'
+                ),
                 1 // Only show 1 video in dashboard
                 );
                 
@@ -255,11 +263,11 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
                         user.injuryPart === 'brain_neuro' ? 'brain_neuro' : 'other'
                     )
                     }
-                    checklist={STAGE_ACTIONS[user.currentStep]}
+                    checklist={actions}
                 />
                 ) : (
                 <div className="bg-white rounded-2xl border border-[var(--border-medium)] shadow-sm p-5 flex items-center justify-center">
-                    <p className="text-sm text-slate-500">추천 영상 준비 중...</p>
+                    <p className="text-sm text-slate-500">{t.videoCard.preparing}</p>
                 </div>
                 );
             })()}
@@ -271,12 +279,12 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
              <QuickActionGrid currentStep={user.currentStep} userName={user.name} />
              
              {/* 1. Community Widget (맞춤 커뮤니티) - Moved from below */}
-             <CommunityWidget user={user} />
+             <CommunityWidget user={user} isGuest={isGuest} />
 
              {/* Today's To-Do (Mobile Only - Hybrid View) */}
              <div className="block md:hidden">
                 <ActionChecklist 
-                    actions={STAGE_ACTIONS[user.currentStep] || []}
+                    actions={actions}
                     initialCompletedIds={user.completed_actions || []} 
                 />
              </div>
@@ -294,6 +302,13 @@ export default function DashboardClient({ initialUser, currentStage, isGuest = f
 
 
        </div>
+
+      {/* Onboarding Modal for New Users */}
+      <OnboardingModal 
+        isOpen={!isGuest && user.role !== 'admin' && (!user.userRole || user.currentStep === 0)}
+        onComplete={handleOnboardingComplete}
+        initialData={user}
+      />
     </div>
   );
 }

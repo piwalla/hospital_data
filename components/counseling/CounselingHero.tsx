@@ -16,15 +16,15 @@ export default function CounselingHero() {
           className="object-cover opacity-80"
           priority
         />
-        <div 
-           className="absolute inset-0 opacity-[0.15]"
-           style={{ 
-             backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', 
-             backgroundSize: '48px 48px' 
-           }}
-        />
-        {/* Dark Elegant Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+         <div 
+            className="absolute inset-0 opacity-[0.2]"
+            style={{ 
+              backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', 
+              backgroundSize: '48px 48px' 
+            }}
+         />
+         {/* Dark Elegant Overlay - Standarized with landing page */}
+         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       </div>
 
       <div className="container px-4 mx-auto text-center z-10 pt-12 md:pt-0">

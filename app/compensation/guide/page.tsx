@@ -2,6 +2,7 @@
 
 import React, { Suspense, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,10 @@ import {
   CheckCircle2, // Good Case
   XCircle, // Bad Case
   MessageCircle, // Script
+  Lightbulb, // Tips
+  Coins, // Money
+  ClipboardList, // Checklist
+  AlertTriangle, // Warning
 } from 'lucide-react';
 import { calculateSickLeave, calculateDisability, formatCurrency } from '@/lib/calculator/benefit-calculations';
 import { BenefitDetailModal, ModalSection } from '@/components/compensation/BenefitDetailModal';
@@ -116,6 +121,13 @@ function CompensationReportContent() {
     }
   }, [searchParams]);
 
+  // No data case -> Redirect to calculator (Moved up to prevent Hook order error)
+  React.useEffect(() => {
+    if (!isLoading && (!averageWage || averageWage <= 0)) {
+        router.replace('/calculator');
+    }
+  }, [isLoading, averageWage, router]);
+
   if (isLoading) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -124,25 +136,14 @@ function CompensationReportContent() {
       );
   }
 
-  // No data case -> Show Empty State
-  if (!averageWage || averageWage <= 0) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50">
-        <div className="text-center max-w-md space-y-6">
-          <AlertCircle className="w-16 h-16 text-slate-300 mx-auto" />
-          <h2 className="text-2xl font-bold text-slate-900">데이터가 없습니다</h2>
-          <p className="text-slate-600">
-            평균임금 계산기에서 먼저 급여를 계산해주세요.
-          </p>
-          <Button 
-            onClick={() => router.push('/calculator')}
-            className="w-full py-6 text-lg bg-green-700 hover:bg-green-800"
-          >
-            산재 급여 계산하러 가기
-          </Button>
+
+
+  if (isLoading || (!averageWage || averageWage <= 0)) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#14532d]" />
         </div>
-      </div>
-    );
+      );
   }
 
   // 2. Calculations
@@ -151,61 +152,99 @@ function CompensationReportContent() {
   const disabilityMin = calculateDisability(averageWage, 14); 
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
-      {/* Report Header */}
-      {/* Report Header - Emerald Theme Update */}
-      <div className="bg-white/80 backdrop-blur-md border-b border-emerald-100 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <span className="text-xs font-bold text-emerald-600 tracking-wider uppercase mb-1 block">Compensation Report</span>
-            <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
-              {(userName !== '회원' && userName.length >= 2 && /^[가-힣]+$/.test(userName)) ? userName.slice(1) : userName}님이 받을 수 있는 모든 산재 보상 내역이에요
-            </h1>
-          </div>
-          <div className="text-right hidden md:block">
-            <p className="text-xs text-slate-500 font-medium">기준 일급 (평균임금)</p>
-            <p className="text-lg font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg inline-block mt-1">
-              {formatCurrency(averageWage)}
-            </p>
-          </div>
+    <div className="min-h-screen bg-slate-50/50 pb-20">
+      {/* Hero Section - Dashboard Style */}
+      <div className="relative w-full h-auto md:min-h-[50vh] flex md:items-center md:justify-center overflow-hidden mb-12">
+        {/* Background Decor */}
+        <div className="absolute inset-0 z-0">
+             <Image
+              src="/landing/hero-my-journey.png" 
+              alt="Compensation Report Background"
+              fill
+              className="object-cover opacity-90"
+              priority
+            />
+             <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-emerald-950/60 to-slate-50/50" />
+             <div 
+                className="absolute inset-0 opacity-[0.1]"
+                style={{ 
+                  backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', 
+                  backgroundSize: '32px 32px' 
+                }}
+             />
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 container mx-auto px-6 py-24 md:py-0 flex flex-col items-center justify-center gap-10 md:gap-12 text-white">
+             <div className="shrink-0 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-emerald-300 text-sm font-bold tracking-wider uppercase shadow-lg">
+                <Briefcase className="w-4 h-4" />
+                Compensation Report
+             </div>
+             
+             <h1 className="shrink-0 text-3xl sm:text-4xl md:text-6xl font-black leading-tight drop-shadow-2xl text-center">
+                <span className="text-[#4ADE80]">{(userName !== '회원' && userName.length >= 2 && /^[가-힣]+$/.test(userName)) ? userName.slice(1) : userName}님</span>이 받을 수 있는<br className="hidden md:block" />
+                모든 산재 보상 내역
+             </h1>
+
+             {/* Wage Card Removed as per user request to fix mobile overlap */}
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-8 space-y-12">
-        
-        {/* Mobile Wage Summary */}
-        <div className="md:hidden bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
-             <span className="text-sm text-slate-500 font-medium">내 평균임금 (일급)</span>
-             <span className="text-lg font-bold text-slate-900">{formatCurrency(averageWage)}</span>
-        </div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-16">
 
         {/* Section 1: 치료와 생활 (Treatment) - 5 Cards Layout */}
         <section className="space-y-4 animate-in slide-in-from-bottom-4 duration-700">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="bg-emerald-100 text-emerald-700 p-2 rounded-xl">
-              <Stethoscope className="w-5 h-5" />
+          <div className="flex items-center gap-3 mb-5">
+            <span className="bg-[#14532d]/10 text-[#14532d] p-3 rounded-2xl">
+              <Stethoscope className="w-7 h-7" />
             </span>
-            <h2 className="text-xl font-black text-slate-900 tracking-tight">1. 요양 기간 (치료 및 생활 안정)</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">1. 요양 기간 (치료 및 생활 안정)</h2>
             <Badge variant="outline" className="ml-auto text-xs text-slate-500 font-normal border-slate-200">요양 중</Badge>
           </div>
 
           {/* Grid Layout: Row 1 (3 items), Row 2 (2 items) */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+             {/* 1-1. 휴업급여 (Promoted to Top) */}
+             <Card className="rounded-[2rem] border-[#14532d]/20 bg-gradient-to-br from-[#14532d]/5 to-slate-50 shadow-[0_4px_20px_-4px_rgba(20,83,45,0.1)] relative overflow-hidden group cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-[#14532d]/10 hover:border-[#14532d]/40 lg:col-span-2"
+                   onClick={() => setActiveModal('SICK_LEAVE')}>
+                <CardHeader className="pb-2">
+                    <CardTitle className="text-base font-bold text-[#14532d] flex justify-between items-center">
+                        휴업급여 (월급 대체)
+                        <Badge className="bg-white text-[#14532d] hover:bg-white hover:text-[#14532d]/80">상세 보기</Badge>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
+                        <div>
+                            <div className="flex items-baseline gap-2 mb-1">
+                                <span className="text-3xl font-black text-[#14532d] tracking-tight">
+                                    {formatCurrency(sickLeaveData.dailyAmount)}
+                                </span>
+                                <span className="text-xs text-[#14532d]/80 font-bold">/ 1일</span>
+                            </div>
+                            <p className="text-lg font-bold text-[#14532d]/90 mt-2">
+                                월 약 <span className="text-2xl font-black text-[#14532d]">{formatCurrency(sickLeaveData.dailyAmount * 30)}</span> 예상 (평균임금의 70%)
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+             </Card>
              
              {/* 1-1. 치료비 (Medical + Drug + Assistive) */}
-             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-900/5 hover:border-emerald-500/30 cursor-pointer group bg-white"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#14532d]/10 hover:border-[#14532d]/30 cursor-pointer group bg-white"
                    onClick={() => setActiveModal('TREATMENT')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
                         치료비 및 보조기구
-                        <Badge variant="secondary" className="bg-slate-50 text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">전액 지원</Badge>
+                        <Badge variant="secondary" className="bg-slate-50 text-slate-600 group-hover:bg-[#14532d]/10 group-hover:text-[#14532d] transition-colors">전액 지원</Badge>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-slate-500 leading-snug mb-3">
                         진료비, 약제비는 물론 치료에 필요한 <span className="font-bold text-slate-800">재활 보조기구</span>까지 지원됩니다.
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
+                    <div className="flex items-center gap-2 text-xs text-[#14532d] font-medium">
                          <Accessibility className="w-4 h-4" />
                          <span>의족, 휠체어 등 보조기 포함</span>
                     </div>
@@ -213,12 +252,12 @@ function CompensationReportContent() {
              </Card>
 
              {/* 1-2. 간병료 */}
-             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-900/5 hover:border-emerald-500/30 cursor-pointer group bg-white"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#14532d]/10 hover:border-[#14532d]/30 cursor-pointer group bg-white"
                    onClick={() => setActiveModal('NURSING_TX')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
                         간병료 (치료 중)
-                        <Badge variant="secondary" className="bg-slate-50 text-slate-600 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-colors">실비 지원</Badge>
+                        <Badge variant="secondary" className="bg-slate-50 text-slate-600 group-hover:bg-[#14532d]/10 group-hover:text-[#14532d] transition-colors">실비 지원</Badge>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -233,53 +272,29 @@ function CompensationReportContent() {
              </Card>
 
              {/* 1-3. 이송비 */}
-             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-900/5 hover:border-emerald-500/30 cursor-pointer group bg-white"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#14532d]/10 hover:border-[#14532d]/30 cursor-pointer group bg-white"
                    onClick={() => setActiveModal('TRANSPORT')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
                         이송비 (교통비)
-                        <Badge variant="secondary" className="bg-white text-slate-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors border border-emerald-100">교통비</Badge>
+                        <Badge variant="secondary" className="bg-white text-slate-600 group-hover:bg-[#14532d] group-hover:text-white transition-colors border border-slate-200 group-hover:border-[#14532d]">교통비</Badge>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-slate-500 leading-snug mb-3">
                         병원 방문이나 전원을 위해 이동할 때 발생하는 <span className="font-bold text-slate-800">교통비</span>를 지원합니다.
                     </p>
-                    <div className="flex items-center gap-2 text-xs text-slate-400 font-medium group-hover:text-emerald-600 transition-colors">
+                    <div className="flex items-center gap-2 text-xs text-slate-400 font-medium group-hover:text-[#14532d] transition-colors">
                          <Ambulance className="w-4 h-4" />
                          <span>택시, 구급차, 자가용 지원 기준 보기</span>
                     </div>
                 </CardContent>
              </Card>
 
-             {/* 1-4. 휴업급여 */}
-             <Card className="rounded-[2rem] border-emerald-200/60 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-[0_4px_20px_-4px_rgba(16,185,129,0.1)] relative overflow-hidden group cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-emerald-900/10 hover:border-emerald-500/40 lg:col-span-2"
-                   onClick={() => setActiveModal('SICK_LEAVE')}>
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-bold text-emerald-900 flex justify-between items-center">
-                        휴업급여 (월급 대체)
-                        <Badge className="bg-white text-emerald-700 hover:bg-white hover:text-emerald-800">상세 보기</Badge>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
-                        <div>
-                            <div className="flex items-baseline gap-2 mb-1">
-                                <span className="text-3xl font-black text-emerald-800 tracking-tight">
-                                    {formatCurrency(sickLeaveData.dailyAmount)}
-                                </span>
-                                <span className="text-xs text-emerald-600 font-bold">/ 1일</span>
-                            </div>
-                            <p className="text-sm text-emerald-700/80">
-                                월 약 <span className="font-bold text-emerald-900">{formatCurrency(sickLeaveData.dailyAmount * 30)}</span> 예상 (평균임금의 70%)
-                            </p>
-                        </div>
-                    </div>
-                </CardContent>
-             </Card>
+             {/* 1-4. 휴업급여 (Moved to Top) */}
 
              {/* 1-5. 융자 Card */}
-             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-emerald-900/5 hover:border-emerald-500/30 cursor-pointer group bg-white"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#14532d]/5 hover:border-[#14532d]/30 cursor-pointer group bg-white"
                    onClick={() => setActiveModal('LOAN')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
@@ -304,22 +319,22 @@ function CompensationReportContent() {
 
         {/* Section 2: 치료 종결 (End of Treatment) */}
         <section className="space-y-4 animate-in slide-in-from-bottom-4 duration-700 delay-150">
-          <div className="flex items-center gap-2 mb-2">
-             <span className="bg-purple-100 text-purple-700 p-1.5 rounded-lg">
-              <Activity className="w-5 h-5" />
+          <div className="flex items-center gap-3 mb-5">
+             <span className="bg-[#14532d]/10 text-[#14532d] p-3 rounded-2xl">
+              <Activity className="w-7 h-7" />
             </span>
-            <h2 className="text-xl font-black text-slate-900 tracking-tight">2. 치료 종결 (장해 심사 및 보상)</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">2. 치료 종결 (장해 심사 및 보상)</h2>
             <Badge variant="outline" className="ml-auto text-xs text-slate-500 font-normal">종결 후</Badge>
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
             {/* 2-1. 장해급여 */}
-            <Card className="md:col-span-2 rounded-[2rem] border-slate-200/60 bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-purple-900/5 hover:border-purple-300 group"
+            <Card className="md:col-span-2 rounded-[2rem] border-slate-200/60 bg-white shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#14532d]/10 hover:border-[#14532d]/30 group"
                     onClick={() => setActiveModal('DISABILITY')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-lg font-bold text-slate-900 flex justify-between items-center">
                         장해급여 예상 범위
-                        <Badge className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-100">등급표 보기</Badge>
+                        <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200">등급표 보기</Badge>
                     </CardTitle>
                     <CardDescription>
                         장해 등급(1급~14급) 판정에 따라 지급액이 결정됩니다.
@@ -333,21 +348,21 @@ function CompensationReportContent() {
                         </div>
                         <div className="w-full h-px sm:w-px sm:h-12 bg-slate-300 relative mx-4"></div>
                         <div className="text-center sm:text-right">
-                            <p className="text-xs text-purple-600 font-bold mb-1">최대 (1급)</p>
-                            <p className="text-2xl font-extrabold text-purple-900">{formatCurrency(disabilityMax.pension)}</p>
-                            <p className="text-[10px] text-purple-600">매년 (연금)</p>
+                            <p className="text-xs text-[#14532d] font-bold mb-1">최대 (1급)</p>
+                            <p className="text-2xl font-extrabold text-[#14532d]">{formatCurrency(disabilityMax.pension)}</p>
+                            <p className="text-[10px] text-[#14532d]/70">매년 (연금)</p>
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
             {/* 2-2. 간병급여 */}
-            <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-pink-900/5 hover:border-pink-300 cursor-pointer group bg-white"
+            <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#14532d]/10 hover:border-[#14532d]/30 cursor-pointer group bg-white"
                   onClick={() => setActiveModal('NURSING')}>
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
                         간병급여
-                        <Badge variant="secondary" className="bg-pink-50 text-pink-700 border-pink-100">종결 후</Badge>
+                        <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-slate-200">종결 후</Badge>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -355,7 +370,7 @@ function CompensationReportContent() {
                         <p className="text-sm text-slate-600 leading-snug">
                             치료가 끝난 뒤에도 간병이 필요하다면 지원받습니다.
                         </p>
-                        <div className="flex items-center gap-2 mt-3 text-pink-600 text-sm font-bold">
+                        <div className="flex items-center gap-2 mt-3 text-[#14532d] text-sm font-bold">
                             <HeartPulse className="w-4 h-4" />
                             최대 {formatCurrency(COMPENSATION_CONSTANTS.NURSING_BENEFIT.PROFESSIONAL.CONSTANT)}/일
                         </div>
@@ -367,21 +382,21 @@ function CompensationReportContent() {
 
         {/* Section 3: 재활 및 기타 */}
         <section className="space-y-4 animate-in slide-in-from-bottom-4 duration-700 delay-300">
-            <div className="flex items-center gap-2 mb-2">
-             <span className="bg-green-100 text-green-700 p-1.5 rounded-lg">
-              <Briefcase className="w-5 h-5" />
+            <div className="flex items-center gap-3 mb-5">
+             <span className="bg-[#14532d]/10 text-[#14532d] p-3 rounded-2xl">
+              <Briefcase className="w-7 h-7" />
             </span>
-            <h2 className="text-xl font-black text-slate-900 tracking-tight">3. 직업 복귀 (재활 및 훈련)</h2>
+            <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">3. 직업 복귀 (재활 및 훈련)</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
              {/* 3-1. 재활지원 */}
-             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-green-900/5 hover:border-green-300 group bg-white"
+             <Card className="rounded-[2rem] border-slate-200/60 shadow-[0_2px_12px_-2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-[#14532d]/10 hover:border-[#14532d]/30 group bg-white"
                    onClick={() => setActiveModal('REHAB')}>
                  <CardHeader className="pb-2">
                     <CardTitle className="text-base font-bold text-slate-800 flex justify-between items-center">
                         재취업 훈련 지원
-                        <Badge variant="outline" className="text-slate-500 group-hover:text-green-600 group-hover:border-green-300">상세 조건</Badge>
+                        <Badge variant="outline" className="text-slate-500 group-hover:text-[#14532d] group-hover:border-[#14532d]/30">상세 조건</Badge>
                     </CardTitle>
                  </CardHeader>
                  <CardContent>
@@ -392,7 +407,7 @@ function CompensationReportContent() {
                          </div>
                          <div className="flex justify-between items-center">
                              <span className="text-sm text-slate-600">훈련 수당</span>
-                             <span className="font-bold text-green-700">월 최대 200만원+</span>
+                             <span className="font-bold text-[#14532d]">월 최대 200만원+</span>
                          </div>
                      </div>
                  </CardContent>
@@ -422,7 +437,7 @@ function CompensationReportContent() {
         <div className="pt-8 pb-12 text-center">
             <Button 
                 onClick={() => router.push('/dashboard')}
-                className="bg-slate-900 text-white px-8 py-6 rounded-full text-lg font-bold hover:bg-slate-800 shadow-lg hover:shadow-xl transition-all"
+                className="bg-[#14532d] text-white px-8 py-6 rounded-full text-lg font-bold hover:bg-[#14532d]/90 shadow-lg hover:shadow-xl transition-all"
             >
                 내 대시보드로 이동하기
             </Button>
@@ -444,7 +459,7 @@ function CompensationReportContent() {
                 onClick={() => setTreatmentTab('BASIC')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     treatmentTab === 'BASIC' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -454,7 +469,7 @@ function CompensationReportContent() {
                 onClick={() => setTreatmentTab('ITEMS')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     treatmentTab === 'ITEMS' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -464,7 +479,7 @@ function CompensationReportContent() {
                 onClick={() => setTreatmentTab('CLAIM')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     treatmentTab === 'CLAIM' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -477,8 +492,10 @@ function CompensationReportContent() {
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <ModalSection title="진료비 및 수술비 (요양급여)">
                     <p className="mb-2">공단이 병원에 직접 지급하므로 <strong>본인 부담이 없는 것이 원칙</strong>입니다.</p>
-                    <div className="bg-slate-50 p-3 rounded border border-slate-100 text-sm">
-                        <span className="font-bold text-red-600 block mb-1">⚠️ 지원되지 않는 비급여 항목 (본인 부담)</span>
+                    <div className="bg-amber-50 p-3 rounded border border-amber-100 text-sm">
+                        <span className="font-bold text-amber-700 flex items-center gap-1 mb-1">
+                            <AlertTriangle className="w-4 h-4" /> 지원되지 않는 비급여 항목 (본인 부담)
+                        </span>
                         <ul className="list-disc pl-4 space-y-1 text-slate-600">
                             <li>상급병실료 (단, 일반실이 없어 부득이한 경우 등 예외 있음)</li>
                             <li>선택진료비 (특진비)</li>
@@ -555,7 +572,7 @@ function CompensationReportContent() {
                 onClick={() => setNursingTab('CRITERIA')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     nursingTab === 'CRITERIA' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -565,7 +582,7 @@ function CompensationReportContent() {
                 onClick={() => setNursingTab('AMOUNT')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     nursingTab === 'AMOUNT' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -575,7 +592,7 @@ function CompensationReportContent() {
                 onClick={() => setNursingTab('CLAIM')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     nursingTab === 'CLAIM' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -665,7 +682,7 @@ function CompensationReportContent() {
                 onClick={() => setTransportTab('BASIC')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     transportTab === 'BASIC' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -675,17 +692,19 @@ function CompensationReportContent() {
                 onClick={() => setTransportTab('TIPS')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     transportTab === 'TIPS' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
-                💡 실전 꿀팁
+                <div className="flex items-center justify-center gap-1">
+                    <Lightbulb className="w-3 h-3" /> 실전 꿀팁
+                </div>
              </button>
              <button 
                 onClick={() => setTransportTab('SUBMIT')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     transportTab === 'SUBMIT' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -761,26 +780,26 @@ function CompensationReportContent() {
                             </div>
                             <p className="text-xs text-slate-700 leading-relaxed">
                                 &quot;다리가 너무 아파서 택시 탔어요&quot;하고 영수증만 냄<br/>
-                                → <strong>버스비(약 1,500원)만 지급됨</strong> 😭
+                                → <strong>버스비(약 1,500원)만 지급됨</strong>
                             </p>
                         </div>
-                         <div className="border border-emerald-100 bg-emerald-50/50 p-3 rounded-xl">
-                            <div className="flex items-center gap-1.5 mb-2 text-emerald-700 font-bold text-sm">
+                         <div className="border border-[#14532d]/20 bg-[#14532d]/5 p-3 rounded-xl">
+                            <div className="flex items-center gap-1.5 mb-2 text-[#14532d] font-bold text-sm">
                                 <CheckCircle2 className="w-4 h-4" /> 좋은 예 (전액)
                             </div>
                             <p className="text-xs text-slate-700 leading-relaxed">
                                 미리 의사에게 <strong>&apos;승용차 이용 필요&apos; 소견</strong>을 받고 택시 탐<br/>
-                                → <strong>택시비 전액 지급됨</strong> 🎉
+                                → <strong>택시비 전액 지급됨</strong>
                             </p>
                         </div>
                      </div>
                 </ModalSection>
 
                 {/* Doctor Request Script */}
-                <div className="bg-blue-50 border border-blue-100 p-5 rounded-xl shadow-sm relative overflow-hidden">
-                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-blue-100 rounded-full blur-2xl opacity-50"></div>
-                     <h4 className="text-blue-900 font-bold flex items-center gap-2 mb-3 relative z-10">
-                        <MessageCircle className="w-5 h-5 text-blue-600" />
+                <div className="bg-slate-50 border border-slate-200 p-5 rounded-xl shadow-sm relative overflow-hidden">
+                    <div className="absolute -right-4 -top-4 w-20 h-20 bg-slate-100 rounded-full blur-2xl opacity-50"></div>
+                     <h4 className="text-slate-900 font-bold flex items-center gap-2 mb-3 relative z-10">
+                        <MessageCircle className="w-5 h-5 text-slate-600" />
                         병원 요청 꿀팁 (스크립트)
                      </h4>
                      <p className="text-sm text-slate-600 mb-4 leading-relaxed relative z-10">
@@ -788,11 +807,11 @@ function CompensationReportContent() {
                         <strong>이 한 마디가 교통비를 결정합니다!</strong>
                      </p>
                      
-                     <div className="bg-white p-4 rounded-lg border border-blue-200 shadow-inner relative z-10">
+                     <div className="bg-white p-4 rounded-lg border border-slate-200 shadow-inner relative z-10">
                         <p className="text-slate-800 font-medium text-sm leading-7">
                             &quot;선생님, 제가 거동이 불편해서 대중교통 이용이 너무 힘듭니다. 
                             나중에 이송비 청구할 때 문제없도록 소견서에 
-                            <span className="bg-yellow-200 mx-1 px-1 rounded shadow-sm font-bold text-slate-900">&apos;대중교통 이용 불가&apos;</span>
+                            <span className="bg-amber-100 mx-1 px-1 rounded shadow-sm font-bold text-slate-900">&apos;대중교통 이용 불가&apos;</span>
                             라고 한 줄만 적어주실 수 있을까요?&quot;
                         </p>
                      </div>
@@ -820,16 +839,16 @@ function CompensationReportContent() {
                         </div>
 
                         {/* Step 2 */}
-                        <div className="flex gap-4 items-start bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-                             <div className="bg-white px-2.5 py-1 rounded-lg border border-emerald-200 text-sm font-black text-emerald-800 shadow-sm mt-0.5">2</div>
+                        <div className="flex gap-4 items-start bg-[#14532d]/5 p-3 rounded-xl border border-[#14532d]/20">
+                             <div className="bg-white px-2.5 py-1 rounded-lg border border-[#14532d]/30 text-sm font-black text-[#14532d] shadow-sm mt-0.5">2</div>
                              <div>
-                                <span className="font-bold text-emerald-900 block text-sm mb-1">토탈서비스 접속</span>
-                                <div className="text-xs text-slate-600 bg-white/60 p-2 rounded border border-emerald-100/50 inline-block mb-2">
-                                    로그인 &gt; 민원접수/신고 &gt; 요양신청 &gt; <span className="underline decoration-emerald-300 decoration-2 font-bold text-emerald-800">요양지원비(이송비 등) 청구</span>
+                                <span className="font-bold text-[#14532d] block text-sm mb-1">토탈서비스 접속</span>
+                                <div className="text-xs text-slate-600 bg-white/60 p-2 rounded border border-[#14532d]/10 inline-block mb-2">
+                                    로그인 &gt; 민원접수/신고 &gt; 요양신청 &gt; <span className="underline decoration-[#14532d]/50 decoration-2 font-bold text-[#14532d]">요양지원비(이송비 등) 청구</span>
                                 </div>
                                 <Button 
                                     size="sm"
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm"
+                                    className="w-full bg-[#14532d] hover:bg-[#14532d]/90 text-white rounded-lg shadow-sm"
                                     onClick={() => window.open('https://total.comwel.or.kr', '_blank')}
                                 >
                                     바로가기 <Send className="w-3 h-3 ml-2" />
@@ -938,7 +957,7 @@ function CompensationReportContent() {
                 onClick={() => setDisabilityTab('CRITERIA')}
                 className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${
                     disabilityTab === 'CRITERIA' 
-                    ? 'bg-white text-slate-900 shadow-sm' 
+                    ? 'bg-white text-[#14532d] shadow-sm' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -948,7 +967,7 @@ function CompensationReportContent() {
                 onClick={() => setDisabilityTab('PROCEDURE')}
                 className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${
                     disabilityTab === 'PROCEDURE' 
-                    ? 'bg-white text-slate-900 shadow-sm' 
+                    ? 'bg-white text-[#14532d] shadow-sm' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -960,7 +979,9 @@ function CompensationReportContent() {
         {disabilityTab === 'CRITERIA' && (
             <div className="space-y-6 animate-in fade-in zoom-in-95 duration-200">
                 <div className="bg-slate-50 p-4 rounded-lg text-sm text-slate-600">
-                    <p className="font-bold text-slate-800 mb-1">💡 계산 방법</p>
+                    <p className="font-bold text-slate-800 mb-1 flex items-center gap-1">
+                        <Lightbulb className="w-4 h-4 text-amber-500" /> 계산 방법
+                    </p>
                     <p>평균임금({formatCurrency(averageWage)}) x <strong>등급별 지급일수</strong></p>
                 </div>
                 <div className="max-h-[55vh] overflow-y-auto overflow-x-auto rounded-lg border border-slate-200 scrollbar-thin scrollbar-thumb-slate-300 scrollbar-track-slate-100">
@@ -1028,13 +1049,13 @@ function CompensationReportContent() {
       >
          <ModalSection title="지급 금액 (1일 기준)">
              <div className="grid gap-3">
-                 <div className="flex justify-between items-center bg-pink-50 p-3 rounded border border-pink-100">
-                     <span className="font-bold text-pink-800">상시 간병</span>
-                     <span className="text-pink-700 font-bold">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_BENEFIT.PROFESSIONAL.CONSTANT)}</span>
+                 <div className="flex justify-between items-center bg-white p-3 rounded border border-slate-200 shadow-sm">
+                     <span className="font-bold text-slate-800">상시 간병</span>
+                     <span className="text-[#14532d] font-bold">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_BENEFIT.PROFESSIONAL.CONSTANT)}</span>
                  </div>
-                 <div className="flex justify-between items-center bg-blue-50 p-3 rounded border border-blue-100">
-                     <span className="font-bold text-blue-800">수시 간병</span>
-                     <span className="text-blue-700 font-bold">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_BENEFIT.PROFESSIONAL.OCCASIONAL)}</span>
+                 <div className="flex justify-between items-center bg-white p-3 rounded border border-slate-200 shadow-sm">
+                     <span className="font-bold text-slate-800">수시 간병</span>
+                     <span className="text-[#14532d] font-bold">{formatCurrency(COMPENSATION_CONSTANTS.NURSING_BENEFIT.PROFESSIONAL.OCCASIONAL)}</span>
                  </div>
              </div>
          </ModalSection>
@@ -1060,7 +1081,7 @@ function CompensationReportContent() {
                 onClick={() => setRehabTab('COST')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     rehabTab === 'COST' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -1070,7 +1091,7 @@ function CompensationReportContent() {
                 onClick={() => setRehabTab('ALLOWANCE')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     rehabTab === 'ALLOWANCE' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -1080,7 +1101,7 @@ function CompensationReportContent() {
                 onClick={() => setRehabTab('SPORTS')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     rehabTab === 'SPORTS' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -1090,7 +1111,7 @@ function CompensationReportContent() {
                 onClick={() => setRehabTab('GRANT')}
                 className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${
                     rehabTab === 'GRANT' 
-                    ? 'bg-white text-emerald-700 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-[#14532d] shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700'
                 }`}
              >
@@ -1102,10 +1123,10 @@ function CompensationReportContent() {
         {rehabTab === 'COST' && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <ModalSection title="직업훈련비용 지원">
-                   <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-100 mb-4 text-center">
-                       <p className="text-sm text-emerald-800 font-medium mb-1">1인당 지원 한도</p>
-                       <p className="text-2xl font-black text-emerald-700">최대 600만원</p>
-                       <p className="text-xs text-emerald-600 mt-1">(공단 위탁 훈련 시 최대 800만원)</p>
+                   <div className="bg-[#14532d]/10 p-4 rounded-xl border border-[#14532d]/20 mb-4 text-center">
+                       <p className="text-sm text-[#14532d] font-medium mb-1">1인당 지원 한도</p>
+                       <p className="text-2xl font-black text-[#14532d]">최대 600만원</p>
+                       <p className="text-xs text-[#14532d]/80 mt-1">(공단 위탁 훈련 시 최대 800만원)</p>
                    </div>
                    
                    <div className="space-y-4">
@@ -1133,12 +1154,14 @@ function CompensationReportContent() {
         {rehabTab === 'ALLOWANCE' && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <ModalSection title="직업훈련수당 (생계비 지원)">
-                    <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100 mb-4">
-                        <span className="font-bold text-indigo-900 block mb-2">💰 지급 기준 (계산식)</span>
-                        <p className="text-sm text-indigo-800 leading-relaxed bg-white/60 p-2 rounded border border-indigo-100/50">
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
+                        <span className="font-bold text-slate-800 block mb-2 flex items-center gap-1">
+                            <Coins className="w-4 h-4 text-amber-500" /> 지급 기준 (계산식)
+                        </span>
+                        <p className="text-sm text-slate-700 leading-relaxed bg-white p-2 rounded border border-slate-200 shadow-sm">
                             (월 총 훈련시간 ÷ 8) × 최저임금액
                         </p>
-                        <p className="text-xs text-indigo-600 mt-2">
+                        <p className="text-xs text-slate-500 mt-2">
                             * 사실상 <strong>시간당 최저임금</strong>을 훈련 시간만큼 지급합니다. (1일 8시간 한도)
                         </p>
                     </div>
@@ -1153,8 +1176,8 @@ function CompensationReportContent() {
                              </ul>
                         </div>
 
-                         <div className="text-sm bg-yellow-50 p-3 rounded border border-yellow-100 text-yellow-800">
-                            <strong>⚠️ 주의사항</strong><br/>
+                         <div className="text-sm bg-amber-50 p-3 rounded border border-amber-100 text-amber-800">
+                            <strong className="flex items-center gap-1 mb-1"><AlertTriangle className="w-4 h-4" /> 주의사항</strong>
                             훈련 출석률 <strong>80% 이상</strong>이어야 지급됩니다.<br/>
                             (장해연금 수령액이 많을 경우 감액될 수 있음)
                         </div>
@@ -1178,7 +1201,7 @@ function CompensationReportContent() {
                                  <span className="text-xs text-slate-500">헬스, 수영, 요가 등</span>
                              </div>
                              <div className="text-right">
-                                 <span className="font-bold text-emerald-600 block">월 10만원</span>
+                                 <span className="font-bold text-[#14532d] block">월 10만원</span>
                                  <span className="text-xs text-slate-400">최대 3개월</span>
                              </div>
                          </div>
@@ -1189,7 +1212,7 @@ function CompensationReportContent() {
                                  <span className="text-xs text-slate-500">전문 재활 프로그램</span>
                              </div>
                              <div className="text-right">
-                                 <span className="font-bold text-emerald-600 block">월 60만원</span>
+                                 <span className="font-bold text-[#14532d] block">월 60만원</span>
                                  <span className="text-xs text-slate-400">최대 1개월</span>
                              </div>
                          </div>
@@ -1210,10 +1233,10 @@ function CompensationReportContent() {
         {rehabTab === 'GRANT' && (
              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <ModalSection title="직장복귀지원금">
-                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4 text-center">
-                       <p className="text-sm text-blue-800 font-medium mb-1">월 최대 지원 금액</p>
-                       <p className="text-2xl font-black text-blue-700">80만원</p>
-                       <p className="text-xs text-blue-600 mt-1">(최대 12개월간 지원)</p>
+                     <div className="bg-[#14532d]/5 p-4 rounded-xl border border-[#14532d]/20 mb-4 text-center">
+                       <p className="text-sm text-[#14532d] font-medium mb-1">월 최대 지원 금액</p>
+                       <p className="text-2xl font-black text-[#14532d]">80만원</p>
+                       <p className="text-xs text-slate-500 mt-1">(최대 12개월간 지원)</p>
                    </div>
                    
                    <p className="mb-4 text-sm text-slate-600">

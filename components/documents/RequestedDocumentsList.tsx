@@ -8,41 +8,47 @@
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Hospital, Building2, Scale, FileText } from 'lucide-react';
 import { REQUESTED_DOCUMENTS } from '@/lib/data/requested-documents';
 import type { RequestedDocument } from '@/lib/types/document';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { defaultLocale, documentsTranslations, type Locale } from '@/lib/i18n/config';
 
 
 // 발급처별 아이콘 및 색상
 const sourceConfig: Record<
   RequestedDocument['source'],
-  { icon: typeof Hospital; label: string; color: string; bgColor: string }
+  { icon: typeof Hospital; label: string; color: string; bgColor: string; labelKey: 'hospital' | 'company' | 'court' | 'other' }
 > = {
   hospital: {
     icon: Hospital,
     label: '병원',
     color: 'text-primary',
     bgColor: 'bg-primary/10',
+    labelKey: 'hospital',
   },
   company: {
     icon: Building2,
     label: '회사',
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
+    labelKey: 'company',
   },
   court: {
     icon: Scale,
     label: '법원/기타',
     color: 'text-purple-600',
     bgColor: 'bg-purple-50',
+    labelKey: 'court',
   },
   other: {
     icon: FileText,
     label: '기타',
     color: 'text-gray-600',
     bgColor: 'bg-gray-50',
+    labelKey: 'other',
   },
 };
 
@@ -53,6 +59,39 @@ interface RequestedDocumentsListProps {
 export default function RequestedDocumentsList({ filteredDocuments }: RequestedDocumentsListProps = {}) {
   const documentsToShow = filteredDocuments || REQUESTED_DOCUMENTS;
 
+  // Localization State
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    
+    const updateLocale = () => {
+      const savedLocale = localStorage.getItem('user_locale') as Locale;
+      if (savedLocale && documentsTranslations[savedLocale]) {
+        setLocale(savedLocale);
+      }
+    };
+
+    // Initial load
+    updateLocale();
+
+    // Listen for changes
+    window.addEventListener('localeChange', updateLocale);
+    window.addEventListener('storage', updateLocale);
+
+    return () => {
+      window.removeEventListener('localeChange', updateLocale);
+      window.removeEventListener('storage', updateLocale);
+    };
+  }, []);
+
+  const t = documentsTranslations[locale] || documentsTranslations['ko'];
+
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <div
       className="space-y-6 sm:space-y-8"
@@ -62,7 +101,9 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
       {/* 안내 문구 */}
       <div className="bg-white/80 backdrop-blur-md border border-white/40 rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
         <p className="text-sm md:text-base text-gray-600 leading-relaxed font-medium">
-          이 서류들은 환자가 직접 작성하는 것이 아닙니다. 병원 원무과나 담당 의사 선생님께 <strong className="text-[#14532d] font-black">&quot;발급해 주세요&quot;</strong>라고 요청하시면 됩니다.
+          {t.ui.sections.requestGuide.split('"')[0]} 
+          <strong className="text-[#14532d] font-black">&quot;{t.ui.sections.request.replace('해주세요', '')}&quot;</strong>
+          {t.ui.sections.requestGuide.split('"')[2] || '.'}
         </p>
       </div>
 
@@ -75,13 +116,15 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
         {documentsToShow.map((doc) => {
           const config = sourceConfig[doc.source];
           const Icon = config.icon;
+          const localizedName = t.items[doc.id]?.name || doc.name;
+          const localizedDesc = t.items[doc.id]?.description || doc.description;
 
           return (
             <Link
               key={doc.id}
               href={`/requested-documents/${doc.id}`}
               className="block group"
-              aria-label={`${doc.name} 상세 정보 보기`}
+              aria-label={`${localizedName} 상세 정보 보기`}
             >
               <div
                 className={cn(
@@ -113,8 +156,11 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
                     <div className="flex-1 min-w-0 pt-0.5">
                       <div className="flex items-start gap-2 flex-wrap mb-2">
                         {(() => {
-                          const match = doc.name.match(/^(.+?)\s*\((.+?)\)\s*$/);
-                          if (match) {
+                           // Korean check to see if we should parse brackets
+                          const isKorean = locale === 'ko';
+                          const match = localizedName.match(/^(.+?)\s*\((.+?)\)\s*$/);
+                          
+                          if (match && isKorean) {
                             const [, mainName, bracketContent] = match;
                             return (
                               <div className="flex-1 min-w-0">
@@ -129,17 +175,17 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
                           }
                           return (
                             <h3 className="text-lg md:text-xl font-black text-gray-900 group-hover:text-[#14532d] transition-colors leading-tight flex-1">
-                              {doc.name}
+                              {localizedName}
                             </h3>
                           );
                         })()}
                         <div className="flex items-center gap-2 flex-wrap mt-0.5">
                           <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 font-bold">
-                            {config.label}
+                            {t.ui.badges[config.labelKey]}
                           </span>
                           {doc.isOptional && (
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-orange-50 text-orange-600 border border-orange-100 font-bold">
-                              선택
+                              {t.ui.badges.optional}
                             </span>
                           )}
                         </div>
@@ -147,7 +193,7 @@ export default function RequestedDocumentsList({ filteredDocuments }: RequestedD
                       <p
                         className="text-xs sm:text-sm md:text-base text-muted-foreground line-clamp-3"
                         dangerouslySetInnerHTML={{
-                          __html: doc.description.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>'),
+                          __html: localizedDesc.replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground">$1</strong>'),
                         }}
                       />
                     </div>

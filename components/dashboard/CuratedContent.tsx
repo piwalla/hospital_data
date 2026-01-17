@@ -22,6 +22,10 @@ import { getStageWarnings, WarningType } from "@/lib/data/warnings";
 
 
 
+
+import { useEffect, useState } from "react";
+import { Locale, dashboardTranslations } from "@/lib/i18n/config";
+
 interface CuratedContentProps {
   documents: TimelineDocument[];
   warnings: TimelineWarning[];
@@ -31,8 +35,41 @@ interface CuratedContentProps {
 
 // ... (existing code for CONTENT_TAGS and scoreContent) ...
 
-export default function CuratedContent({ documents, stepNumber, userName = "환자" }: CuratedContentProps) {
+export default function CuratedContent({ documents, stepNumber, userName }: CuratedContentProps) {
+  const [locale, setLocale] = useState<Locale>('ko');
+
+  useEffect(() => {
+    const savedLocale = localStorage.getItem('user_locale') as Locale;
+    if (savedLocale && dashboardTranslations[savedLocale]) {
+      setLocale(savedLocale);
+    }
+
+    const handleLocaleChange = () => {
+      const updatedLocale = localStorage.getItem('user_locale') as Locale;
+      if (updatedLocale && dashboardTranslations[updatedLocale]) {
+        setLocale(updatedLocale);
+      }
+    };
+
+    window.addEventListener('user_locale', handleLocaleChange);
+    window.addEventListener('localeChange', handleLocaleChange);
+    window.addEventListener('storage', handleLocaleChange);
+
+    return () => {
+      window.removeEventListener('user_locale', handleLocaleChange);
+      window.removeEventListener('localeChange', handleLocaleChange);
+      window.removeEventListener('storage', handleLocaleChange);
+    };
+  }, []);
+
+  const t = dashboardTranslations[locale]?.curatedContent || dashboardTranslations['ko'].curatedContent;
+  const docsT = dashboardTranslations[locale]?.documents || dashboardTranslations['en']?.documents || {};
+  const headerT = dashboardTranslations[locale]?.header || dashboardTranslations['ko'].header;
   
+  const displayName = (userName && userName !== '홍길동') ? 
+    userName : 
+    (locale === 'ko' ? '회원' : headerT.guestGreeting.replace('Hello, ', '').replace('!', ''));
+
   const formatDocTitle = (title: string) => {
     // Remove content in parentheses and trim
     return title.replace(/\s*\(.*?\)/g, '').trim();
@@ -40,6 +77,7 @@ export default function CuratedContent({ documents, stepNumber, userName = "환�
 
   // Helper to render warning icon
   const renderWarningIcon = (type: WarningType) => {
+    // ...
     switch (type) {
       case 'alert': return <AlertCircle className="w-5 h-5 text-slate-900" />;
       case 'camera': return <Camera className="w-5 h-5 text-slate-900" />;
@@ -66,16 +104,16 @@ export default function CuratedContent({ documents, stepNumber, userName = "환�
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {/* 1. Essential Documents */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-7 flex flex-col">
+      <div className="bg-white rounded-none border-x-0 border-y sm:border sm:rounded-3xl border-slate-100 shadow-sm p-6 sm:p-7 flex flex-col">
         <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
-          <span className="w-2 h-7 bg-emerald-500 rounded-full inline-block shadow-[0_4px_12px_rgba(16,185,129,0.3)]" />
-          {userName}님께 필요한 서류들
+          <span className="w-2 h-7 bg-primary rounded-full inline-block shadow-[0_4px_12px_rgba(20,83,45,0.3)]" />
+          {t.title.replace('{name}', displayName)}
         </h3>
 
         <div className="flex-1">
           {sortedDocuments.length === 0 ? (
             <div className="h-full flex items-center justify-center p-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-               <p className="text-sm text-slate-400">필요한 문서가 없습니다.</p>
+               <p className="text-sm text-slate-400">{t.noRequiredDocuments}</p>
             </div>
           ) : (
             <ul className="space-y-2">
@@ -89,8 +127,8 @@ export default function CuratedContent({ documents, stepNumber, userName = "환�
                       <FileText className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-lg font-black text-slate-800 truncate pr-2 group-hover:text-emerald-700 transition-colors">
-                        {formatDocTitle(doc.title)}
+                      <p className="text-lg font-black text-slate-800 truncate pr-2 group-hover:text-primary transition-colors">
+                        {docsT[doc.id] || formatDocTitle(doc.title)}
                       </p>
                     </div>
                   </div>
@@ -100,7 +138,7 @@ export default function CuratedContent({ documents, stepNumber, userName = "환�
                       href={doc.pdf_url || doc.guide_url || '#'} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-emerald-600 hover:text-white transition-all ml-2"
+                      className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all ml-2"
                     >
                       <Download className="w-4 h-4" />
                     </a>
@@ -113,10 +151,10 @@ export default function CuratedContent({ documents, stepNumber, userName = "환�
       </div>
 
       {/* 2. Warnings / Tips */}
-      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-7 flex flex-col">
+      <div className="bg-white rounded-none border-x-0 border-y sm:border sm:rounded-3xl border-slate-100 shadow-sm p-6 sm:p-7 flex flex-col">
         <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
-          <span className="w-2 h-7 bg-emerald-500 rounded-full inline-block shadow-[0_4px_12px_rgba(16,185,129,0.3)]" />
-          놓치지 마세요
+          <span className="w-2 h-7 bg-primary rounded-full inline-block shadow-[0_4px_12px_rgba(20,83,45,0.3)]" />
+          {t.noticesTitle}
         </h3>
         
         <div className="flex-1 bg-slate-50 rounded-xl p-4 border border-slate-100">
@@ -125,7 +163,7 @@ export default function CuratedContent({ documents, stepNumber, userName = "환�
             
             return stageWarnings.length === 0 ? (
               <div className="h-full flex items-center justify-center">
-                <p className="text-sm text-slate-500">특별한 주의사항이 없습니다.</p>
+                <p className="text-sm text-slate-500">{t.noNotices || '특별한 주의사항이 없습니다.'}</p>
               </div>
             ) : (
               <ul className="space-y-3">

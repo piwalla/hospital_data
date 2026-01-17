@@ -45,6 +45,10 @@ export default async function DashboardPage() {
 
     if (clerkUser) {
         user.name = clerkUser.firstName || clerkUser.fullName || user.name;
+        // Check for Admin role in Clerk metadata
+        if (clerkUser.publicMetadata?.role === 'admin') {
+           user.role = 'admin';
+        }
     }
   }
   
@@ -62,7 +66,7 @@ export default async function DashboardPage() {
       <MyJourneyHero />
       
       <div className="container mx-auto px-0 max-w-7xl">
-        <div className="px-4 sm:px-6 pb-20">
+        <div className="pb-20">
           <DashboardClient 
             initialUser={user} 
             currentStage={currentStage} 

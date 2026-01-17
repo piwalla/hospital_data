@@ -25,7 +25,7 @@ const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   let userId: string | undefined;
-  let requestBody: { message?: string; sessionId?: string; messages?: any[] } = {};
+  let requestBody: { message?: string; sessionId?: string; messages?: any[]; language?: string } = {};
 
   try {
     // 1. 사용자 인증 (Optional for V2 Guest Mode)
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     // 3. 요청 본문 파싱
     requestBody = await request.json();
-    const { message, sessionId, messages } = requestBody;
+    const { message, sessionId, messages, language = 'ko' } = requestBody;
 
     // Validate input: Either 'message' OR 'messages' array (where last item is current message)
     // Common pattern: Client sends full 'messages' array.
@@ -165,12 +165,19 @@ export async function POST(request: NextRequest) {
 ---
 
 **[답변 형식 (Markdown)]**
-*   가독성을 위해 핵심 내용은 **볼드체**로 강조하고, 단계별 절차나 조건은 리스트(목록) 형식을 사용하여 정리해 주세요.` }],
+*   가독성을 위해 핵심 내용은 **볼드체**로 강조하고, 단계별 절차나 조건은 리스트(목록) 형식을 사용하여 정리해 주세요.
+
+---
+
+**[다국어 지원 지침]**
+*   현재 사용자가 요청한 답변 언어: **${language}**
+*   가장 중요한 규칙: 제공된 참고 문서는 한국어(Korean)이지만, 사용자와의 대화 및 답변은 반드시 **${language}**로 진행해야 합니다. 
+*   만약 ${language}로 답변하기 어려운 전문 용어가 있다면, ${language}로 풀어서 설명하거나 한국어 용어를 괄호 안에 병기하십시오.` }],
     };
     
     const systemResponseEntry = {
         role: "model",
-        parts: [{ text: "네, 알겠습니다. 리워크케어 산재 도우미로서, 제공된 문서를 바탕으로 환자와 가족분들의 궁금증을 해결하고 따뜻하게 위로하며 구체적이고 실질적인 정보를 드리겠습니다. 어려운 용어는 쉽게 풀어서 설명하고, 근거 없는 내용은 답변하지 않겠습니다. 이전 대화 맥락을 기억하여 답변하겠습니다." }],
+        parts: [{ text: `네, 알겠습니다. 사용자가 요청하신 언어(${language})로 산재 정보를 상세히 안내해 드리겠습니다. 어려운 용어는 쉽게 설명하고, 근거 기반의 정확한 정보를 바탕으로 따뜻하게 답변하겠습니다.` }],
     };
 
     const chat = model.startChat({

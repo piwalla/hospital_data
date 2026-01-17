@@ -36,9 +36,9 @@ export default function DisabilityCalculator({ averageWage: propAverageWage = 0 
 
   const getPaymentTypeBadgeColor = (type: string) => {
     switch (type) {
-      case 'pension': return 'bg-blue-100 text-blue-800';
-      case 'lump': return 'bg-green-100 text-green-800';
-      case 'choice': return 'bg-purple-100 text-purple-800';
+      case 'pension': return 'bg-white border border-[#14532d]/20 text-[#14532d] shadow-sm';
+      case 'lump': return 'bg-slate-100 text-slate-700';
+      case 'choice': return 'bg-[#14532d]/10 text-[#14532d]';
       default: return 'bg-slate-100 text-slate-800';
     }
   };
@@ -50,7 +50,7 @@ export default function DisabilityCalculator({ averageWage: propAverageWage = 0 
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Scale className="w-5 h-5 text-purple-600" />
+                <Scale className="w-5 h-5 text-[#14532d]" />
                 장해급여 등급별 비교
               </CardTitle>
               <CardDescription>
@@ -62,12 +62,12 @@ export default function DisabilityCalculator({ averageWage: propAverageWage = 0 
                 {results.map((result) => (
                   <div
                     key={result.grade}
-                    className="p-4 border rounded-lg hover:border-purple-300 hover:bg-purple-50/50 transition-colors"
+                    className="p-4 border rounded-lg hover:border-[#14532d]/40 hover:bg-[#14532d]/5 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg font-bold text-purple-900">
+                          <span className="text-lg font-bold text-[#14532d]">
                             {result.grade}급
                           </span>
                           <span className={`text-xs px-2 py-1 rounded-full ${getPaymentTypeBadgeColor(result.paymentType)}`}>
@@ -80,7 +80,7 @@ export default function DisabilityCalculator({ averageWage: propAverageWage = 0 
 
                         {result.paymentType === 'pension' && (
                           <div className="space-y-1">
-                            <p className="text-2xl font-bold text-purple-900">
+                            <p className="text-2xl font-bold text-[#14532d]">
                               {formatCurrency(result.pension!)}
                             </p>
                             <p className="text-xs text-slate-600">연금 (매월 분할 지급)</p>
@@ -89,7 +89,7 @@ export default function DisabilityCalculator({ averageWage: propAverageWage = 0 
 
                         {result.paymentType === 'lump' && (
                           <div className="space-y-1">
-                            <p className="text-2xl font-bold text-purple-900">
+                            <p className="text-2xl font-bold text-[#14532d]">
                               {formatCurrency(result.lumpSum!)}
                             </p>
                             <p className="text-xs text-slate-600">일시금 (한 번에 지급)</p>
@@ -100,13 +100,13 @@ export default function DisabilityCalculator({ averageWage: propAverageWage = 0 
                           <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-1">
                               <p className="text-xs text-slate-600">일시금</p>
-                              <p className="text-lg font-bold text-purple-900">
+                              <p className="text-lg font-bold text-[#14532d]">
                                 {formatCurrency(result.lumpSum!)}
                               </p>
                             </div>
                             <div className="space-y-1">
                               <p className="text-xs text-slate-600">연금</p>
-                              <p className="text-lg font-bold text-purple-900">
+                              <p className="text-lg font-bold text-[#14532d]">
                                 {formatCurrency(result.pension!)}
                               </p>
                             </div>
@@ -167,7 +167,7 @@ export default function DisabilityCalculator({ averageWage: propAverageWage = 0 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Scale className="w-5 h-5 text-purple-600" />
+              <Scale className="w-5 h-5 text-[#14532d]" />
               장해급여 계산기
             </CardTitle>
             <CardDescription>

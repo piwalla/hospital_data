@@ -8,14 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { UserRole, InjuryPart, Region, AdminUser } from "@/lib/mock-admin-data";
-import { MapPin, UserCircle, Edit2, ExternalLink } from "lucide-react";
+import { MapPin, UserCircle, Edit2, ExternalLink, Check } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { onboardingTranslations, type Locale, defaultLocale } from "@/lib/i18n/config";
 
 interface OnboardingModalProps {
   isOpen: boolean;
   onComplete: (data: { role: UserRole; injuryPart: InjuryPart; region: Region; currentStep: number; agreedToTerms?: boolean; agreedToSensitive?: boolean }) => void;
   initialData?: Partial<AdminUser>;
   onClose?: () => void;
+  isForced?: boolean;
 }
 
 // --- Constants (Extracted for Label Lookup) ---
@@ -66,22 +68,78 @@ const REGIONS = [
   { value: 'jeju', label: '제주' },
 ];
 
-export default function OnboardingModal({ isOpen, onComplete, initialData, onClose }: OnboardingModalProps) {
+// --- Premium Illustrations ---
+const PatientIllustration = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="60" cy="60" r="50" fill="url(#patient-grad)" fillOpacity="0.1" />
+    <circle cx="60" cy="60" r="40" stroke="url(#patient-grad)" strokeWidth="2" strokeDasharray="4 4" />
+    {/* Body */}
+    <path d="M40 85C40 76.7157 46.7157 70 55 70H65C73.2843 70 80 76.7157 80 85V90H40V85Z" fill="url(#patient-grad)" />
+    {/* Head */}
+    <circle cx="60" cy="50" r="12" fill="url(#patient-grad)" />
+    {/* Medical Plus */}
+    <rect x="75" y="45" width="20" height="20" rx="4" fill="white" />
+    <path d="M85 50V60M80 55H90" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" />
+    <defs>
+      <linearGradient id="patient-grad" x1="40" y1="40" x2="80" y2="90" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#10b981" />
+        <stop offset="1" stopColor="#059669" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+const FamilyIllustration = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    <circle cx="60" cy="60" r="50" fill="url(#family-grad)" fillOpacity="0.1" />
+    <circle cx="60" cy="60" r="40" stroke="url(#family-grad)" strokeWidth="2" strokeDasharray="4 4" />
+    {/* Person 1 (Larger) */}
+    <path d="M35 85C35 77.268 41.268 71 49 71H56C63.732 71 70 77.268 70 85V90H35V85Z" fill="url(#family-grad)" fillOpacity="0.6" />
+    <circle cx="52.5" cy="55" r="10" fill="url(#family-grad)" fillOpacity="0.6" />
+    {/* Person 2 (Smaller/Child) */}
+    <path d="M65 85C65 80.5817 68.5817 77 73 77H77C81.4183 77 85 80.5817 85 85V90H65V85Z" fill="url(#family-grad)" />
+    <circle cx="75" cy="68" r="7" fill="url(#family-grad)" />
+    {/* Heart */}
+    <path d="M95 45C95 43.3431 93.6569 42 92 42C90.3431 42 89 43.3431 89 45C89 47.5 92 50 92 50C92 50 95 47.5 95 45Z" fill="#ef4444" />
+    <defs>
+      <linearGradient id="family-grad" x1="40" y1="40" x2="85" y2="90" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#14b8a6" />
+        <stop offset="1" stopColor="#0d9488" />
+      </linearGradient>
+    </defs>
+  </svg>
+);
+
+export default function OnboardingModal({ isOpen, onComplete, initialData, onClose, isForced = false }: OnboardingModalProps) {
   // If initialData exists, we verify if all required fields are present to decide "Summary Mode" availability
   const hasFullData = initialData?.userRole && initialData?.currentStep && initialData?.injuryPart && initialData?.region;
   
   const [isSummaryMode, setIsSummaryMode] = useState<boolean>(!!hasFullData);
   const [step, setStep] = useState(1);
   
-  // State initialization
-  const [role, setRole] = useState<UserRole | undefined>(initialData?.userRole);
-  const [statusStep, setStatusStep] = useState<number | undefined>(initialData?.currentStep);
-  const [injuryPart, setInjuryPart] = useState<InjuryPart | undefined>(initialData?.injuryPart);
-  const [region, setRegion] = useState<Region | undefined>(initialData?.region);
+  // Translation State
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const t = onboardingTranslations[locale] || onboardingTranslations[defaultLocale];
 
-  // Agreement states
-  const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
-  const [agreedToSensitive, setAgreedToSensitive] = useState<boolean>(false);
+  useEffect(() => {
+    // Initial load
+    const savedLocale = (localStorage.getItem('user_locale') as Locale) || defaultLocale;
+    setLocale(savedLocale);
+
+    // Listen for changes
+    const handleStorage = () => {
+      const newLocale = (localStorage.getItem('user_locale') as Locale) || defaultLocale;
+      setLocale(newLocale);
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('localeChange', handleStorage); // Custom event
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('localeChange', handleStorage);
+    };
+  }, []);
 
   // Sync state when Modal opens or data changes
   useEffect(() => {
@@ -96,6 +154,16 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
        setStep(1); 
     }
   }, [isOpen, initialData]);
+  
+  // State initialization
+  const [role, setRole] = useState<UserRole | undefined>(initialData?.userRole);
+  const [statusStep, setStatusStep] = useState<number | undefined>(initialData?.currentStep);
+  const [injuryPart, setInjuryPart] = useState<InjuryPart | undefined>(initialData?.injuryPart);
+  const [region, setRegion] = useState<Region | undefined>(initialData?.region);
+
+  // Agreement states
+  const [agreedToTerms, setAgreedToTerms] = useState<boolean>(false);
+  const [agreedToSensitive, setAgreedToSensitive] = useState<boolean>(false);
 
   const handleNext = () => {
     if (step < 4) {
@@ -110,7 +178,6 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
           agreedToTerms,
           agreedToSensitive
         });
-        // Reset mode for next open if handled externally, but safer to keep state logic clean
       }
     }
   };
@@ -128,51 +195,58 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
     return false;
   };
 
-  // Helper to get labels
-  const getRoleLabel = (r?: UserRole) => ROLES.find(x => x.value === r)?.label || r;
-  const getStatusLabel = (s?: number) => STATUS_STEPS.find(x => x.step === s)?.label || s;
-  const getInjuryLabel = (i?: string) => INJURY_PARTS.find(x => x.id === i)?.label || i;
+  // Helper to get labels (Now using 't')
+  const getRoleLabel = (r?: UserRole) => {
+    if (r === 'patient') return t.roles.patient.replace('\n', ' ');
+    if (r === 'family') return t.roles.family.replace('\n', ' ');
+    return r;
+  };
+  
+  const getStatusLabel = (s?: number) => {
+    if (s === 1) return t.status.step1.label;
+    if (s === 2) return t.status.step2.label;
+    if (s === 3) return t.status.step3.label;
+    if (s === 4) return t.status.step4.label;
+    return s;
+  };
+
+  const getInjuryLabel = (i?: string) => {
+    if (i === 'hand_arm') return t.injury.hand_arm;
+    if (i === 'foot_leg') return t.injury.foot_leg;
+    if (i === 'spine') return t.injury.spine;
+    if (i === 'brain_neuro') return t.injury.brain_neuro;
+    if (i === 'other') return t.injury.other;
+    return i;
+  };
   
   const getRegionLabel = (r?: any) => {
     if (!r) return undefined;
-
-    // 1. Handle Object (RegionSelection from complex selector)
-    if (typeof r === 'object' && r !== null) {
-      if ('provinceName' in r) {
+    // ... (Region logic same as before, essentially returns Korean name which is fine as region names are data)
+    // For now we keep region names in Korean as per strategy (Hybrid Localization)
+    if (typeof r === 'object' && r !== null && 'provinceName' in r) {
          const parts = [r.provinceName, r.districtName, r.subDistrictName].filter(Boolean);
          return parts.join(' ');
-      }
     }
-
-    // 2. Handle String
     if (typeof r === 'string') {
-        // Try parsing JSON string
         if (r.trim().startsWith('{')) {
           try {
              const parsed = JSON.parse(r);
-             if (parsed.provinceName) {
-                const parts = [parsed.provinceName, parsed.districtName, parsed.subDistrictName].filter(Boolean);
-                return parts.join(' ');
-             }
-          } catch {
-             // Ignore parse error
-          }
+             if (parsed.provinceName) return [parsed.provinceName, parsed.districtName, parsed.subDistrictName].filter(Boolean).join(' ');
+          } catch {}
         }
-        
-        // Lookup simple code (e.g. 'seoul')
         const found = REGIONS.find(x => x.value === r);
         return found ? found.label : r;
     }
-
     return r;
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
-       if (!open && onClose) onClose();
+       if (!open && !isForced && onClose) onClose();
     }}>
-      <DialogContent className="sm:max-w-[425px]" showCloseButton={false}>
-        {/* Custom Close Button to avoid overlaps */}
+      <DialogContent className="sm:max-w-[425px] w-[92%] max-h-[85vh] overflow-y-auto rounded-2xl" showCloseButton={!isForced}>
+        {/* Custom Close Button */}
+        {!isForced && (
         <button 
           onClick={onClose}
           className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-[60]"
@@ -182,41 +256,42 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
           </svg>
           <span className="sr-only">Close</span>
         </button>
+        )}
         {/* === SUMMARY VIEW === */}
         {isSummaryMode ? (
            <>
              <DialogHeader>
-               <DialogTitle className="text-xl font-bold text-center">내 정보 확인</DialogTitle>
-               <DialogDescription className="text-center">
-                 현재 설정된 맞춤 정보입니다.<br/>변경사항이 있으신가요?
+               <DialogTitle className="text-xl font-bold text-center whitespace-pre-wrap">{t.summary.title}</DialogTitle>
+               <DialogDescription className="text-center whitespace-pre-wrap">
+                 {t.summary.desc}
                </DialogDescription>
              </DialogHeader>
-             <div className="py-6 space-y-4">
+             <div className="py-4 sm:py-6 space-y-4">
                <div className="bg-slate-50 p-4 rounded-lg space-y-3 border border-slate-100">
                  <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                    <span className="text-sm text-slate-500">이용 유형</span>
-                    <span className="font-semibold text-slate-800">{getRoleLabel(role)}</span>
+                    <span className="text-sm text-slate-500">{t.summary.labels.role}</span>
+                    <span className="font-semibold text-slate-800 text-right whitespace-pre-wrap leading-tight max-w-[60%]">{getRoleLabel(role)}</span>
                  </div>
                  <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                    <span className="text-sm text-slate-500">진행 단계</span>
-                    <span className="font-semibold text-slate-800">{getStatusLabel(statusStep)}</span>
+                    <span className="text-sm text-slate-500">{t.summary.labels.status}</span>
+                    <span className="font-semibold text-slate-800 text-right whitespace-pre-wrap leading-tight max-w-[60%]">{getStatusLabel(statusStep)}</span>
                  </div>
                  <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                    <span className="text-sm text-slate-500">치료 부위</span>
-                    <span className="font-semibold text-slate-800">{getInjuryLabel(injuryPart)}</span>
+                    <span className="text-sm text-slate-500">{t.summary.labels.injury}</span>
+                    <span className="font-semibold text-slate-800 text-right whitespace-pre-wrap leading-tight max-w-[60%]">{getInjuryLabel(injuryPart)}</span>
                  </div>
                  <div className="flex justify-between items-center pt-1">
-                    <span className="text-sm text-slate-500">거주 지역</span>
-                    <span className="font-semibold text-slate-800">{getRegionLabel(region)}</span>
+                    <span className="text-sm text-slate-500">{t.summary.labels.region}</span>
+                    <span className="font-semibold text-slate-800 text-right whitespace-pre-wrap leading-tight max-w-[60%]">{getRegionLabel(region)}</span>
                  </div>
                </div>
              </div>
              <div className="flex flex-col gap-2 mt-4">
                <Button onClick={handleModifyStart} className="w-full bg-[#14532d] hover:bg-[#14532d]/90 gap-2 py-6 text-lg">
-                 <Edit2 className="w-4 h-4" /> 정보 수정하기
+                 <Edit2 className="w-4 h-4" /> {t.buttons.modify}
                </Button>
                <Button variant="ghost" onClick={onClose} className="w-full text-slate-500 hover:bg-slate-100 py-4">
-                 그대로 유지하기
+                 {t.buttons.keep}
                </Button>
              </div>
            </>
@@ -232,36 +307,55 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
                   />
                 ))}
               </div>
-              <DialogTitle className="text-xl font-bold text-center">
-                {STEPS_INFO[step-1].title}
+              <DialogTitle className="text-xl font-bold text-center whitespace-pre-wrap min-h-[3.5rem] flex items-center justify-center">
+                {step === 1 ? t.steps.role : 
+                 step === 2 ? t.steps.details :
+                 step === 3 ? t.steps.injury :
+                 t.steps.region}
               </DialogTitle>
-              <DialogDescription className="text-center">
-                정보를 수정하면 대시보드가<br/>즉시 업데이트됩니다.
+              <DialogDescription className="sr-only">
+                {step === 1 ? t.steps.role : 
+                 step === 2 ? t.steps.details :
+                 step === 3 ? t.steps.injury :
+                 t.steps.region}
               </DialogDescription>
+             {/* Removed Description to save space on mobile, title is enough context */}
             </DialogHeader>
     
-            <div className="py-6">
+            <div className="py-2 sm:py-6">
               {/* Step 1: User Role */}
               {step === 1 && (
-                <RadioGroup onValueChange={(v) => setRole(v as UserRole)} value={role} className="grid grid-cols-2 gap-4">
+                <RadioGroup onValueChange={(v) => setRole(v as UserRole)} value={role || ""} className="grid grid-cols-2 gap-2 sm:gap-4">
                   <div>
                     <RadioGroupItem value="patient" id="patient" className="peer sr-only" />
                     <Label
                       htmlFor="patient"
-                      className="flex flex-col items-center justify-between rounded-xl border-2 border-slate-200 bg-transparent p-4 hover:bg-slate-50 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-center h-[120px]"
+                      onClick={() => setRole('patient')}
+                      className="flex flex-col items-center justify-between rounded-2xl border-2 peer-data-[state=checked]:border-4 border-slate-100 bg-white p-2 sm:p-4 hover:bg-slate-50 peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-100/50 cursor-pointer text-center min-h-[140px] transition-all duration-300 shadow-sm hover:shadow-md h-full relative"
                     >
-                      <UserCircle className="mb-2 h-8 w-8 text-slate-500 peer-data-[state=checked]:text-primary" />
-                      <span className="text-sm font-bold">제가<br/>산재 환자예요</span>
+                      {role === 'patient' && (
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-emerald-600 rounded-full flex items-center justify-center text-white">
+                          <Check className="w-4 h-4" />
+                        </div>
+                      )}
+                      <PatientIllustration className="mb-1 sm:mb-2 h-12 w-12 sm:h-20 sm:w-20 transition-transform duration-300 peer-data-[state=checked]:scale-110 flex-shrink-0" />
+                      <span className={`text-xs sm:text-sm font-bold whitespace-pre-wrap leading-tight ${role === 'patient' ? 'text-emerald-800' : 'text-slate-700'}`}>{t.roles.patient}</span>
                     </Label>
                   </div>
                   <div>
                     <RadioGroupItem value="family" id="family" className="peer sr-only" />
                     <Label
                       htmlFor="family"
-                      className="flex flex-col items-center justify-between rounded-xl border-2 border-slate-200 bg-transparent p-4 hover:bg-slate-50 peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-center h-[120px]"
+                      onClick={() => setRole('family')}
+                      className="flex flex-col items-center justify-between rounded-2xl border-2 peer-data-[state=checked]:border-4 border-slate-100 bg-white p-2 sm:p-4 hover:bg-slate-50 peer-data-[state=checked]:border-teal-600 peer-data-[state=checked]:bg-teal-100/50 cursor-pointer text-center min-h-[140px] transition-all duration-300 shadow-sm hover:shadow-md h-full relative"
                     >
-                      <UserCircle className="mb-2 h-8 w-8 text-slate-500 peer-data-[state=checked]:text-primary" />
-                      <span className="text-sm font-bold">저는<br/>보호자(가족)예요</span>
+                      {role === 'family' && (
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center text-white">
+                          <Check className="w-4 h-4" />
+                        </div>
+                      )}
+                      <FamilyIllustration className="mb-1 sm:mb-2 h-12 w-12 sm:h-20 sm:w-20 transition-transform duration-300 peer-data-[state=checked]:scale-110 flex-shrink-0" />
+                      <span className={`text-xs sm:text-sm font-bold whitespace-pre-wrap leading-tight ${role === 'family' ? 'text-teal-800' : 'text-slate-700'}`}>{t.roles.family}</span>
                     </Label>
                   </div>
                 </RadioGroup>
@@ -269,37 +363,41 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
 
               {/* Legal Agreement (Step 1 Integration) */}
               {step === 1 && (
-                <div className="mt-8 pt-6 border-t border-slate-100 space-y-4">
-                  <div className="flex items-center space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <div className="mt-4 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-100 space-y-2 sm:space-y-4">
+                  <div className="flex items-start space-x-3 bg-slate-50 p-2 sm:p-3 rounded-lg border border-slate-100">
                     <Checkbox 
                       id="terms-agree" 
                       checked={agreedToTerms} 
                       onChange={(e) => setAgreedToTerms(e.target.checked)}
+                      className="mt-0.5 flex-shrink-0"
                     />
-                    <div className="grid gap-1.5 leading-none">
-                      <label htmlFor="terms-agree" className="text-sm font-medium leading-none cursor-pointer">
-                        이용약관 및 개인정보 수집 이용 동의 (필수)
+                    <div className="grid gap-1.5 leading-tight">
+                      <label htmlFor="terms-agree" className="text-xs sm:text-sm font-medium cursor-pointer text-balance">
+                        {t.consent.terms}
                       </label>
-                      <Link href="/terms" target="_blank" className="text-xs text-blue-600 hover:underline flex items-center gap-0.5">
-                        약관 보기 <ExternalLink className="w-3 h-3" />
+                      <Link href="/terms" target="_blank" className="text-[10px] sm:text-xs text-blue-600 hover:underline flex items-center gap-0.5">
+                        {t.consent.termsLink} <ExternalLink className="w-3 h-3" />
                       </Link>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-3 bg-rose-50/50 p-3 rounded-lg border border-rose-100">
+                  <div className="flex items-start space-x-3 bg-rose-50/50 p-2 sm:p-3 rounded-lg border border-rose-100">
                     <Checkbox 
                       id="sensitive-agree" 
                       checked={agreedToSensitive} 
                       onChange={(e) => setAgreedToSensitive(e.target.checked)}
+                      className="mt-0.5 flex-shrink-0"
                     />
-                    <div className="grid gap-1.5 leading-none">
-                      <label htmlFor="sensitive-agree" className="text-sm font-medium leading-none cursor-pointer text-rose-900">
-                        [민감정보] 건강 관련 정보 수집 및 이용 동의 (필수)
+                    <div className="grid gap-1.5 leading-tight">
+                      <label htmlFor="sensitive-agree" className="text-xs sm:text-sm font-medium cursor-pointer text-rose-900 text-balance">
+                        {t.consent.sensitive}
                       </label>
-                      <Link href="/privacy" target="_blank" className="text-xs text-rose-600 hover:underline flex items-center gap-0.5">
-                        내용 보기 <ExternalLink className="w-3 h-3" />
+                      <Link href="/privacy" target="_blank" className="text-[10px] sm:text-xs text-rose-600 hover:underline flex items-center gap-0.5">
+                        {t.consent.sensitiveLink} <ExternalLink className="w-3 h-3" />
                       </Link>
-                      <p className="text-[10px] text-rose-400 mt-1">부상 부위 및 진행 단계 정보를 통한 서비스 제공을 위함</p>
+                      <p className="text-[10px] text-rose-400 mt-1 text-balance">
+                        {t.consent.sensitiveDesc}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -308,20 +406,26 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
               {/* Step 2: Status */}
               {step === 2 && (
                 <div className="space-y-3">
-                  {STATUS_STEPS.map((item) => (
-                    <button
-                      key={item.step}
-                      onClick={() => setStatusStep(item.step)}
-                      className={`w-full flex flex-col items-start p-4 rounded-lg border-2 transition-all text-left ${
-                        statusStep === item.step
-                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                          : 'border-slate-100 hover:border-slate-300'
-                      }`}
-                    >
-                      <span className="font-bold text-slate-800 text-lg mb-1">{item.label}</span>
-                      <span className="text-sm text-slate-500">{item.desc}</span>
-                    </button>
-                  ))}
+                  {[1, 2, 3, 4].map((s) => {
+                     // Get localized status data dynamically
+                     const statusData = s === 1 ? t.status.step1 : 
+                                      s === 2 ? t.status.step2 : 
+                                      s === 3 ? t.status.step3 : t.status.step4;
+                     return (
+                        <button
+                          key={s}
+                          onClick={() => setStatusStep(s)}
+                          className={`w-full flex flex-col items-start p-4 rounded-lg border-2 transition-all text-left min-h-[80px] ${
+                            statusStep === s
+                              ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                              : 'border-slate-100 hover:border-slate-300'
+                          }`}
+                        >
+                          <span className="font-bold text-slate-800 text-base sm:text-lg mb-1 leading-tight">{statusData.label}</span>
+                          <span className="text-xs sm:text-sm text-slate-500 leading-normal">{statusData.desc}</span>
+                        </button>
+                    );
+                  })}
                 </div>
               )}
     
@@ -332,14 +436,16 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
                      <button
                         key={item.id}
                         onClick={() => setInjuryPart(item.id as InjuryPart)}
-                        className={`w-full flex items-center p-3 rounded-lg border-2 transition-all text-left ${
+                        className={`w-full flex items-center p-3 rounded-lg border-2 transition-all text-left min-h-[60px] ${
                           injuryPart === item.id 
                             ? 'border-primary bg-primary/5 ring-1 ring-primary' 
                             : 'border-slate-100 hover:border-slate-300'
                         }`}
                      >
-                       <span className="text-xl mr-3">{item.icon}</span>
-                       <span className="font-semibold text-slate-700">{item.label}</span>
+                       <span className="text-xl mr-3 flex-shrink-0">{item.icon}</span>
+                       <span className="font-semibold text-slate-700 leading-tight">
+                         {getInjuryLabel(item.id)}
+                       </span>
                      </button>
                    ))}
                 </div>
@@ -353,9 +459,9 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
                       <MapPin className="w-8 h-8 text-blue-500" />
                     </div>
                   </div>
-                  <Select onValueChange={(v) => setRegion(v as Region)} value={region}>
+                  <Select onValueChange={(v) => setRegion(v as Region)} value={region || ""}>
                     <SelectTrigger className="w-full h-12 text-lg">
-                      <SelectValue placeholder="지역을 선택해주세요" />
+                      <SelectValue placeholder={t.region.placeholder} />
                     </SelectTrigger>
                     <SelectContent>
                       {REGIONS.map((r) => (
@@ -368,18 +474,19 @@ export default function OnboardingModal({ isOpen, onComplete, initialData, onClo
             </div>
     
             <DialogFooter className="flex gap-2">
-               {/* Back Button logic could go here if requested, currently just Next/Close */}
                {isSummaryMode ? null : (
+                 !isForced && (
                   <Button variant="ghost" onClick={initialData ? () => setIsSummaryMode(true) : onClose}>
-                     취소
+                     {t.buttons.cancel}
                   </Button>
+                 )
                )}
               <Button 
                 onClick={handleNext} 
                 disabled={!isStepValid()}
                 className="w-full bg-primary hover:bg-primary/90 text-lg py-6"
               >
-                {step === 4 ? "수정 완료" : "다음으로"}
+                {step === 4 ? t.buttons.complete : t.buttons.next}
               </Button>
             </DialogFooter>
            </>

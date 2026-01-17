@@ -115,7 +115,9 @@ export default function ProfilePage() {
             </div>
           </div>
           <CardContent className="pt-14 pb-8 px-8">
-            <h1 className="text-2xl font-black text-slate-900">{user?.fullName || "이용자"}님</h1>
+            <h1 className="text-2xl font-black text-slate-900">
+              {user?.username || (user?.lastName && user?.firstName ? `${user.lastName}${user.firstName}` : user?.fullName) || "이용자"}님
+            </h1>
             <p className="text-slate-500 font-medium">{user?.primaryEmailAddress?.emailAddress}</p>
           </CardContent>
         </Card>

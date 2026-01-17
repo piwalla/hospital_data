@@ -43,19 +43,12 @@ export async function POST(request: NextRequest) {
   let requestBody: { message?: string; sessionId?: string } = {};
 
   try {
-    // 사용자 인증 확인
+    // 사용자 인증 확인 (Optional for Beta)
     const { userId: clerkUserId } = await auth();
     userId = clerkUserId;
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: '로그인이 필요합니다.',
-        },
-        { status: 401 }
-      );
-    }
+    
+    // [Beta Strategy] Allow guests to use chatbot freely
+    // if (!userId) { ... } check removed to enable public access
 
     // 웹훅 URL 확인
     if (!N8N_WEBHOOK_URL) {

@@ -24,11 +24,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-import { createClerkSupabaseClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/service-role";
 import { auth } from "@clerk/nextjs/server";
 
 export default async function PostDetailPage({ params }: PageProps) {
-  const client = createClerkSupabaseClient();
+  const client = createSupabaseAdminClient();
   const { userId } = await auth();
   const { id } = await params;
   const { post, error } = await getPost(id);

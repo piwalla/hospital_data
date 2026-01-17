@@ -9,53 +9,81 @@ import ResponsiveNavigation from "@/components/ResponsiveNavigation";
 import Footer from "@/components/Footer";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import FloatingChatbotButton from "@/components/chatbot/FloatingChatbotButton";
+import SelectiveOnboarding from "@/components/auth/SelectiveOnboarding";
 import MainContent from "@/components/MainContent";
 import "./globals.css";
 
+import Script from "next/script";
+import { getSeoConfig } from "@/app/actions/admin-settings";
+
 const description = "AI기반 산재 도우미 리워크케어에서 도와드립니다.";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://hospital-data-one.vercel.app"),
-  title: {
-    default: "리워크케어(ReWorkCare) - 산재 근로자를 위한 필수 플랫폼",
-    template: "%s | 리워크케어",
-  },
-  description: description,
-  keywords: ["산재", "산업재해", "휴업급여", "산재병원", "요양급여", "산재신청", "근로복지공단", "리워크케어"],
-  authors: [{ name: "ReWorkCare Team" }],
-  openGraph: {
-    type: "website",
-    locale: "ko_KR",
-    url: "/",
-    siteName: "리워크케어 (ReWorkCare)",
-    title: "갑작스러운 산재, 막막하신가요? | 리워크케어",
-    description: description,
-    images: [
-      {
-        url: "/og-image.png", // public 폴더에 이미지를 추가해야 함
-        width: 1200,
-        height: 630,
-        alt: "리워크케어 서비스 소개 이미지",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "산재 근로자를 위한 모든 정보, 리워크케어",
-    description: description,
-    images: ["/og-image.png"], // Twitter용 이미지
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getSeoConfig();
 
-export default function RootLayout({
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://hospital-data-one.vercel.app"),
+    title: {
+      default: "리워크케어(ReWorkCare) - 산재 근로자를 위한 필수 플랫폼",
+      template: "%s | 리워크케어",
+    },
+    description: description,
+    keywords: ["산재", "산업재해", "휴업급여", "산재병원", "요양급여", "산재신청", "근로복지공단", "리워크케어"],
+    authors: [{ name: "ReWorkCare Team" }],
+    openGraph: {
+      type: "website",
+      locale: "ko_KR",
+      url: "/",
+      siteName: "리워크케어 (ReWorkCare)",
+      title: "갑작스러운 산재, 막막하신가요? | 리워크케어",
+      description: description,
+      images: [
+        {
+          url: "/og-image.png", // public 폴더에 이미지를 추가해야 함
+          width: 1200,
+          height: 630,
+          alt: "리워크케어 서비스 소개 이미지",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "산재 근로자를 위한 모든 정보, 리워크케어",
+      description: description,
+      images: ["/og-image.png"], // Twitter용 이미지
+    },
+    alternates: {
+      canonical: 'https://www.reworkcare.com',
+      types: {
+        'application/rss+xml': 'https://www.reworkcare.com/feed.xml',
+      },
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    verification: {
+      google: config?.google_site_verification || undefined,
+      other: {
+        "naver-site-verification": config?.naver_site_verification || undefined,
+        "msvalidate.01": config?.bing_site_verification || undefined,
+      },
+    },
+    icons: {
+      icon: "/icon.png",
+      shortcut: "/favicon.ico",
+      apple: "/icon.png",
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const config = await getSeoConfig();
+  const adsenseId = config?.adsense_client_id;
   return (
     <ClerkProvider 
       localization={{
@@ -102,15 +130,21 @@ export default function RootLayout({
             crossOrigin="anonymous"
             href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
           />
+          {adsenseId && (
+            <Script
+              async
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
+              crossOrigin="anonymous"
+              strategy="afterInteractive"
+            />
+          )}
         </head>
         <body 
           className="antialiased w-full max-w-full overflow-x-hidden"
           suppressHydrationWarning={true}
         >
           <SyncUserProvider>
-
-
-
+            <SelectiveOnboarding />
             <div className="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
               <Navbar />
               <ResponsiveNavigation />

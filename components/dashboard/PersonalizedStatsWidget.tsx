@@ -1,12 +1,14 @@
 
 "use client";
 
+
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, Clock } from "lucide-react";
 import { RadialBarChart, RadialBar, ResponsiveContainer, PolarAngleAxis } from 'recharts';
 import { cn } from "@/lib/utils";
+import { Locale, dashboardTranslations } from "@/lib/i18n/config";
 
 interface PersonalizedStatsWidgetProps {
   userName?: string;
@@ -32,6 +34,35 @@ export default function PersonalizedStatsWidget({ userName, injury, region, clas
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [type, setType] = useState<'accident' | 'disease'>('accident'); // 'accident' | 'disease'
+  
+  const [locale, setLocale] = useState<Locale>('ko');
+
+  useEffect(() => {
+    const savedLocale = localStorage.getItem('user_locale') as Locale;
+    if (savedLocale && dashboardTranslations[savedLocale]) {
+      setLocale(savedLocale);
+    }
+
+    const handleLocaleChange = () => {
+      const updatedLocale = localStorage.getItem('user_locale') as Locale;
+      if (updatedLocale && dashboardTranslations[updatedLocale]) {
+        setLocale(updatedLocale);
+      }
+    };
+
+    window.addEventListener('user_locale', handleLocaleChange);
+    window.addEventListener('localeChange', handleLocaleChange);
+    window.addEventListener('storage', handleLocaleChange);
+
+    return () => {
+      window.removeEventListener('user_locale', handleLocaleChange);
+      window.removeEventListener('localeChange', handleLocaleChange);
+      window.removeEventListener('storage', handleLocaleChange);
+    };
+  }, []);
+
+  const t = dashboardTranslations[locale]?.statsWidget || dashboardTranslations['ko'].statsWidget;
+  const headerT = dashboardTranslations[locale]?.header || dashboardTranslations['ko'].header;
 
   useEffect(() => {
     async function fetchStats() {
@@ -63,7 +94,7 @@ export default function PersonalizedStatsWidget({ userName, injury, region, clas
     return (
        <Card className={`bg-slate-50 border-dashed ${className}`}>
          <CardContent className="flex items-center justify-center py-8 text-slate-400 text-sm">
-           통계 데이터를 불러올 수 없습니다.
+           {t.error}
          </CardContent>
        </Card>
     );
@@ -92,36 +123,39 @@ export default function PersonalizedStatsWidget({ userName, injury, region, clas
   // User requested NO default values. If data is missing (~0), show empty/dash.
   const displayTreatment = parseInt(treatmentDuration as string) > 0 ? treatmentDuration : "-"; 
 
-  // --- Conversational Helpers ---
+  // --- Conversational Helpers (Localized) ---
   const approvalCount = Math.floor(parseFloat(approvalRate) / 10);
   const processingDays = parseFloat(processingTime);
   const processingText = processingDays >= 7 
-      ? `약 ${Math.round(processingDays / 7)}주` 
-      : `약 ${Math.round(processingDays)}일`;
+      ? `${Math.round(processingDays / 7)}${locale === 'ko' ? '주' : ' wks'}` 
+      : `${Math.round(processingDays)}${locale === 'ko' ? '일' : ' days'}`;
       
   const treatmentDays = parseInt(displayTreatment as string);
   const treatmentText = treatmentDays > 0 
-      ? `약 ${Math.round(treatmentDays / 30)}개월` 
-      : "정보 없음";
-
+      ? `${Math.round(treatmentDays / 30)}${locale === 'ko' ? '개월' : ' mos'}` 
+      : t.noInfo;
 
 
   // Chart Data Preparation (Moved AFTER definitions)
   // 1. Approval Rate Chart
-  const chartDataApproval = [{ name: 'Approval', value: parseFloat(approvalRate), fill: isAccident ? '#10b981' : '#ef4444' }]; 
+  const chartDataApproval = [{ name: 'Approval', value: parseFloat(approvalRate), fill: isAccident ? '#14532d' : '#ef4444' }]; 
 
   // 2. Processing Time Chart (Comparative)
   // Compare selected type vs the other type to show context
 
 
+  const displayName = (userName && userName !== '홍길동') ? 
+    userName : 
+    (locale === 'ko' ? '회원' : headerT.guestGreeting.replace('Hello, ', '').replace('!', ''));
+
   return (
-    <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-[2.5rem] overflow-hidden transition-all hover:shadow-premium-hover", className)}>
-      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-emerald-50/50 relative px-6 sm:px-8 pt-7">
+    <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-none border-x-0 sm:border sm:rounded-3xl overflow-hidden transition-all hover:shadow-premium-hover", className)}>
+      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-dashed border-slate-100 relative px-6 sm:px-8 pt-7">
         <div className="flex items-center gap-3">
-           <span className="w-2 h-7 bg-emerald-500 rounded-full inline-block shadow-[0_4px_12px_rgba(16,185,129,0.3)]" />
+           <span className="w-2 h-7 bg-primary rounded-full inline-block shadow-[0_4px_12px_rgba(20,83,45,0.3)]" />
            <div>
              <CardTitle className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-               {userName ? `${userName}님과 유사한 분들의 치료 통계예요` : '나와 유사한 분들의 치료 통계예요'}
+               {t.title.replace('{name}', displayName)}
              </CardTitle>
            </div>
         </div>
@@ -129,15 +163,21 @@ export default function PersonalizedStatsWidget({ userName, injury, region, clas
          <div className="flex bg-slate-100/50 p-1 rounded-xl backdrop-blur-sm border border-white/50">
           <button
             onClick={() => setType('accident')}
-            className={cn("px-4 py-1.5 text-xs font-bold rounded-lg transition-all", isAccident ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700')}
+            className={cn(
+              "px-4 py-1.5 text-xs font-bold rounded-lg transition-all", 
+              isAccident ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            )}
           >
-            사고
+            {t.toggle.accident}
           </button>
           <button
             onClick={() => setType('disease')}
-            className={cn("px-4 py-1.5 text-sm font-bold rounded-lg transition-all", !isAccident ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700')}
+            className={cn(
+              "px-4 py-1.5 text-sm font-bold rounded-lg transition-all", 
+              !isAccident ? 'bg-white text-rose-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+            )}
           >
-            질병
+            {t.toggle.disease}
           </button>
         </div>
       </CardHeader>
@@ -155,15 +195,15 @@ export default function PersonalizedStatsWidget({ userName, injury, region, clas
                    </RadialBarChart>
                  </ResponsiveContainer>
                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={cn("text-2xl font-black tracking-tighter", isAccident ? 'text-emerald-600' : 'text-rose-600')}>
+                    <span className={cn("text-2xl font-black tracking-tighter", isAccident ? 'text-primary' : 'text-rose-600')}>
                       {approvalRate}%
                     </span>
                  </div>
              </div>
               <div>
-                <p className="text-lg font-black text-emerald-700 mb-1">평균 승인 확률</p>
-                <p className="text-lg font-black text-slate-800 leading-tight">
-                  10명 중 {approvalCount}명이<br/>승인받고 있어요
+                <p className="text-lg font-bold text-slate-500 mb-1">{t.labels.avgApproval}</p>
+                <p className="text-lg font-black text-slate-800 leading-tight whitespace-pre-wrap">
+                  {t.descriptions.approval.replace('{count}', approvalCount.toString())}
                 </p>
               </div>
           </div>
@@ -174,30 +214,31 @@ export default function PersonalizedStatsWidget({ userName, injury, region, clas
                 <Clock className="w-10 h-10 text-orange-400" />
              </div>
               <div>
-                <p className="text-lg font-black text-emerald-700 mb-1">결과 소요 기간</p>
-                <p className="text-lg font-black text-slate-800 leading-tight">
-                  접수 후 {processingText} 이상<br/>소요될 수 있어요
+                <p className="text-lg font-bold text-slate-500 mb-1">{t.labels.processingTime}</p>
+                <p className="text-lg font-black text-slate-800 leading-tight whitespace-pre-wrap">
+                  {t.descriptions.processing.replace('{time}', processingText)}
                 </p>
               </div>
           </div>
 
           {/* 3. Treatment Duration */}
           <div className="flex flex-col items-center text-center space-y-4">
-             <div className="w-20 h-20 rounded-[2rem] bg-emerald-50 flex items-center justify-center mb-2">
-                <Calendar className="w-10 h-10 text-emerald-400" />
+             <div className="w-20 h-20 rounded-[2rem] bg-slate-50 flex items-center justify-center mb-2">
+                <Calendar className="w-10 h-10 text-slate-400" />
              </div>
               <div>
-                <p className="text-lg font-black text-emerald-700 mb-1">집중 치료 기간</p>
-                <p className="text-lg font-black text-slate-800 leading-tight">
-                  보통 {treatmentText} 동안<br/>회복에 전념해요
+                <p className="text-lg font-bold text-slate-500 mb-1">{t.labels.treatmentDuration}</p>
+                <p className="text-lg font-black text-slate-800 leading-tight whitespace-pre-wrap">
+                   {t.descriptions.treatment.replace('{time}', treatmentText)}
                 </p>
               </div>
           </div>
 
         </div>
         
+        {/* Source link remains same or can be localized if needed, but 'Official Stats' is likely fine for now or can also be added */}
         <div className="mt-8 pt-6 border-t border-slate-100/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-            <p className="text-xs font-black text-emerald-600 uppercase tracking-widest">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
               Source: Official Stats 2023
             </p>
         </div>

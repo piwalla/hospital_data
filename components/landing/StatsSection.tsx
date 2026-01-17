@@ -53,16 +53,20 @@ function StatCard({ imageSrc, value, label, description }: StatItemProps) {
         />
       </div>
       
-      <div className="text-2xl md:text-4xl font-bold text-gray-900 mb-2 w-full break-normal">
+      <div className="text-2xl md:text-5xl font-bold text-gray-900 mb-2 w-full break-normal">
         <AnimatedCounter value={value} />
       </div>
-      <div className="text-lg font-bold text-gray-800 mb-1 w-full break-keep">{label}</div>
-      <div className="text-sm text-gray-500 font-medium w-full break-keep">{description}</div>
+      <div className="text-lg md:text-2xl font-bold text-gray-800 mb-1 w-full break-keep">{label}</div>
+      <div className="text-sm md:text-base text-gray-500 font-medium w-full break-keep">{description}</div>
     </div>
   );
 }
 
-export default function StatsSection() {
+import { Locale, landingTranslations } from '@/lib/i18n/config';
+
+export default function StatsSection({ locale = 'ko' }: { locale?: Locale }) {
+  const t = landingTranslations[locale];
+
   return (
     <section className="py-24 bg-gray-50 relative overflow-hidden">
         {/* Background Decoration (Optional, for Glassmorphism contrast) */}
@@ -72,19 +76,15 @@ export default function StatsSection() {
         </div>
 
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="text-center mb-16 max-w-4xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight mb-8">
-            &quot;저도 업무 중 사고를 겪었던 <span className="text-primary relative px-1">산재 근로자였습니다<span className="absolute inset-x-0 bottom-1 h-3 bg-green-100 -z-10 opacity-60"></span></span>.&quot;
+        <div className="text-center mb-16 max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-4xl font-bold text-gray-900 leading-tight mb-8">
+            &quot;{t.statsTitle}&quot;
           </h2>
           
           <div className="relative">
-             <div className="text-gray-700 text-lg md:text-xl leading-relaxed font-medium break-keep space-y-2">
+             <div className="text-gray-700 text-lg md:text-2xl leading-relaxed font-medium break-keep space-y-2">
                <p>
-                 치료만으로도 벅찬 시기에 겪었던 절차의 막막함.<br className="hidden md:block" />
-                 <span className="font-bold text-gray-900">&apos;누가 미리 알려줬더라면&apos;</span> 아쉬워했던 정보들을 모았습니다.
-               </p>
-               <p className="text-gray-600">
-                 같은 길을 걷는 분들께 든든한 길잡이가 되겠습니다.
+                 {t.statsDescription}
                </p>
              </div>
           </div>
@@ -94,27 +94,27 @@ export default function StatsSection() {
           <StatCard
             imageSrc="/landing/icon-3d-docs-removebg-preview.png"
             value="13+"
-            label="서류 안내"
-            description="필수 서류 작성 가이드"
+            label={t.statDocsLabel}
+            description={t.statDocsDesc}
           />
           <StatCard
              imageSrc="/landing/icon-3d-video-removebg-preview.png"
             value="15+"
-            label="설명 동영상"
-            description="쉬운 이해를 돕는 영상"
+            label={t.statVideoLabel}
+            description={t.statVideoDesc}
           />
           <StatCard
             imageSrc="/landing/icon-3d-hospital-removebg-preview.png"
             value="1,800+"
-            label="산재 병원"
-            description="재활 인증 의료기관"
+            label={t.statHospitalLabel}
+            description={t.statHospitalDesc}
             delay={0.2}
           />
           <StatCard
             imageSrc="/landing/icon-3d-rehab-center-removebg-preview.png"
             value="3,000+"
-            label="재활 기관"
-            description="직업훈련 및 재활 시설"
+            label={t.statRehabLabel}
+            description={t.statRehabDesc}
             delay={0.3}
           />
         </div>
@@ -123,7 +123,7 @@ export default function StatsSection() {
           <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-green-100 rounded-full shadow-sm">
             <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
             <span className="text-sm font-semibold text-gray-700">
-              근로복지공단 공식 데이터 기반
+              {t.statSource}
             </span>
           </div>
         </div>

@@ -27,7 +27,13 @@ export function createClerkSupabaseClient() {
 
   return createClient(supabaseUrl, supabaseKey, {
     async accessToken() {
-      return (await auth()).getToken();
+      try {
+        const token = await (await auth()).getToken({ template: 'supabase' });
+        return token;
+      } catch (e) {
+        console.error("Supabase auth token fetch failed:", e);
+        return null; // Fallback to anon/public access
+      }
     },
   });
 }

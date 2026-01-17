@@ -2,8 +2,27 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { Locale, chatbotTranslations } from "@/lib/i18n/config";
 
-export default function ChatbotHero() {
+interface ChatbotHeroProps {
+  locale?: Locale;
+}
+
+export default function ChatbotHero({ locale = 'ko' }: ChatbotHeroProps) {
+  const t = chatbotTranslations[locale];
+
+  // For Korean, we want to keep the specific highlighting
+  const renderTitle = () => {
+    if (locale === 'ko') {
+      return (
+        <>
+          24시간 <span className="text-[#4ADE80]">언제나</span>, 산재 전문 상담 챗봇
+        </>
+      );
+    }
+    return t.pageHeroTitle;
+  };
+
   return (
     <section className="relative w-screen left-[calc(-50vw+50%)] h-[20vh] min-h-[200px] md:h-[45vh] md:min-h-[400px] -mt-16 mb-12 flex items-center justify-center overflow-hidden">
       {/* Background Decor */}
@@ -38,7 +57,7 @@ export default function ChatbotHero() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-lg"
             >
-              24시간 <span className="text-[#4ADE80]">언제나</span>, 산재 전문 상담 챗봇
+              {renderTitle()}
             </motion.h1>
             
             <motion.p 
@@ -47,7 +66,7 @@ export default function ChatbotHero() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-sm sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-md"
             >
-              복잡한 규정도 AI가 쉽고 정확하게 알려드립니다.
+              {t.pageHeroSubtitle}
             </motion.p>
           </div>
         </div>

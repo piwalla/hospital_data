@@ -1,6 +1,6 @@
 /**
  * @file TimelineContainer.tsx
- * @description 타임라인 메인 컨테이너 컴포넌트
+ * @description 타임라인 메인 컨테이너 컴포넌트 (지역화 지원)
  * 
  * 레이아웃:
  * - 모든 화면 크기: 세로 타임라인 (위에서 아래로)
@@ -10,18 +10,23 @@
 
 import TimelineStepCard from './TimelineStepCard';
 import type { StageWithDetails } from '@/lib/types/timeline';
+import { Locale, TimelineTranslation } from '@/lib/i18n/config';
 
 interface TimelineContainerProps {
   stages: StageWithDetails[];
   currentStepNumber?: number;
+  locale: Locale;
+  t: TimelineTranslation;
 }
 
-export default function TimelineContainer({ stages, currentStepNumber }: TimelineContainerProps) {
+export default function TimelineContainer({ stages, currentStepNumber, locale, t }: TimelineContainerProps) {
 
   if (stages.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-[#6B7280]">타임라인 데이터를 불러올 수 없습니다.</p>
+        <p className="text-[#6B7280]">
+          {locale === 'ko' ? '타임라인 데이터를 불러올 수 없습니다.' : 'Failed to load timeline data.'}
+        </p>
       </div>
     );
   }
@@ -36,6 +41,8 @@ export default function TimelineContainer({ stages, currentStepNumber }: Timelin
               stage={stage}
               stepNumber={stage.step_number}
               isCurrentStep={currentStepNumber === stage.step_number}
+              locale={locale}
+              t={t}
             />
             
             {/* Chevron between cards */}

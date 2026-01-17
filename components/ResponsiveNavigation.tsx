@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MapPin, FileText, MessageSquareText, ListOrdered, Heart } from "lucide-react";
+import { MapPin, FileText, MessageSquareText, ListOrdered, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import React from "react";
+import { Locale, locales, navTranslations } from "@/lib/i18n/config";
 
 /**
  * 반응형 네비게이션 컴포넌트 (모바일 전용)
@@ -14,31 +16,59 @@ import { cn } from "@/lib/utils";
 const ResponsiveNavigation = () => {
   const pathname = usePathname();
 
+  /* Locale & Translation Logic */
+  const [locale, setLocale] = React.useState<Locale>('ko');
+
+  React.useEffect(() => {
+    const stored = localStorage.getItem('user_locale');
+    if (stored && locales.includes(stored as Locale)) {
+      setLocale(stored as Locale);
+    }
+
+    const handleLocaleChange = () => {
+      const updated = localStorage.getItem('user_locale');
+      if (updated && locales.includes(updated as Locale)) {
+        setLocale(updated as Locale);
+      }
+    };
+
+    window.addEventListener('storage', handleLocaleChange);
+    window.addEventListener('localeChange', handleLocaleChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleLocaleChange);
+      window.removeEventListener('localeChange', handleLocaleChange);
+    };
+  }, []);
+
+  const displayLocale = locale === 'ko' ? 'ko' : 'en';
+  const t = navTranslations[displayLocale];
+
   const tabs = [
     {
+      href: "/dashboard",
+      label: t.dashboard,
+      icon: LayoutDashboard,
+    },
+    {
+      href: "/chatbot-v2",
+      label: t.chatbot,
+      icon: MessageSquareText,
+    },
+    {
       href: "/timeline",
-      label: "진행 과정",
+      label: t.timeline,
       icon: ListOrdered,
     },
     {
       href: "/hospitals",
-      label: "병원 찾기",
+      label: t.hospitals,
       icon: MapPin,
     },
     {
       href: "/documents",
-      label: "서류 안내",
+      label: t.documents,
       icon: FileText,
-    },
-    {
-      href: "/chatbot-v2",
-      label: "산재 상담",
-      icon: MessageSquareText,
-    },
-    {
-      href: "/counseling",
-      label: "심리 상담",
-      icon: Heart,
     },
   ];
 
@@ -48,10 +78,10 @@ const ResponsiveNavigation = () => {
     <>
       {/* 모바일 전용: 하단 탭 바 (< 768px) */}
       <nav 
-        className="fixed bottom-0 left-0 right-0 bg-primary border-t border-primary/20 z-[2000] md:hidden safe-area-inset-bottom shadow-lg"
+        className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-200 z-[2000] md:hidden safe-area-inset-bottom shadow-[0_-4px_16px_rgba(0,0,0,0.04)]"
         data-testid="mobile-navigation"
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-around h-16 relative">
+        <div className="max-w-7xl mx-auto flex items-center justify-around h-[70px] relative px-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = pathname === tab.href || pathname?.startsWith(tab.href + "/");
@@ -61,21 +91,30 @@ const ResponsiveNavigation = () => {
                 key={tab.href}
                 href={tab.href}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1.5 flex-1 h-full transition-all duration-200 ease-in-out relative",
+                  "flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300 ease-in-out relative",
                   isActive
-                    ? "text-primary bg-white/20"
-                    : "text-white/80 active:text-white active:scale-95"
+                    ? "text-emerald-600"
+                    : "text-slate-400 active:scale-90"
                 )}
               >
-                <Icon
-                  className={cn(
-                    "transition-all duration-200",
-                    isActive ? "w-7 h-7 scale-110 text-white" : "w-6 h-6"
+                <div className={cn(
+                  "relative p-1.5 rounded-2xl transition-all duration-300",
+                  isActive ? "bg-emerald-50 text-emerald-600" : ""
+                )}>
+                  <Icon
+                    className={cn(
+                      "transition-all duration-300",
+                      isActive ? "w-6 h-6" : "w-6 h-6"
+                    )}
+                    strokeWidth={isActive ? 2.5 : 2}
+                  />
+                  {isActive && (
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
                   )}
-                />
+                </div>
                 <span className={cn(
-                  "text-xs transition-all duration-200 text-white",
-                  isActive ? "font-bold" : "font-medium"
+                  "text-[10px] sm:text-xs transition-all duration-300",
+                  isActive ? "font-bold text-emerald-600" : "font-medium text-slate-500"
                 )}>{tab.label}</span>
               </Link>
             );

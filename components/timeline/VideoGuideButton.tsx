@@ -1,6 +1,6 @@
 /**
  * @file VideoGuideButton.tsx
- * @description 비디오 가이드 버튼 컴포넌트
+ * @description 비디오 가이드 버튼 컴포넌트 (지역화 지원)
  * 
  * 산재 보상 완벽 가이드 비디오를 YouTube 임베드로 제공합니다.
  * 지연 로딩으로 최적화되어 있습니다.
@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import type { VariantProps } from 'class-variance-authority';
 import { buttonVariants } from '@/components/ui/button';
+import { Locale, TimelineTranslation } from '@/lib/i18n/config';
 
 // YouTube 동영상 ID (URL에서 추출: https://youtu.be/r433_ZwERkc)
 const YOUTUBE_VIDEO_ID = 'r433_ZwERkc';
@@ -29,12 +30,16 @@ interface VideoGuideButtonProps {
   size?: VariantProps<typeof buttonVariants>['size'];
   variant?: VariantProps<typeof buttonVariants>['variant'];
   children?: React.ReactNode;
+  locale: Locale;
+  t: TimelineTranslation;
 }
 
 export default function VideoGuideButton({ 
   size = 'lg',
   variant = 'default',
   children,
+  locale,
+  t,
 }: VideoGuideButtonProps) {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
@@ -57,13 +62,13 @@ export default function VideoGuideButton({
           className="flex items-center gap-2"
         >
           <Play className={iconSize} />
-          {children ?? '영상 가이드 보기'}
+          {children ?? t.videoBtn}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl w-full p-0">
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle className="text-xl sm:text-2xl font-bold">
-            산재 보상 완벽 가이드
+            {t.videoTitle}
           </DialogTitle>
         </DialogHeader>
         <div className="px-6 pb-6">
@@ -71,7 +76,7 @@ export default function VideoGuideButton({
             <div className="relative w-full" style={{ paddingBottom: '56.25%', height: 0 }}>
               <iframe
                 src={YOUTUBE_EMBED_URL}
-                title="산재 보상 완벽 가이드 영상"
+                title={t.videoTitle}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
                 className="absolute top-0 left-0 w-full h-full rounded-lg"
@@ -80,7 +85,7 @@ export default function VideoGuideButton({
             </div>
           )}
           <p className="mt-4 text-sm text-muted-foreground">
-            💡 팁: YouTube에서 자막, 재생 속도 조절 등 다양한 기능을 사용할 수 있습니다.
+            {t.videoTip}
           </p>
         </div>
       </DialogContent>

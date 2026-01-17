@@ -18,6 +18,7 @@ import AiReadingLoader from '@/components/ui/ai-reading-loader';
 import SmartBrainIcon from '@/components/chatbot/SmartBrainIcon';
 import { SignInButton, useUser } from '@clerk/nextjs';
 import { X } from 'lucide-react';
+import { Locale, chatbotTranslations } from '@/lib/i18n/config';
 
 
 interface ChatMessage {
@@ -29,17 +30,26 @@ interface ChatMessage {
 interface RagChatbotV2Props {
   mode?: 'full' | 'widget';
   initialQuestion?: string;
+  currentLocale?: Locale;
+  onLocaleChange?: (locale: Locale) => void;
 }
 
-export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChatbotV2Props) {
+export default function RagChatbotV2({ 
+  mode = 'full', 
+  initialQuestion,
+  currentLocale,
+  onLocaleChange
+}: RagChatbotV2Props) {
   const { user } = useUser();
+  const [internalLocale, setInternalLocale] = useState<Locale>('ko');
+  
+  // Use currentLocale if provided, otherwise use internalLocale
+  const selectedLocale = currentLocale || internalLocale;
+  const t = chatbotTranslations[selectedLocale];
+
   const recommendedQuestions = useMemo(
-    () => [
-      '요양급여가 뭔가요?',
-      '산업재해 신청은 어떻게 하나요?',
-      '휴업급여는 언제 받을 수 있나요?',
-    ],
-    []
+    () => t.recQuestions,
+    [t.recQuestions]
   );
   const [question, setQuestion] = useState(initialQuestion || '');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -59,10 +69,40 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
   useEffect(() => {
     setMounted(true);
     if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem('guest_chat_count');
-        if (saved) setGuestCount(parseInt(saved));
+        const savedCount = localStorage.getItem('guest_chat_count');
+        if (savedCount) setGuestCount(parseInt(savedCount));
+        
+        const savedLocale = localStorage.getItem('user_locale') as Locale;
+        if (savedLocale) setInternalLocale(savedLocale);
     }
+
+    const handleGlobalLocaleChange = () => {
+      const updated = localStorage.getItem('user_locale') as Locale;
+      if (updated) {
+        setInternalLocale(updated);
+      }
+    };
+
+    window.addEventListener('storage', handleGlobalLocaleChange);
+    window.addEventListener('localeChange', handleGlobalLocaleChange);
+
+    return () => {
+      window.removeEventListener('storage', handleGlobalLocaleChange);
+      window.removeEventListener('localeChange', handleGlobalLocaleChange);
+    };
   }, []);
+
+  const handleLocaleChange = (locale: Locale) => {
+    if (onLocaleChange) {
+      onLocaleChange(locale);
+    } else {
+      setInternalLocale(locale);
+      if (typeof window !== 'undefined') {
+          localStorage.setItem('user_locale', locale);
+          window.dispatchEvent(new Event('localeChange'));
+      }
+    }
+  };
 
   const handleShare = async (text: string, index: number) => {
     try {
@@ -84,7 +124,7 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
   const handleAsk = async (customQuestion?: string) => {
     const finalQuestion = (customQuestion ?? question).trim();
     if (finalQuestion.length < 2) {
-      setError('질문을 2자 이상 입력해주세요.');
+      setError(t.errorTooShort);
       return;
     }
 
@@ -130,14 +170,15 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
           // Wait, 'messages' state is stale here?
           // No, I called setMessages above, but 'messages' variable is from render.
           // So I should construct the new array locally.
-          messages: [...messages, { role: 'user', content: finalQuestion }]
+          messages: [...messages, { role: 'user', content: finalQuestion }],
+          language: selectedLocale
         }),
         signal: controller.signal,
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `서버 오류: ${response.status}`);
+        throw new Error(errorData.error || `${t.errorServer}${response.status}`);
       }
 
       const data = await response.json();
@@ -145,17 +186,17 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
       const citations = data?.citations;
       
       if (!answer) {
-        throw new Error('응답을 받지 못했습니다.');
+        throw new Error(t.errorNoResponse);
       }
 
       setMessages((prev) => [...prev, { role: 'assistant', content: answer, citations }]);
     } catch (err: any) {
       if (err.name === 'AbortError') {
         setIsTimeout(true);
-        setError('응답이 지연되고 있어요. 잠시 후 다시 시도해주세요.');
+        setError(t.errorTimeout);
       } else {
         console.error('[RagChatbotV2] Error', err);
-        setError(err.message || '챗봇 응답 생성 중 오류가 발생했습니다.');
+        setError(err.message || t.errorGeneric);
       }
       setMessages((prev) => prev.slice(0, -1)); // 실패 시 user 메시지 제거
     } finally {
@@ -221,19 +262,23 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
 
   return (
     <div className={`bg-white/50 backdrop-blur-xl ${isWidget ? 'p-4 h-full flex flex-col' : 'p-4 sm:p-8 md:p-10'}`} role="region" aria-label="산재 상담 챗봇 V2">
-      <div className="mb-4 sm:mb-6">
-        <div className="flex flex-wrap gap-2 sm:gap-3">
-          {recommendedQuestions.map((item) => (
-            <button
-              key={item}
-              type="button"
-              className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[var(--border-light)] bg-gray-50 text-foreground hover:bg-primary/10 hover:border-primary transition-colors duration-200 ${isWidget ? 'whitespace-nowrap' : ''}`}
-              onClick={() => handleAsk(item)}
-              disabled={loading}
-            >
-              {item}
-            </button>
-          ))}
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex-1">
+          {!isWidget && (
+            <div className="flex flex-wrap gap-2 sm:gap-3">
+              {recommendedQuestions.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[var(--border-light)] bg-gray-50 text-foreground hover:bg-primary/10 hover:border-primary transition-colors duration-200"
+                  onClick={() => handleAsk(item)}
+                  disabled={loading}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -245,11 +290,10 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
             </div>
             <div className="space-y-3">
               <h2 className={`${isWidget ? 'text-xl' : 'text-2xl sm:text-3xl'} font-black text-gray-900 tracking-tight`}>
-                똑똑한 산재 AI 비서
+                {t.title}
               </h2>
               <p className={`text-gray-500 font-medium max-w-md mx-auto leading-relaxed ${isWidget ? 'text-xs' : ''}`}>
-                24시간 언제나 곁에서 대기하고 있습니다.<br />
-                궁금한 산재 정보를 지금 바로 물어보세요!
+                {t.subtitle}
               </p>
             </div>
           </div>
@@ -273,7 +317,7 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
                             <div className="flex items-center gap-2 mb-2">
                               <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md border border-blue-100 flex items-center gap-1">
                                 <Sparkles className="w-3 h-3" />
-                                문서 기반 답변 (신뢰도 높음)
+                                {t.sourceTitle}
                               </span>
                             </div>
                             <div className="flex flex-wrap gap-1.5 mt-1">
@@ -330,12 +374,12 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
                         {copiedIndex === index ? (
                           <>
                             <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                            <span className="text-green-600">복사됨</span>
+                            <span className="text-green-600">{t.copied}</span>
                           </>
                         ) : (
                           <>
                             <Share2 className="w-3.5 h-3.5" />
-                            <span>공유</span>
+                            <span>{t.share}</span>
                           </>
                         )}
                       </button>
@@ -352,7 +396,7 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
         {loading && (
           <div className="text-left">
             <div className="inline-block bg-white/50 border border-[var(--border-light)] rounded-[2rem] p-6 backdrop-blur-sm shadow-sm">
-              <AiReadingLoader />
+              <AiReadingLoader message={t.loadingMessage} />
             </div>
           </div>
         )}
@@ -366,14 +410,14 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
 
       {isTimeout && (
         <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm sm:text-base text-yellow-800">응답이 지연되고 있습니다.</p>
+          <p className="text-sm sm:text-base text-yellow-800">{t.errorTimeout}</p>
         </div>
       )}
 
       <form onSubmit={(e) => { e.preventDefault(); handleAsk(); }} className={`relative ${isWidget ? 'pt-2' : 'pt-6'}`}>
         <div className="relative group">
           <Textarea
-            placeholder="산재 관련 질문을 입력해주세요..."
+            placeholder={t.placeholder}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => {
@@ -397,7 +441,7 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
         </div>
         {!isWidget && (
             <p className="text-center text-xs text-gray-400 mt-3 font-medium">
-            AI 챗봇의 답변은 부정확할 수 있으며, 법적 효력이 없습니다.
+            {t.disclaimer}
             </p>
         )}
       </form>
@@ -422,24 +466,21 @@ export default function RagChatbotV2({ mode = 'full', initialQuestion }: RagChat
                     </div>
                     
                     <div className="space-y-2">
-                        <h3 className="text-xl font-black text-gray-900">무료 체험이 종료되었습니다</h3>
-                        <p className="text-gray-600 font-medium text-sm leading-relaxed">
-                            로그인하고 <strong>무제한 AI 상담</strong>과<br/>
-                            <strong>나에게 맞는 산재 정보</strong>를 확인해보세요!
-                        </p>
+                        <h3 className="text-xl font-black text-gray-900">{t.limitModalTitle}</h3>
+                        <p className="text-gray-600 font-medium text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: t.limitModalDesc }} />
                     </div>
 
                     <div className="pt-2">
                         <SignInButton mode="modal">
                             <Button size="lg" className="w-full text-base font-bold bg-[#14532d] hover:bg-[#114023] h-12 rounded-xl text-white shadow-lg shadow-green-900/20">
-                                3초 만에 시작하기
+                                {t.limitModalButton}
                             </Button>
                         </SignInButton>
                         <button 
                             onClick={() => setShowLoginModal(false)}
                             className="mt-4 text-xs text-gray-400 hover:text-gray-600 font-medium underline underline-offset-4"
                         >
-                            나중에 할게요
+                            {t.limitModalLater}
                         </button>
                     </div>
                 </div>

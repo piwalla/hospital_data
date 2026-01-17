@@ -8,7 +8,11 @@ import CTAButton from "./CTAButton";
 import { ChevronDown } from "lucide-react";
 
 
-export default function HeroSection() {
+import { Locale, landingTranslations } from '@/lib/i18n/config';
+
+export default function HeroSection({ locale = 'ko' }: { locale?: Locale }) {
+  const t = landingTranslations[locale];
+
   return (
     // Removed bg-gradient-to-b to allow image to show through
     // Added w-screen and left-[calc(-50vw+50%)] to break out of parent container width
@@ -16,13 +20,20 @@ export default function HeroSection() {
     <section className="relative w-screen left-[calc(-50vw+50%)] min-h-[100dvh] -mt-16 flex items-center justify-center overflow-hidden pt-12 md:pt-0">
       {/* Background Decor */}
       <div className="absolute inset-0 -z-10 w-full h-full overflow-hidden">
-        <Image
-          src="/landing/hero-handshake.png"
-          alt="Warm Support and Connection Background"
-          fill
-          className="object-cover opacity-80"
-          priority
-        />
+        <motion.div
+          initial={{ scale: 1.15, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.8 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="relative w-full h-full"
+        >
+          <Image
+            src="/landing/hero-handshake.png"
+            alt="Warm Support and Connection Background"
+            fill
+            className="object-cover"
+            priority
+          />
+        </motion.div>
         <div 
            className="absolute inset-0 opacity-[0.2]"
            style={{ 
@@ -35,30 +46,37 @@ export default function HeroSection() {
       </div>
 
       <div className="container px-4 mx-auto text-center z-10">
-        {/* Increased max-w from 3xl to 5xl to reduce clustering */}
-        <div className="max-w-6xl mx-auto space-y-8">
-          
+        <div className="max-w-6xl mx-auto space-y-12">
           {/* Headlines */}
-          <div className="space-y-4 md:space-y-6">
+          <div className="space-y-4 md:space-y-8">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-tight md:leading-[1.1] drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]"
+              className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-white leading-tight md:leading-[1.1] drop-shadow-[0_2px_15px_rgba(0,0,0,0.6)]"
             >
-              <span className="block text-gray-300 text-xl sm:text-2xl md:text-4xl font-bold mb-2 md:mb-4 drop-shadow-sm">복잡한 산재,</span>
-              혼자 감당하지 마세요.
+              <span className="block text-gray-300 text-xl sm:text-2xl md:text-5xl font-bold mb-4 md:mb-6 drop-shadow-sm opacity-90">
+                {t.heroTitlePrefix}
+              </span>
+              
+              <span className="relative inline-block">
+                {/* Emphasis Glow Effect */}
+                <div className="absolute -inset-x-6 -inset-y-2 bg-green-400/10 blur-3xl rounded-full -z-10 animate-pulse" />
+                {t.heroTitleSuffix}
+              </span>
             </motion.h1>
             
-            <motion.p 
+            <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-base sm:text-lg md:text-2xl text-gray-200 max-w-3xl mx-auto leading-relaxed font-semibold drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] px-4"
+              className="text-base sm:text-lg md:text-3xl text-gray-200 max-w-4xl mx-auto leading-relaxed font-semibold drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)] px-4 opacity-90"
             >
-              누구에게 물어봐야 할지 막막하셨죠? 산재 신청부터 보상까지,<br className="hidden md:block"/>
-              엉킨 실타래를 풀듯 <span className="text-[#4ADE80] font-bold">리워크케어가 차근차근 알려드릴게요.</span>
-            </motion.p>
+              <span className="text-[#4ADE80]">
+                {t.heroDescription.split('?')[0]}?
+              </span>
+              {t.heroDescription.split('?')[1]}
+            </motion.div>
           </div>
 
           {/* Action Buttons */}
@@ -68,9 +86,13 @@ export default function HeroSection() {
             transition={{ duration: 0.5, delay: 0.7 }}
             className="flex flex-col items-center justify-center gap-4 pt-4 md:pt-8"
           >
-            {/* Primary CTA - 강조 */}
-            <CTAButton href="/chatbot-v2" variant="primary" className="w-auto text-base sm:text-lg px-6 py-3 sm:px-8 sm:py-4 shadow-xl hover:shadow-2xl hover:-translate-y-0.5">
-              산재 AI 무료로 사용하기
+            <CTAButton 
+              href="/chatbot-v2" 
+              variant="primary" 
+              className="w-auto text-base sm:text-lg md:text-2xl px-6 py-3 sm:px-12 sm:py-6 shadow-2xl hover:shadow-green-400/30 hover:-translate-y-1 transition-all duration-300 relative group overflow-hidden"
+            >
+              <span className="relative z-10">{t.heroCta}</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer" />
             </CTAButton>
           </motion.div>
         </div>
@@ -79,10 +101,10 @@ export default function HeroSection() {
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1, y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+        transition={{ duration: 2, repeat: Infinity, delay: 2 }}
         className="absolute bottom-24 left-1/2 -translate-x-1/2 text-white z-30 drop-shadow-md"
       >
-        <ChevronDown className="w-10 h-10 animate-bounce" />
+        <ChevronDown className="w-12 h-12 animate-bounce opacity-70" />
       </motion.div>
     </section>
   );

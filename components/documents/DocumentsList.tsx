@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   FileWarning,
@@ -27,6 +27,7 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import RequestedDocumentsList from './RequestedDocumentsList';
 import { getRequestedDocumentsByStage } from '@/lib/data/requested-documents';
+import { defaultLocale, documentsTranslations, type Locale } from '@/lib/i18n/config';
 
 // 각 서류에 맞는 아이콘 매핑
 const documentIcons: Record<string, typeof FileWarning> = {
@@ -80,6 +81,35 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
   const stageFromUrl = searchParams.get('stage') ? parseInt(searchParams.get('stage')!, 10) : initialStage;
   const [showAll, setShowAll] = useState(!stageFromUrl); // 단계가 없으면 전체 보기
   const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태
+  
+  // Localization State
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    
+    const updateLocale = () => {
+      const savedLocale = localStorage.getItem('user_locale') as Locale;
+      if (savedLocale && documentsTranslations[savedLocale]) {
+        setLocale(savedLocale);
+      }
+    };
+
+    // Initial load
+    updateLocale();
+
+    // Listen for changes
+    window.addEventListener('localeChange', updateLocale);
+    window.addEventListener('storage', updateLocale);
+
+    return () => {
+      window.removeEventListener('localeChange', updateLocale);
+      window.removeEventListener('storage', updateLocale);
+    };
+  }, []);
+
+  const t = documentsTranslations[locale] || documentsTranslations['ko'];
 
   // 단계별 필터링된 서류
   const filteredDocuments = useMemo(() => {
@@ -97,10 +127,15 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       docs = docs.filter((doc) => {
-        // 검색 대상: 서류명, 설명, 검색 키워드
+        // Localized fields for search
+        const localizedName = t.items[doc.id]?.name || doc.name;
+        const localizedDesc = t.items[doc.id]?.description || doc.description;
+
+        // 검색 대상: 서류명, 설명, 검색 키워드(Korean only for now unless translated keywords exist, which they don't yet)
         const searchTargets = [
-          doc.name,
-          doc.description,
+          localizedName,
+          localizedDesc, 
+          doc.name, // Still search original Korean name
           ...(doc.searchKeywords || [])
         ];
         
@@ -111,7 +146,7 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
     }
     
     return docs;
-  }, [stageFromUrl, showAll, searchQuery]);
+  }, [stageFromUrl, showAll, searchQuery, t.items]);
 
   // 단계별 필터링된 요청 서류
   const filteredRequestedDocuments = useMemo(() => {
@@ -142,6 +177,10 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
     router.push(`/documents?${params.toString()}`);
   };
 
+  if (!isMounted) {
+    return null; // Prevent hydration mismatch by rendering nothing strictly on server first (or skeleton)
+  }
+
   return (
     <div 
       className="space-y-8 sm:space-y-12"
@@ -164,13 +203,13 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
               : 'bg-white/80 backdrop-blur-md text-gray-500 hover:text-[#14532d] border border-gray-200/50 shadow-sm'
           )}
         >
-          전체 보기
+          {t.ui.tabs.all}
         </button>
         {[
-          { id: 1, label: '1. 신청 단계' },
-          { id: 2, label: '2. 치료 중' },
-          { id: 3, label: '3. 장해 평가' },
-          { id: 4, label: '4. 사회 복귀' },
+          { id: 1, label: t.ui.tabs.step1 },
+          { id: 2, label: t.ui.tabs.step2 },
+          { id: 3, label: t.ui.tabs.step3 },
+          { id: 4, label: t.ui.tabs.step4 },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -209,7 +248,7 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="찾으시는 서류 이름이 있나요?"
+              placeholder={t.ui.search.placeholder}
               className="w-full pl-14 pr-12 py-4.5 bg-transparent border-none focus:ring-0 placeholder-gray-400 text-gray-800 text-base font-medium"
             />
             {searchQuery && (
@@ -227,7 +266,7 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
         </div>
         {searchQuery && (
           <p className="mt-3 text-sm text-gray-500 text-center animate-fade-in font-medium">
-            <span className="font-bold text-[#14532d]">{filteredDocuments.length}개</span>의 서류를 찾았습니다
+             {t.ui.search.result.replace('{n}', filteredDocuments.length.toString())}
           </p>
         )}
       </div>
@@ -241,18 +280,17 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#14532d] text-white text-[10px] font-black">
                   {stageFromUrl}
                 </span>
-                현재 단계에서 꼭 필요한 서류입니다
+                {t.ui.banner.title}
               </h3>
               <p className="text-gray-500 text-sm font-medium">
-                총 {filteredDocuments.length + (filteredRequestedDocuments?.length || 0)}개의 서류가 필요합니다.
-                (작성 {filteredDocuments.length}개 + 요청 {filteredRequestedDocuments?.length || 0}개)
+                {t.ui.banner.desc.replace('{n}', (filteredDocuments.length + (filteredRequestedDocuments?.length || 0)).toString())}
               </p>
             </div>
             <button
               onClick={handleShowAll}
               className="text-sm font-bold text-[#14532d] hover:bg-[#14532d]/10 px-5 py-2 rounded-xl transition-all"
             >
-              전체 서류 보기 &rarr;
+              {t.ui.banner.button} &rarr;
             </button>
           </div>
         </div>
@@ -268,11 +306,11 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
               <FileEdit className="w-6 h-6 text-[#14532d]" strokeWidth={2.5} />
             </div>
             <h2 id="section-write" className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
-              직접 작성해주세요
+              {t.ui.sections.write}
             </h2>
           </div>
           <span className="hidden sm:inline-flex px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-gray-200/50 text-xs font-bold text-[#14532d] shadow-sm">
-            총 {filteredDocuments.length}종
+            Total {filteredDocuments.length}
           </span>
         </header>
 
@@ -284,13 +322,15 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
         {filteredDocuments.map((document) => {
           const Icon = documentIcons[document.id] || FileWarning;
           const iconColor = documentIconColors[document.id] || 'text-gray-600';
+          const localizedName = t.items[document.id]?.name || document.name;
+          const localizedDesc = t.items[document.id]?.description || document.description;
 
           return (
             <Link
               key={document.id}
               href={`/documents/${document.id}`}
               className="group block h-full"
-              aria-label={`${document.name} 상세 정보 보기`}
+              aria-label={`${localizedName} 상세 정보 보기`}
             >
               <div
                 className={cn(
@@ -324,35 +364,19 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
                       <Icon className={cn('w-5 h-5 md:w-7 md:h-7 transition-colors duration-300 group-hover:text-white', iconColor)} strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0 pt-0.5">
-                      {(() => {
-                        const match = document.name.match(/^(.+?)\s*\((.+?)\)\s*$/);
-                        if (match) {
-                          const [, mainName, bracketContent] = match;
-                          return (
-                            <h3 className="group-hover:text-[#14532d] transition-colors leading-tight">
-                              <span className="block text-lg md:text-xl font-black text-gray-900">{mainName}</span>
-                              <span className="block text-sm text-gray-400 font-bold group-hover:text-[#14532d]/60 mt-0.5">
-                                {bracketContent}
-                              </span>
-                            </h3>
-                          );
-                        }
-                        return (
-                          <h3 className="text-lg md:text-xl font-black text-gray-900 group-hover:text-[#14532d] transition-colors leading-tight">
-                            {document.name}
-                          </h3>
-                        );
-                      })()}
+                      <h3 className="text-lg md:text-xl font-black text-gray-900 group-hover:text-[#14532d] transition-colors leading-tight">
+                        {localizedName}
+                      </h3>
                     </div>
                   </div>
 
                    <p className="text-gray-500 font-medium leading-relaxed mb-4 md:mb-6 line-clamp-2 md:line-clamp-3 text-sm md:text-[15px] group-hover:text-gray-600 transition-colors">
-                      {document.description}
+                      {localizedDesc}
                    </p>
 
                   <div className="mt-auto pt-3 md:pt-5 border-t border-gray-100/60 flex items-center justify-between group/link">
                      <span className="text-xs font-black uppercase tracking-wider text-gray-400 group-hover:text-[#14532d] transition-colors">
-                       Guides & Details
+                       Request Guide
                      </span>
                      <div className="w-9 h-9 rounded-xl bg-gray-50 flex items-center justify-center group-hover:bg-[#14532d] group-hover:text-white transition-all duration-500 shadow-sm">
                         <svg className="w-5 h-5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -377,7 +401,7 @@ export default function DocumentsList({ initialStage }: DocumentsListProps) {
               <FileQuestion className="w-6 h-6 text-[#14532d]" strokeWidth={2.5} />
             </div>
             <h2 id="section-request" className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
-              발급 요청해주세요
+              {t.ui.sections.request}
             </h2>
         </header>
 

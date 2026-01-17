@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { usePathname } from "next/navigation";
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ interface AdminLayoutClientProps {
 
 export function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <div className="flex h-screen w-full bg-slate-50 overflow-hidden font-sans">
@@ -38,10 +40,11 @@ export function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
       </div>
 
       {/* Main Content Wrapper */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-[100] bg-slate-50">
         
         {/* Responsive Header */}
-        <header className="bg-white border-b border-gray-200 flex items-center justify-between px-4 h-16 flex-shrink-0">
+        <header className="bg-white border-b border-gray-200 flex items-center justify-between px-4 h-16 flex-shrink-0 relative z-[101]">
+          {/* ... */}
           <div className="flex items-center gap-3">
              {/* Mobile Menu Button */}
             <Button 
@@ -66,7 +69,7 @@ export function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
               {user.fullName || user.username} (Admin)
             </span>
              
-            <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden border border-slate-100">
+            <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden border border-slate-100 relative">
                {user.imageUrl ? (
                    <Image src={user.imageUrl} alt="Profile" fill className="object-cover" />
                ) : (
@@ -76,13 +79,13 @@ export function AdminLayoutClient({ children, user }: AdminLayoutClientProps) {
           </div>
         </header>
 
-        {/* Dashbaord Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 w-full">
+        {/* Dashboard Content Area */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 w-full relative z-[100] bg-slate-50">
            {/* 
               Wrap children in a container that handles overflow safely.
               Using w-full max-w-[1600px] mx-auto for centering on huge screens 
            */}
-           <div className="w-full max-w-[1600px] mx-auto">
+           <div className="w-full max-w-[1600px] mx-auto relative z-[100]" key={pathname}>
               {children}
            </div>
         </main>

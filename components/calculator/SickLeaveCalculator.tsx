@@ -61,9 +61,9 @@ export default function SickLeaveCalculator({ averageWage: propAverageWage = 0 }
     <div className="space-y-6">
       {!isEditing && result ? (
         // 간단한 결과 표시
-        <Card className="border-blue-200 bg-blue-50">
+        <Card className="border-[#14532d]/20 bg-[#14532d]/5">
           <CardHeader>
-            <CardTitle className="text-blue-900 flex items-center justify-between">
+            <CardTitle className="text-[#14532d] flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <HeartPulse className="w-5 h-5" />
                 휴업급여 계산
@@ -72,7 +72,7 @@ export default function SickLeaveCalculator({ averageWage: propAverageWage = 0 }
                 variant="outline"
                 size="sm"
                 onClick={() => setIsEditing(true)}
-                className="bg-white"
+                className="bg-white hover:bg-white/90 text-[#14532d] border-[#14532d]/20"
               >
                 <Edit2 className="w-4 h-4 mr-1" />
                 수정하기
@@ -81,35 +81,35 @@ export default function SickLeaveCalculator({ averageWage: propAverageWage = 0 }
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <p className="text-4xl font-bold text-blue-900">
+              <p className="text-4xl font-bold text-[#14532d]">
                 {formatCurrency(result.dailyAmount)}
-                <span className="text-lg font-normal text-blue-700 ml-2">/일</span>
+                <span className="text-lg font-normal text-[#14532d]/80 ml-2">/일</span>
               </p>
-              <p className="text-2xl font-semibold text-blue-800">
+              <p className="text-2xl font-semibold text-[#14532d]/90">
                 총 {formatCurrency(result.totalAmount)}
-                <span className="text-sm font-normal text-blue-600 ml-2">
+                <span className="text-sm font-normal text-[#14532d]/70 ml-2">
                   ({days}일 기준)
                 </span>
               </p>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-blue-700">
-              <span className="px-3 py-1 bg-blue-100 rounded-full">
+            <div className="flex items-center gap-2 text-sm text-[#14532d]/80">
+              <span className="px-3 py-1 bg-[#14532d]/10 rounded-full font-medium">
                 {getAgeText()}, {days}일 기준 결과입니다
               </span>
               {result.isSpecialCase && (
-                <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full">
+                <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full font-medium">
                   저소득 특례 적용
                 </span>
               )}
               {result.isAgeReduction && (
-                <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full">
+                <span className="px-3 py-1 bg-orange-100 text-orange-800 rounded-full font-medium">
                   고령자 감액 적용
                 </span>
               )}
             </div>
 
-            <p className="text-sm text-blue-600">
+            <p className="text-sm text-[#14532d]/70">
               수정이 필요하면 <strong>수정하기</strong> 버튼을 눌러주세요
             </p>
           </CardContent>
@@ -119,7 +119,7 @@ export default function SickLeaveCalculator({ averageWage: propAverageWage = 0 }
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <HeartPulse className="w-5 h-5 text-blue-600" />
+              <HeartPulse className="w-5 h-5 text-[#14532d]" />
               휴업급여 계산기
             </CardTitle>
             <CardDescription>

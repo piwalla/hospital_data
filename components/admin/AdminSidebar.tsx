@@ -45,6 +45,11 @@ const menuItems = [
     href: "/admin/chatbot/stats",
     icon: Bot,
   },
+  {
+    title: "SEO & 광고 설정",
+    href: "/admin/settings/seo",
+    icon: Settings,
+  },
 ];
 
 export function AdminSidebar({ onClose }: { onClose?: () => void }) {
@@ -87,15 +92,7 @@ export function AdminSidebar({ onClose }: { onClose?: () => void }) {
         })}
       </nav>
 
-      {/* Footer */}
       <div className="p-4 border-t border-slate-800 space-y-2">
-        <Link
-          href="/admin/settings"
-          className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition-colors"
-        >
-          <Settings className="w-5 h-5" />
-          설정
-        </Link>
         <Link
             href="/"
             className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"

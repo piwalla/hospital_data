@@ -21,7 +21,7 @@ interface FeatureData {
 
 export function FeatureUsageChart({ data }: { data: FeatureData[] }) {
   return (
-    <div className="h-[300px] w-full">
+    <div className="h-[300px] w-full overflow-hidden relative" style={{ height: '300px' }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}

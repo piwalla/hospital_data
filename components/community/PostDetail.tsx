@@ -12,6 +12,8 @@ import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import { deletePostAction } from "@/app/actions/community";
 
 import { useClerkSupabaseClient } from "@/lib/supabase/clerk-client";
 import { useUser } from "@clerk/nextjs";
@@ -80,17 +82,12 @@ export default function PostDetail({ post, comments, initialLiked }: PostDetailP
                     size="sm"
                     onClick={async () => {
                       if (confirm('정말 삭제하시겠습니까?')) {
-                        // 삭제 로직
-                        const { error } = await client
-                          .from('community_posts')
-                          .update({ deleted_at: new Date().toISOString() })
-                          .eq('id', post.id);
-                        
-                        if (!error) {
+                        try {
+                          await deletePostAction(post.id);
                           alert('삭제되었습니다.');
                           window.location.href = '/community';
-                        } else {
-                          alert('삭제 실패: ' + error.message);
+                        } catch (error: any) {
+                          alert(error.message || '삭제 실패');
                         }
                       }
                     }}
@@ -117,7 +114,7 @@ export default function PostDetail({ post, comments, initialLiked }: PostDetailP
             {/* 내용 */}
             <div className="prose prose-slate max-w-none">
               <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={[remarkGfm, remarkBreaks]}
                 components={{
                   h1: ({...props}) => <h1 className="text-3xl font-bold mt-8 mb-4 text-slate-900" {...props} />,
                   h2: ({...props}) => <h2 className="text-2xl font-bold mt-6 mb-3 text-slate-800" {...props} />,

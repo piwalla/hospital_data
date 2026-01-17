@@ -1,9 +1,42 @@
 "use client";
 
+
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { Locale, dashboardTranslations } from "@/lib/i18n/config";
 
 export default function MyJourneyHero() {
+  const [locale, setLocale] = useState<Locale>('ko');
+
+  useEffect(() => {
+    // Initial load
+    const savedLocale = localStorage.getItem('user_locale') as Locale;
+    if (savedLocale && dashboardTranslations[savedLocale]) {
+      setLocale(savedLocale);
+    }
+
+    // Event listener for dynamic updates
+    const handleLocaleChange = () => {
+      const updatedLocale = localStorage.getItem('user_locale') as Locale;
+      if (updatedLocale && dashboardTranslations[updatedLocale]) {
+        setLocale(updatedLocale);
+      }
+    };
+
+    window.addEventListener('user_locale', handleLocaleChange);
+    window.addEventListener('localeChange', handleLocaleChange);
+    window.addEventListener('storage', handleLocaleChange);
+
+    return () => {
+      window.removeEventListener('user_locale', handleLocaleChange);
+      window.removeEventListener('localeChange', handleLocaleChange);
+      window.removeEventListener('storage', handleLocaleChange);
+    };
+  }, []);
+
+  const t = dashboardTranslations[locale]?.hero || dashboardTranslations['ko'].hero;
+
   return (
     <section className="relative w-screen left-[calc(-50vw+50%)] h-[20vh] min-h-[200px] md:h-[45vh] md:min-h-[400px] -mt-16 mb-12 flex items-center justify-center overflow-hidden">
       {/* Background Decor */}
@@ -16,15 +49,15 @@ export default function MyJourneyHero() {
           className="object-cover opacity-80"
           priority
         />
-        <div 
-           className="absolute inset-0 opacity-[0.15]"
-           style={{ 
-             backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', 
-             backgroundSize: '48px 48px' 
-           }}
-        />
-        {/* Dark Elegant Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+         <div 
+            className="absolute inset-0 opacity-[0.2]"
+            style={{ 
+              backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', 
+              backgroundSize: '48px 48px' 
+            }}
+         />
+         {/* Dark Elegant Overlay - Standarized with landing page */}
+         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       </div>
 
       <div className="container px-4 mx-auto text-center z-10 pt-12 md:pt-0">
@@ -38,7 +71,7 @@ export default function MyJourneyHero() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-lg"
             >
-              복잡한 산재, <span className="text-[#4ADE80]">길잡이</span>가 되어 드립니다
+              {t.title}<span className="text-[#4ADE80]">{t.highlight}</span>
             </motion.h1>
             
             <motion.p 
@@ -47,7 +80,8 @@ export default function MyJourneyHero() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-sm sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-md"
             >
-              리워크케어가 개인 대시보드에 정리해 드립니다.
+              {t.subtitle}
+
             </motion.p>
           </div>
         </div>

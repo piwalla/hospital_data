@@ -2,8 +2,31 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+import { hospitalTranslations, type Locale, defaultLocale } from "@/lib/i18n/config";
 
 export default function HospitalsHero() {
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const t = hospitalTranslations[locale];
+
+  useEffect(() => {
+    const savedLocale = (localStorage.getItem('user_locale') as Locale) || defaultLocale;
+    setLocale(savedLocale);
+
+    const handleStorage = () => {
+      const newLocale = (localStorage.getItem('user_locale') as Locale) || defaultLocale;
+      setLocale(newLocale);
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('localeChange', handleStorage);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('localeChange', handleStorage);
+    };
+  }, []);
+
   return (
     <section className="relative w-screen left-[calc(-50vw+50%)] h-[20vh] min-h-[200px] md:h-[45vh] md:min-h-[400px] -mt-16 mb-12 flex items-center justify-center overflow-hidden">
       {/* Background Decor */}
@@ -16,15 +39,15 @@ export default function HospitalsHero() {
           className="object-cover opacity-80"
           priority
         />
-        <div 
-           className="absolute inset-0 opacity-[0.15]"
-           style={{ 
-             backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', 
-             backgroundSize: '48px 48px' 
-           }}
-        />
-        {/* Dark Elegant Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70" />
+         <div 
+            className="absolute inset-0 opacity-[0.2]"
+            style={{ 
+              backgroundImage: 'radial-gradient(#CBD5E1 1px, transparent 1px)', 
+              backgroundSize: '48px 48px' 
+            }}
+         />
+         {/* Dark Elegant Overlay - Standarized with landing page */}
+         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       </div>
 
       <div className="container px-4 mx-auto text-center z-10 pt-12 md:pt-0">
@@ -38,7 +61,7 @@ export default function HospitalsHero() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-lg"
             >
-              어디서 <span className="text-[#4ADE80]">치료</span>되나요?
+              <span key={locale}>{t.hero.title}</span> <span className="text-[#4ADE80]">{t.hero.highlight}</span>
             </motion.h1>
             
             <motion.p 
@@ -47,7 +70,7 @@ export default function HospitalsHero() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-sm sm:text-lg md:text-xl text-gray-100 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-md"
             >
-              가까운 산재 지정 의료기관을 쉽고 빠르게 찾아보세요.
+              {t.hero.subtitle}
             </motion.p>
           </div>
         </div>

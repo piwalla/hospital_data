@@ -19,6 +19,7 @@ import { useEffect, useRef, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import type { RehabilitationCenter } from '@/lib/api/rehabilitation-centers';
 import { COLORS } from '@/lib/constants/colors';
+import { hospitalTranslations, type Locale, defaultLocale } from '@/lib/i18n/config';
 
 // 네이버 지도 타입 정의
 declare global {
@@ -78,6 +79,28 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   className,
   onMapChange,
 }) => {
+  // 번역 훅 추가
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const t = hospitalTranslations[locale];
+
+  useEffect(() => {
+    const savedLocale = (localStorage.getItem('user_locale') as Locale) || defaultLocale;
+    setLocale(savedLocale);
+
+    const handleStorage = () => {
+      const newLocale = (localStorage.getItem('user_locale') as Locale) || defaultLocale;
+      setLocale(newLocale);
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('localeChange', handleStorage);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('localeChange', handleStorage);
+    };
+  }, []);
+
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null); // 지도 인스턴스 저장
   const markersRef = useRef<any[]>([]); // 마커 배열 저장 (병원 + 재활기관)
@@ -87,9 +110,6 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-
-
 
   // enableLocationChange prop 변경 시 ref 업데이트
   useEffect(() => {
@@ -365,202 +385,6 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
         console.log('[HospitalMap] 사용자 위치 마커 추가:', userLocation);
       }
 
-      // 병원 및 재활기관 마커 추가 함수
-      const addMarkers = (mapInstance: any, hospitalList: Hospital[], rehabCenterList: RehabilitationCenter[]) => {
-        // 기존 마커 제거
-        markersRef.current.forEach((marker) => {
-          marker.setMap(null);
-        });
-        markersRef.current = [];
-
-        // 병원 마커 추가
-        hospitalList.forEach((hospital) => {
-          // 좌표가 유효한 경우에만 마커 추가
-          if (hospital.latitude !== 0 && hospital.longitude !== 0) {
-            const marker = new window.naver.maps.Marker({
-              position: new window.naver.maps.LatLng(
-                hospital.latitude,
-                hospital.longitude
-              ),
-              map: mapInstance,
-              title: hospital.name,
-              icon: {
-                content: `<div style="width:${
-                  hospital.is_rehabilitation_certified ? '22px' : '15px'
-                };height:${
-                  hospital.is_rehabilitation_certified ? '22px' : '15px'
-                };background:${
-                  hospital.is_rehabilitation_certified 
-                    ? '#FF0000' // Red (Certified)
-                    : (hospital.type === 'hospital' 
-                        ? '#3B82F6' // Blue (Hospital)
-                        : '#22C55E') // Green (Pharmacy)
-                };border-radius:50%;border:${hospital.is_rehabilitation_certified ? '3px' : '2px'} solid white;box-shadow:0 1px 3px rgba(0,0,0,0.3);${
-                  hospital.is_rehabilitation_certified ? 'box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3); z-index: 10;' : '' // Glow effect for certified (Red)
-                }"></div>`,
-                anchor: createNaverPoint(hospital.is_rehabilitation_certified ? 11 : 7.5, hospital.is_rehabilitation_certified ? 11 : 7.5),
-              },
-              zIndex: hospital.is_rehabilitation_certified ? 100 : 1, // Certified on top
-            });
-
-            // 정보창 생성 (닫기 버튼 포함)
-            const infoWindowId = `infoWindow_${hospital.id}`;
-            // 기관 유형 및 진료과목 정보 표시
-            const institutionTypeBadge = hospital.institution_type 
-              ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.primary};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
-              : '';
-            const certifiedBadge = hospital.is_rehabilitation_certified
-              ? `<span style="display:inline-block;padding:2px 8px;background:#E11D48;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;font-weight:bold;">산재재활인증</span>`
-              : '';
-            const departmentBadge = hospital.department_extracted && hospital.department_extracted !== '기타'
-              ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.rehabilitation};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
-              : '';
-            
-            const infoWindow = new window.naver.maps.InfoWindow({
-              content: `
-                <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
-                  <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
-                  <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${hospital.name}</h4>
-                  ${institutionTypeBadge || certifiedBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${certifiedBadge}${departmentBadge}</div>` : ''}
-                  <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${hospital.address}</p>
-                  ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${hospital.phone}</p>` : ''}
-                  <div style="display:flex;gap:8px;margin-top:8px;">
-                    ${hospital.phone ? `<button onclick="window.open('tel:${hospital.phone}')" style="padding:6px 12px;background:${COLORS.primary};color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
-                    <button onclick="(function() {
-                      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                      const address = '${hospital.address.replace(/'/g, "\\'")}';
-                      if (isMobile) {
-                        // 모바일: 주소 기반 검색 링크 사용
-                        window.open('https://m.map.naver.com/search/' + encodeURIComponent(address), '_blank');
-                      } else {
-                        // 데스크톱: 주소 기반 검색 링크 사용
-                        window.open('https://map.naver.com/search/' + encodeURIComponent(address), '_blank');
-                      }
-                    })()" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
-                  </div>
-                </div>
-              `,
-            });
-
-            // 전역 함수로 InfoWindow 닫기 함수 등록 (각 InfoWindow마다 고유 ID 사용)
-            (window as any).closeInfoWindow = () => {
-              if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
-                currentInfoWindowRef.current.close();
-                currentInfoWindowRef.current = null;
-              }
-            };
-
-            // 마커 클릭 이벤트
-            window.naver.maps.Event.addListener(marker, 'click', () => {
-              // 이전 InfoWindow 닫기
-              if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
-                currentInfoWindowRef.current.close();
-              }
-
-              // Bottom Sheet 열기 (onHospitalClick이 있는 경우)
-              if (onHospitalClick) {
-                onHospitalClick(hospital);
-              }
-
-              // 같은 마커를 다시 클릭한 경우 닫기만 하고, 아니면 열기
-              if (currentInfoWindowRef.current === infoWindow && infoWindow.getMap()) {
-                infoWindow.close();
-                currentInfoWindowRef.current = null;
-              } else {
-                infoWindow.open(mapInstance, marker);
-                currentInfoWindowRef.current = infoWindow;
-              }
-            });
-
-            markersRef.current.push(marker);
-          }
-        });
-
-        // 재활기관 마커 추가 (보라색 #9333EA)
-        rehabCenterList.forEach((center) => {
-          // 좌표가 유효한 경우에만 마커 추가
-          if (center.latitude !== 0 && center.longitude !== 0) {
-            const marker = new window.naver.maps.Marker({
-              position: new window.naver.maps.LatLng(
-                center.latitude,
-                center.longitude
-              ),
-              map: mapInstance,
-              title: center.name,
-              icon: {
-                content: `<div style="width:15px;height:15px;background:#A855F7;border-radius:50%;border:2px solid white;box-shadow:0 1px 2px rgba(0,0,0,0.3);"></div>`, // Purple (Rehab) - 15px
-                anchor: createNaverPoint(7.5, 7.5),
-              },
-              zIndex: 50,
-            });
-
-            // 재활기관 정보창 생성 (기관구분명 표시)
-            const infoWindowId = `infoWindow_rehab_${center.id}`;
-            const infoWindow = new window.naver.maps.InfoWindow({
-              content: `
-                <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
-                  <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
-                  <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${center.name}</h4>
-                  <p style="margin:0 0 4px 0;font-size:11px;color:${COLORS.rehabilitation};font-weight:500;">🏥 ${center.gigwan_fg_nm || '재활기관'}</p>
-                  <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${center.address}</p>
-                  ${center.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${center.phone}</p>` : ''}
-                  <div style="display:flex;gap:8px;margin-top:8px;">
-                    ${center.phone ? `<button onclick="window.open('tel:${center.phone}')" style="padding:6px 12px;background:${COLORS.rehabilitation};color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
-                    <button onclick="(function() {
-                      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                      const address = '${center.address.replace(/'/g, "\\'")}';
-                      if (isMobile) {
-                        // 모바일: 주소 기반 검색 링크 사용
-                        window.open('https://m.map.naver.com/search/' + encodeURIComponent(address), '_blank');
-                      } else {
-                        // 데스크톱: 주소 기반 검색 링크 사용
-                        window.open('https://map.naver.com/search/' + encodeURIComponent(address), '_blank');
-                      }
-                    })()" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
-                  </div>
-                </div>
-              `,
-            });
-
-            // 전역 함수로 InfoWindow 닫기 함수 등록
-            (window as any).closeInfoWindow = () => {
-              if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
-                currentInfoWindowRef.current.close();
-                currentInfoWindowRef.current = null;
-              }
-            };
-
-            // 재활기관 마커 클릭 이벤트
-            window.naver.maps.Event.addListener(marker, 'click', () => {
-              // 이전 InfoWindow 닫기
-              if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
-                currentInfoWindowRef.current.close();
-              }
-
-              // Bottom Sheet 열기 (onRehabilitationCenterClick이 있는 경우)
-              if (onRehabilitationCenterClick) {
-                onRehabilitationCenterClick(center);
-              }
-
-              // 같은 마커를 다시 클릭한 경우 닫기만 하고, 아니면 열기
-              if (currentInfoWindowRef.current === infoWindow && infoWindow.getMap()) {
-                infoWindow.close();
-                currentInfoWindowRef.current = null;
-              } else {
-                infoWindow.open(mapInstance, marker);
-                currentInfoWindowRef.current = infoWindow;
-              }
-            });
-
-            markersRef.current.push(marker);
-          }
-        });
-
-        console.log('[HospitalMap] 마커 추가 완료:', `병원 ${hospitalList.length}개, 재활기관 ${rehabCenterList.length}개`);
-      };
-
-      // 초기 마커 추가
-      addMarkers(map, hospitals, rehabilitationCenters);
       setIsLoading(false);
     } catch (error) {
       console.error('[HospitalMap] 지도 초기화 실패:', error);
@@ -569,6 +393,171 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapRef, userLocation]); // center, zoom 제거 - 지도는 한 번만 초기화
+
+  // 마커 업데이트 Effect (언어 변경/데이터 변경 시 실행)
+  useEffect(() => {
+    if (!mapInstanceRef.current || !window.naver) return;
+    
+    const mapInstance = mapInstanceRef.current;
+    
+    // 기존 마커 제거
+    markersRef.current.forEach((marker) => {
+      marker.setMap(null);
+    });
+    markersRef.current = [];
+
+    // 병원 마커 추가
+    hospitals.forEach((hospital) => {
+      if (hospital.latitude !== 0 && hospital.longitude !== 0) {
+        const marker = new window.naver.maps.Marker({
+          position: new window.naver.maps.LatLng(hospital.latitude, hospital.longitude),
+          map: mapInstance,
+          title: hospital.name,
+          icon: {
+            content: `<div style="width:${
+              hospital.is_rehabilitation_certified ? '22px' : '15px'
+            };height:${
+              hospital.is_rehabilitation_certified ? '22px' : '15px'
+            };background:${
+              hospital.is_rehabilitation_certified 
+                ? '#FF0000' 
+                : (hospital.type === 'hospital' ? '#3B82F6' : '#22C55E') 
+            };border-radius:50%;border:${hospital.is_rehabilitation_certified ? '3px' : '2px'} solid white;box-shadow:0 1px 3px rgba(0,0,0,0.3);${
+              hospital.is_rehabilitation_certified ? 'box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3); z-index: 10;' : ''
+            }"></div>`,
+            anchor: createNaverPoint(hospital.is_rehabilitation_certified ? 11 : 7.5, hospital.is_rehabilitation_certified ? 11 : 7.5),
+          },
+          zIndex: hospital.is_rehabilitation_certified ? 100 : 1,
+        });
+
+        const infoWindowId = `infoWindow_${hospital.id}`;
+        const institutionTypeBadge = hospital.institution_type 
+          ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.primary};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
+          : '';
+        const certifiedBadge = hospital.is_rehabilitation_certified
+          ? `<span style="display:inline-block;padding:2px 8px;background:#E11D48;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;font-weight:bold;">산재재활인증</span>`
+          : '';
+        const departmentBadge = hospital.department_extracted && hospital.department_extracted !== '기타'
+          ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.rehabilitation};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
+          : '';
+        
+        const infoWindow = new window.naver.maps.InfoWindow({
+          content: `
+            <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
+              <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
+              <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${hospital.name}</h4>
+              ${institutionTypeBadge || certifiedBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${certifiedBadge}${departmentBadge}</div>` : ''}
+              <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${t.infoWindow.address} ${hospital.address}</p>
+              ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${hospital.phone}</p>` : ''}
+              <div style="display:flex;gap:8px;margin-top:8px;">
+                 ${hospital.phone ? `<button onclick="window.open('tel:${hospital.phone}')" style="padding:6px 12px;background:${COLORS.primary};color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">${t.infoWindow.call}</button>` : ''}
+                 <button onclick="(function() {
+                   const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                   const address = '${hospital.address.replace(/'/g, "\\'")}';
+                   if (isMobile) {
+                     window.open('https://m.map.naver.com/search/' + encodeURIComponent(address), '_blank');
+                   } else {
+                     window.open('https://map.naver.com/search/' + encodeURIComponent(address), '_blank');
+                   }
+                 })()" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">${t.infoWindow.directions}</button>
+              </div>
+            </div>
+          `,
+        });
+
+        // 전역 함수 등록
+        (window as any).closeInfoWindow = () => {
+          if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
+            currentInfoWindowRef.current.close();
+            currentInfoWindowRef.current = null;
+          }
+        };
+
+        window.naver.maps.Event.addListener(marker, 'click', () => {
+          if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
+            currentInfoWindowRef.current.close();
+          }
+          if (onHospitalClick) onHospitalClick(hospital);
+          
+          if (currentInfoWindowRef.current === infoWindow && infoWindow.getMap()) {
+            infoWindow.close();
+            currentInfoWindowRef.current = null;
+          } else {
+            infoWindow.open(mapInstance, marker);
+            currentInfoWindowRef.current = infoWindow;
+          }
+        });
+
+        markersRef.current.push(marker);
+      }
+    });
+
+    // 재활기관 마커 추가
+    rehabilitationCenters.forEach((center) => {
+       if (center.latitude !== 0 && center.longitude !== 0) {
+            const marker = new window.naver.maps.Marker({
+              position: new window.naver.maps.LatLng(center.latitude, center.longitude),
+              map: mapInstance,
+              title: center.name,
+              icon: {
+                content: `<div style="width:15px;height:15px;background:#A855F7;border-radius:50%;border:2px solid white;box-shadow:0 1px 2px rgba(0,0,0,0.3);"></div>`, 
+                anchor: createNaverPoint(7.5, 7.5),
+              },
+              zIndex: 50,
+            });
+
+            const infoWindowId = `infoWindow_rehab_${center.id}`;
+            const infoWindow = new window.naver.maps.InfoWindow({
+              content: `
+                <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
+                  <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
+                  <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${center.name}</h4>
+                  <p style="margin:0 0 4px 0;font-size:11px;color:${COLORS.rehabilitation};font-weight:500;">🏥 ${center.gigwan_fg_nm || '재활기관'}</p>
+                  <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${t.infoWindow.address} ${center.address}</p>
+                  ${center.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${center.phone}</p>` : ''}
+                  <div style="display:flex;gap:8px;margin-top:8px;">
+                    ${center.phone ? `<button onclick="window.open('tel:${center.phone}')" style="padding:6px 12px;background:${COLORS.rehabilitation};color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">${t.infoWindow.call}</button>` : ''}
+                    <button onclick="(function() {
+                      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                      const address = '${center.address.replace(/'/g, "\\'")}';
+                      if (isMobile) {
+                        window.open('https://m.map.naver.com/search/' + encodeURIComponent(address), '_blank');
+                      } else {
+                        window.open('https://map.naver.com/search/' + encodeURIComponent(address), '_blank');
+                      }
+                    })()" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">${t.infoWindow.directions}</button>
+                  </div>
+                </div>
+              `,
+            });
+            
+             (window as any).closeInfoWindow = () => {
+              if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
+                currentInfoWindowRef.current.close();
+                currentInfoWindowRef.current = null;
+              }
+            };
+
+            window.naver.maps.Event.addListener(marker, 'click', () => {
+              if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
+                currentInfoWindowRef.current.close();
+              }
+              if (onRehabilitationCenterClick) onRehabilitationCenterClick(center);
+              
+              if (currentInfoWindowRef.current === infoWindow && infoWindow.getMap()) {
+                infoWindow.close();
+                currentInfoWindowRef.current = null;
+              } else {
+                infoWindow.open(mapInstance, marker);
+                currentInfoWindowRef.current = infoWindow;
+              }
+            });
+
+            markersRef.current.push(marker);
+       }
+    });
+
+  }, [hospitals, rehabilitationCenters, t, onHospitalClick, onRehabilitationCenterClick]);
 
   // center prop 변경 시 지도 중심만 업데이트 (지도 리셋하지 않음)
   useEffect(() => {
@@ -598,200 +587,6 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
       map.setZoom(zoom);
     }
   }, [zoom]);
-
-  // hospitals 변경 시 마커만 업데이트 (지도는 리셋하지 않음)
-  useEffect(() => {
-    if (!mapInstanceRef.current || !window.naver || !window.naver.maps) {
-      return;
-    }
-
-    // 기존 마커 제거
-    markersRef.current.forEach((marker) => {
-      marker.setMap(null);
-    });
-    markersRef.current = [];
-
-    // 사용자 위치 마커 업데이트 (hospitals 변경 시에도 유지)
-    if (userLocation && mapInstanceRef.current) {
-      if (!userMarkerRef.current) {
-        const userMarker = new window.naver.maps.Marker({
-          position: new window.naver.maps.LatLng(userLocation.lat, userLocation.lng),
-          map: mapInstanceRef.current,
-          title: '내 위치',
-          icon: {
-            content: `
-              <div style="background:#F59E0B;width:30px;height:30px;border-radius:50%;border:3px solid white;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(0,0,0,0.3);">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="18px" height="18px"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-              </div>
-            `,
-            anchor: createNaverPoint(15, 15),
-          },
-          zIndex: 1000,
-        });
-        userMarkerRef.current = userMarker;
-      }
-    }
-
-    // 병원 마커 추가
-    hospitals.forEach((hospital) => {
-      if (hospital.latitude !== 0 && hospital.longitude !== 0) {
-        const marker = new window.naver.maps.Marker({
-          position: new window.naver.maps.LatLng(
-            hospital.latitude,
-            hospital.longitude
-          ),
-          map: mapInstanceRef.current,
-          title: hospital.name,
-            icon: {
-              content: `<div style="width:${
-                hospital.is_rehabilitation_certified ? '22px' : '15px'
-              };height:${
-                hospital.is_rehabilitation_certified ? '22px' : '15px'
-              };background:${
-                hospital.is_rehabilitation_certified 
-                  ? '#FF0000' // Red (Certified)
-                  : (hospital.type === 'hospital' 
-                      ? '#3B82F6' // Blue (Hospital)
-                      : '#22C55E') // Green (Pharmacy)
-              };border-radius:50%;border:${hospital.is_rehabilitation_certified ? '3px' : '2px'} solid white;box-shadow:0 1px 3px rgba(0,0,0,0.3);${
-                hospital.is_rehabilitation_certified ? 'box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.3); z-index: 10;' : '' // Glow effect for certified (Red)
-              }"></div>`,
-              anchor: createNaverPoint(hospital.is_rehabilitation_certified ? 11 : 7.5, hospital.is_rehabilitation_certified ? 11 : 7.5),
-            },
-        });
-
-        // 정보창 생성 (닫기 버튼 포함)
-        const infoWindowId = `infoWindow_${hospital.id}`;
-        // 기관 유형 및 진료과목 정보 표시
-        const institutionTypeBadge = hospital.institution_type 
-          ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.primary};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.institution_type}</span>`
-          : '';
-        const certifiedBadge = hospital.is_rehabilitation_certified
-          ? `<span style="display:inline-block;padding:2px 8px;background:#2563EB;color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">산재재활인증</span>`
-          : '';
-        const departmentBadge = hospital.department_extracted && hospital.department_extracted !== '기타'
-          ? `<span style="display:inline-block;padding:2px 8px;background:${COLORS.rehabilitation};color:white;border-radius:4px;font-size:10px;margin-right:4px;margin-bottom:4px;">${hospital.department_extracted}</span>`
-          : '';
-        
-        const infoWindow = new window.naver.maps.InfoWindow({
-          content: `
-            <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
-              <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
-              <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${hospital.name}</h4>
-              ${institutionTypeBadge || certifiedBadge || departmentBadge ? `<div style="margin:0 0 8px 0;padding-right:24px;">${institutionTypeBadge}${certifiedBadge}${departmentBadge}</div>` : ''}
-              <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${hospital.address}</p>
-              ${hospital.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${hospital.phone}</p>` : ''}
-              <div style="display:flex;gap:8px;margin-top:8px;">
-                ${hospital.phone ? `<button onclick="window.open('tel:${hospital.phone}')" style="padding:6px 12px;background:#2F6E4F;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
-                <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(hospital.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
-              </div>
-            </div>
-          `,
-        });
-
-        // 전역 함수로 InfoWindow 닫기 함수 등록
-        (window as any).closeInfoWindow = () => {
-          if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
-            currentInfoWindowRef.current.close();
-            currentInfoWindowRef.current = null;
-          }
-        };
-
-        window.naver.maps.Event.addListener(marker, 'click', () => {
-          // 이전 InfoWindow 닫기
-          if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
-            currentInfoWindowRef.current.close();
-          }
-
-          // Bottom Sheet 열기
-          if (onHospitalClick) {
-            onHospitalClick(hospital);
-          }
-
-          // 같은 마커를 다시 클릭한 경우 닫기만 하고, 아니면 열기
-          if (currentInfoWindowRef.current === infoWindow && infoWindow.getMap()) {
-            infoWindow.close();
-            currentInfoWindowRef.current = null;
-          } else {
-            infoWindow.open(mapInstanceRef.current, marker);
-            currentInfoWindowRef.current = infoWindow;
-          }
-        });
-
-        markersRef.current.push(marker);
-      }
-    });
-
-    // 재활기관 마커 추가 (보라색 #9333EA)
-    rehabilitationCenters.forEach((center) => {
-      if (center.latitude !== 0 && center.longitude !== 0) {
-            const marker = new window.naver.maps.Marker({
-          position: new window.naver.maps.LatLng(
-            center.latitude,
-            center.longitude
-          ),
-          map: mapInstanceRef.current,
-          title: center.name,
-              icon: {
-                content: `<div style="width:15px;height:15px;background:#A855F7;border-radius:50%;border:2px solid white;box-shadow:0 1px 2px rgba(0,0,0,0.3);"></div>`, // Purple (Rehab) - 15px
-                anchor: createNaverPoint(7.5, 7.5),
-              },
-        });
-
-        // 재활기관 정보창 생성 (기관구분명 표시)
-        const infoWindowId = `infoWindow_rehab_${center.id}`;
-        const infoWindow = new window.naver.maps.InfoWindow({
-          content: `
-            <div style="padding:16px;min-width:200px;max-width:300px;position:relative;background:linear-gradient(135deg, rgba(255, 213, 79, 0.05), rgba(165, 214, 167, 0.08));border:1px solid #E8F5E9;border-radius:16px;box-shadow:0 8px 30px rgba(0, 0, 0, 0.04);">
-              <button onclick="window.closeInfoWindow('${infoWindowId}')" style="position:absolute;top:8px;right:8px;width:24px;height:24px;background:#F5F9F6;border:none;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;color:#555;padding:0;transition:background 0.2s;" onmouseover="this.style.background='#E8F5E9'" onmouseout="this.style.background='#F5F9F6'">×</button>
-              <h4 style="margin:0 0 8px 0;font-size:16px;font-weight:bold;padding-right:24px;color:#1C1C1E;">${center.name}</h4>
-              <p style="margin:0 0 4px 0;font-size:11px;color:${COLORS.rehabilitation};font-weight:500;">🏥 ${center.gigwan_fg_nm || '재활기관'}</p>
-              <p style="margin:0 0 8px 0;font-size:12px;color:#555;">${center.address}</p>
-              ${center.phone ? `<p style="margin:0 0 8px 0;font-size:12px;color:#555;">📞 ${center.phone}</p>` : ''}
-              <div style="display:flex;gap:8px;margin-top:8px;">
-                ${center.phone ? `<button onclick="window.open('tel:${center.phone}')" style="padding:6px 12px;background:#9333EA;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">전화</button>` : ''}
-                <button onclick="window.open('https://map.naver.com/search/${encodeURIComponent(center.address)}')" style="padding:6px 12px;background:#61C48C;color:white;border:none;border-radius:16px;cursor:pointer;font-size:12px;box-shadow:0 2px 8px rgba(0, 0, 0, 0.04);transition:box-shadow 0.2s;" onmouseover="this.style.boxShadow='0 4px 16px rgba(0, 0, 0, 0.04)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)'">길찾기</button>
-              </div>
-            </div>
-          `,
-        });
-
-        // 전역 함수로 InfoWindow 닫기 함수 등록
-        (window as any).closeInfoWindow = () => {
-          if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
-            currentInfoWindowRef.current.close();
-            currentInfoWindowRef.current = null;
-          }
-        };
-
-        // 재활기관 마커 클릭 이벤트
-        window.naver.maps.Event.addListener(marker, 'click', () => {
-          // 이전 InfoWindow 닫기
-          if (currentInfoWindowRef.current && currentInfoWindowRef.current.getMap()) {
-            currentInfoWindowRef.current.close();
-          }
-
-          // Bottom Sheet 열기 (onRehabilitationCenterClick이 있는 경우)
-          if (onRehabilitationCenterClick) {
-            onRehabilitationCenterClick(center);
-          }
-
-          // 같은 마커를 다시 클릭한 경우 닫기만 하고, 아니면 열기
-          if (currentInfoWindowRef.current === infoWindow && infoWindow.getMap()) {
-            infoWindow.close();
-            currentInfoWindowRef.current = null;
-          } else {
-            infoWindow.open(mapInstanceRef.current, marker);
-            currentInfoWindowRef.current = infoWindow;
-          }
-        });
-
-        markersRef.current.push(marker);
-      }
-    });
-
-    console.log('[HospitalMap] 마커 업데이트 완료:', `병원 ${hospitals.length}개, 재활기관 ${rehabilitationCenters.length}개`);
-  }, [hospitals, rehabilitationCenters, onHospitalClick, onRehabilitationCenterClick, userLocation]);
 
   // 네이버 지도 SDK 로드 (신규 NCP Maps API v3)
   useEffect(() => {
@@ -862,4 +657,3 @@ const HospitalMap: React.FC<HospitalMapProps> = ({
 };
 
 export default HospitalMap;
-

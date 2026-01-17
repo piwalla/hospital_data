@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { ALL_PROVINCES, findProvinceByCode } from '@/lib/data/korean-regions';
 import type { RegionSelection } from '@/lib/types/region';
 import { getRegionCoordinates } from '@/lib/data/region-coordinates';
+import { hospitalTranslations, type Locale, defaultLocale } from '@/lib/i18n/config';
 
 interface RegionSelectorProps {
   value: RegionSelection;
@@ -138,6 +139,28 @@ export default function RegionSelector({
     }
   };
 
+  // 번역 훅
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const t = hospitalTranslations[locale];
+
+  useEffect(() => {
+    const savedLocale = (localStorage.getItem('locale') as Locale) || defaultLocale;
+    setLocale(savedLocale);
+
+    const handleStorage = () => {
+      const newLocale = (localStorage.getItem('locale') as Locale) || defaultLocale;
+      setLocale(newLocale);
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('localeChange', handleStorage);
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('localeChange', handleStorage);
+    };
+  }, []);
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       {/* 시/도 선택 */}
@@ -151,9 +174,9 @@ export default function RegionSelector({
           transition-all duration-200 ease-in-out
           min-w-[140px]
         "
-        aria-label="시/도 선택"
+        aria-label={t.sections.selectRegion}
       >
-        <option value="">시/도 선택</option>
+        <option value="">{t.sections.selectRegion}</option>
         {ALL_PROVINCES.map((province) => (
           <option key={province.code} value={province.code}>
             {province.name}
@@ -173,9 +196,9 @@ export default function RegionSelector({
             transition-all duration-200 ease-in-out
             min-w-[140px]
           "
-          aria-label="시/군/구 선택"
+          aria-label={t.sections.selectRegionBtn}
         >
-          <option value="">시/군/구 선택</option>
+          <option value="">{t.sections.selectRegion}</option>
           {availableDistricts.map((district) => (
             <option key={district.code} value={district.code}>
               {district.name}
@@ -196,9 +219,9 @@ export default function RegionSelector({
             transition-all duration-200 ease-in-out
             min-w-[140px]
           "
-          aria-label="구 선택"
+          aria-label={t.sections.selectRegionBtn}
         >
-          <option value="">구 선택</option>
+          <option value="">{t.sections.selectRegion}</option>
           {availableSubDistricts.map((subDistrict) => (
             <option key={subDistrict.code} value={subDistrict.code}>
               {subDistrict.name}

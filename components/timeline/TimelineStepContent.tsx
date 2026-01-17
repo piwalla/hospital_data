@@ -16,14 +16,18 @@ import ConditionalPDFViewer from './ConditionalPDFViewer';
 import type { StageWithDetails } from '@/lib/types/timeline';
 import { cn } from '@/lib/utils';
 
+import { Locale, TimelineTranslation } from '@/lib/i18n/config';
+
 interface TimelineStepContentProps {
   stage: StageWithDetails;
   nextStage?: StageWithDetails;
   prevStage?: StageWithDetails;
   initialTab?: 'guide' | 'actions' | 'documents' | 'warnings';
+  locale: Locale;
+  t: TimelineTranslation;
 }
 
-export default function TimelineStepContent({ stage, nextStage, prevStage, initialTab }: TimelineStepContentProps) {
+export default function TimelineStepContent({ stage, nextStage, prevStage, initialTab, locale, t }: TimelineStepContentProps) {
   // URL 파라미터로 전달된 탭이 있으면 사용, 없으면 기본값 사용
   const getInitialTab = (): 'guide' | 'actions' | 'documents' | 'warnings' => {
     if (initialTab) return initialTab;
@@ -124,37 +128,37 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
           aria-label="단계 상세 정보 탭"
         >
           {/* 1단계, 2단계, 3단계, 4단계일 때 "설명 보기" 탭 표시 */}
-          {(stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
+            {(stage.step_number === 1 || stage.step_number === 2 || stage.step_number === 3 || stage.step_number === 4) && pdfUrl && (
             <>
               <TabButton
                 tab="guide"
-                label="설명 보기"
+                label={t.tabs.guide}
                 icon={BookOpen}
               />
-              <span id="tab-guide" className="sr-only">설명 보기 탭</span>
+              <span id="tab-guide" className="sr-only">{t.tabs.guide}</span>
             </>
           )}
           <TabButton
             tab="actions"
-            label="해야 할 일"
+            label={t.tabs.actions}
             icon={CheckCircle2}
             count={actionsCount}
           />
-          <span id="tab-actions" className="sr-only">해야 할 일 탭</span>
+          <span id="tab-actions" className="sr-only">{t.tabs.actions}</span>
           <TabButton
             tab="documents"
-            label="서류"
+            label={t.tabs.documents}
             icon={FileText}
             count={stage.documents.length}
           />
-          <span id="tab-documents" className="sr-only">서류 탭</span>
+          <span id="tab-documents" className="sr-only">{t.tabs.documents}</span>
           <TabButton
             tab="warnings"
-            label="주의사항"
+            label={t.tabs.warnings}
             icon={AlertTriangle}
             count={stage.warnings.length}
           />
-          <span id="tab-warnings" className="sr-only">주의사항 탭</span>
+          <span id="tab-warnings" className="sr-only">{t.tabs.warnings}</span>
         </div>
         
         {/* ... (Scroll hint remains) */}
@@ -177,11 +181,11 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
                     <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
-                      영상으로 쉽게 설명해 드려요
+                      {t.stages[stage.step_number as 1|2|3|4]?.videoDesc || 'Guide Video'}
                     </h2>
                   </div>
                   <span className="text-[10px] sm:text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full w-fit">
-                    ※ 본 영상은 AI 기술을 활용하여 제작되었습니다.
+                    {t.aiVideoNotice}
                   </span>
                 </div>
                 <div className="relative w-full max-w-full rounded-xl overflow-hidden border border-[var(--border-medium)] bg-white shadow-sm">
@@ -197,13 +201,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                   </div>
                 </div>
                 <p className="text-sm sm:text-base text-muted-foreground text-center px-0 sm:px-0">
-                  {stage.step_number === 1 
-                    ? '산재 신청 과정을 영상으로 확인하세요'
-                    : stage.step_number === 2
-                    ? '병원에서 치료받고 급여 받는 과정을 영상으로 확인하세요'
-                    : stage.step_number === 3
-                    ? '치료 끝나고 장해 등급 받는 과정을 영상으로 확인하세요'
-                    : '직장 복귀하거나 재취업하는 과정을 영상으로 확인하세요'}
+                  {t.stages[stage.step_number as 1|2|3|4]?.videoUrlTitle}
                 </p>
               </div>
             )}
@@ -215,11 +213,11 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="w-1 h-6 sm:h-8 bg-primary rounded-full"></div>
                     <h2 className="text-lg sm:text-xl font-bold text-foreground font-brand">
-                      이렇게 진행하시면 됩니다.
+                       {t.guideTitle}
                     </h2>
                   </div>
                   <span className="text-[10px] sm:text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full w-fit">
-                    ※ 본 문서는 AI 기술을 활용하여 작성되었습니다.
+                    {t.aiDocNotice}
                   </span>
                 </div>
                 <Button
@@ -229,7 +227,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                   className="flex items-center gap-2 w-full sm:w-auto justify-center"
                 >
                   <a href={pdfUrl ?? '#'} download target="_blank" rel="noreferrer">
-                    PDF 다운로드
+                    PDF {t.dictionary['download'] || 'Download'}
                   </a>
                 </Button>
               </div>
@@ -250,13 +248,12 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
             <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
               <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7 text-primary flex-shrink-0 mt-0.5" />
               <p className="text-base sm:text-base text-[#374151] leading-relaxed">
-                이 단계에서는 꼭 해야 하는 일 {actionsCount}개가 있습니다.
-                {stage.actionItems?.length > 0 && <span> 항목을 눌러 자세한 이유를 확인하세요.</span>}
+                {t.tabs.actions}: {actionsCount}
               </p>
             </div>
             
             {actionsCount === 0 ? (
-              <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">해야 할 일이 없습니다.</p>
+              <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">{t.status.emptyActions}</p>
             ) : stage.actionItems && stage.actionItems.length > 0 ? (
               /* 구조화된 Action Items (Numbered List Style) */
               <div className="space-y-4 sm:space-y-5">
@@ -272,7 +269,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                         {index + 1}
                       </span>
                       <span className="leading-snug pt-0.5">
-                        {action.title}
+                        {t.dictionary[action.title] || action.title}
                       </span>
                     </h4>
                     {action.description && (
@@ -311,11 +308,11 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
               <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
                 <FileText className="w-6 h-6 sm:w-7 sm:h-7 text-primary flex-shrink-0 mt-0.5" />
                 <p className="text-base sm:text-base text-[#374151] leading-relaxed">
-                  이 단계에서 필요한 서류 {stage.documents.length}개가 있습니다.
+                  {t.tabs.documents}: {stage.documents.length}
                 </p>
               </div>
               {stage.documents.length === 0 ? (
-                <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">필수 서류가 없습니다.</p>
+                <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">{t.status.emptyDocuments}</p>
               ) : (
                 <>
                   <ul className="space-y-4 sm:space-y-5" role="list" aria-label="필수 서류 목록">
@@ -332,7 +329,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                               </span>
                             )}
                             <span className="text-senior-body font-medium text-foreground break-words">
-                              {doc.title}
+                              {t.dictionary[doc.title] || doc.title}
                             </span>
                           </div>
                         </div>
@@ -343,7 +340,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                   {/* 더 자세한 서류 안내 링크 */}
                   <div className="mt-4 sm:mt-6 p-4 sm:p-5 rounded-lg bg-primary/5 border border-primary/20">
                     <p className="text-sm sm:text-base text-foreground mb-3">
-                      💡 이 서류에 대해 더 자세히 알고 싶으신가요?
+                      {t.docDetailTip}
                     </p>
                     <Button
                       asChild
@@ -351,7 +348,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                       className="w-full sm:w-auto"
                     >
                       <Link href={`/documents?stage=${stage.step_number}`} prefetch={false}>
-                        {stage.step_number}단계 서류 안내 자세히 보기
+                        {t.docDetailBtn.replace('{step}', stage.step_number.toString())}
                       </Link>
                     </Button>
                   </div>
@@ -371,11 +368,11 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
             <div className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-lg bg-[var(--alert)]/10 border border-[var(--alert)]/20">
               <AlertTriangle className="w-6 h-6 sm:w-7 sm:h-7 text-[var(--alert)] flex-shrink-0 mt-0.5" />
               <p className="text-base sm:text-base text-[#374151] leading-relaxed">
-                이 단계에서 꼭 알아두어야 할 내용 {stage.warnings.length}개가 있습니다.
+                {t.tabs.warnings}: {stage.warnings.length}
               </p>
             </div>
             {stage.warnings.length === 0 ? (
-              <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">주의사항이 없습니다.</p>
+              <p className="text-senior-body text-[#6B7280]" role="status" aria-live="polite">{t.status.emptyWarnings}</p>
             ) : (
               <div className="space-y-4 sm:space-y-5" role="list" aria-label="주의사항 목록">
                 {stage.warnings.map((warning, index) => (
@@ -389,7 +386,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
                         {index + 1}
                       </span>
                       <span className="leading-snug pt-0.5">
-                        {warning.content}
+                        {t.dictionary[warning.content] || warning.content}
                       </span>
                     </h4>
                     {warning.description && (
@@ -409,8 +406,8 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
       {nextStage && nextStage.title && (
         <div className="pt-4 sm:pt-6 border-t border-[var(--border-medium)]">
           <p className="text-base sm:text-base text-[#374151]">
-            <strong className="font-semibold text-foreground">다음 단계:</strong>{' '}
-            {nextStage.title}
+            <strong className="font-semibold text-foreground">{t.nextCondition}:</strong>{' '}
+            {t.dictionary[nextStage.title] || nextStage.title}
           </p>
         </div>
       )}
@@ -426,7 +423,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
           >
             <Link href={`/timeline/${prevStage.step_number}`}>
               <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
-              이전 단계
+              {t.prevStep}
             </Link>
           </Button>
         )}
@@ -438,7 +435,7 @@ export default function TimelineStepContent({ stage, nextStage, prevStage, initi
             className="flex-1 text-base sm:text-lg min-h-[48px]"
           >
             <Link href={`/timeline/${nextStage.step_number}`}>
-              다음 단계
+              {t.nextStep}
               <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2" />
             </Link>
           </Button>

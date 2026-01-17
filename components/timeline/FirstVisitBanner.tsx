@@ -12,10 +12,16 @@ import { useState, useEffect } from 'react';
 import { X, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import VideoGuideButton from './VideoGuideButton';
+import { Locale, TimelineTranslation } from '@/lib/i18n/config';
 
 const STORAGE_KEY = 'timeline-first-visit-dismissed';
 
-export default function FirstVisitBanner() {
+interface FirstVisitBannerProps {
+  locale: Locale;
+  t: TimelineTranslation;
+}
+
+export default function FirstVisitBanner({ locale, t }: FirstVisitBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -46,12 +52,12 @@ export default function FirstVisitBanner() {
         <Info className="w-5 h-5 sm:w-6 sm:h-6 text-primary flex-shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
           <p className="text-base sm:text-lg font-semibold text-foreground mb-1">
-            처음이신가요?
+            {t.firstVisitTitle}
           </p>
           <p className="text-base sm:text-base text-[#374151] leading-relaxed mb-3">
-            아래 단계를 순서대로 확인해보세요. 각 단계에서 해야 할 일, 필요한 서류, 주의사항을 확인할 수 있습니다.
+            {t.firstVisitDesc}
           </p>
-          <VideoGuideButton size="sm" />
+          <VideoGuideButton size="sm" locale={locale} t={t} />
         </div>
         <Button
           variant="ghost"

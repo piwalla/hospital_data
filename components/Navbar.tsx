@@ -4,10 +4,12 @@ import { SignedOut, SignInButton, SignedIn, UserButton, useUser } from "@clerk/n
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ShieldCheck, User } from "lucide-react";
+import { Locale, locales, navTranslations } from "@/lib/i18n/config";
+import LanguageSwitcher from "@/components/common/LanguageSwitcher";
 
 // Admin Check Component
 // Admin Check Component
@@ -38,30 +40,65 @@ const AdminLink = ({ className }: { className?: string }) => {
 const Navbar = () => {
   const pathname = usePathname();
 
+  /* Locale & Translation Logic */
+  const [locale, setLocale] = React.useState<Locale>('ko');
+
+  useEffect(() => {
+    const stored = localStorage.getItem('user_locale');
+    if (stored && locales.includes(stored as Locale)) {
+      setLocale(stored as Locale);
+    }
+
+    const handleStorageChange = () => {
+      const updated = localStorage.getItem('user_locale');
+      if (updated && locales.includes(updated as Locale)) {
+        setLocale(updated as Locale);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localeChange', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localeChange', handleStorageChange);
+    };
+  }, []);
+
+  const handleManualLocaleChange = (newLocale: Locale) => {
+    setLocale(newLocale);
+    localStorage.setItem('user_locale', newLocale);
+    window.dispatchEvent(new Event('localeChange'));
+  };
+
+  // Show English for all non-Korean locales as requested
+  const displayLocale = locale === 'ko' ? 'ko' : 'en';
+  const t = navTranslations[displayLocale];
+
   const tabs = [
     {
       href: "/dashboard",
-      label: "나의 여정",
-    },
-    {
-      href: "/timeline",
-      label: "진행 과정",
-    },
-    {
-      href: "/hospitals",
-      label: "병원 찾기",
-    },
-    {
-      href: "/documents",
-      label: "서류 안내",
+      label: t.dashboard,
     },
     {
       href: "/chatbot-v2",
-      label: "산재 상담",
+      label: t.chatbot,
+    },
+    {
+      href: "/timeline",
+      label: t.timeline,
+    },
+    {
+      href: "/hospitals",
+      label: t.hospitals,
+    },
+    {
+      href: "/documents",
+      label: t.documents,
     },
     {
       href: "/counseling",
-      label: "심리 상담",
+      label: t.counseling,
     },
   ];
 
@@ -123,7 +160,7 @@ const Navbar = () => {
                 priority
               />
             </div>
-            <span className="text-sm md:text-xl">리워크케어</span>
+            <span className="text-sm md:text-xl">{t.brand}</span>
           </Link>
           
           {/* 네비게이션 메뉴 */}
@@ -146,9 +183,19 @@ const Navbar = () => {
             })}
           </nav>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-2 sm:gap-4 items-center">
             {isMounted ? (
               <>
+                <LanguageSwitcher 
+                  currentLocale={locale} 
+                  onLocaleChange={handleManualLocaleChange}
+                  variant="nav"
+                  className={cn(
+                    "hover:bg-black/5 dark:hover:bg-white/20",
+                    navTextColor,
+                    (isTransparentPage && !isScrolled) ? "hover:bg-white/10" : ""
+                  )}
+                />
                 <SignedOut>
                   <SignInButton mode="modal">
                     <Button 
@@ -159,7 +206,7 @@ const Navbar = () => {
                           : "bg-white text-primary hover:bg-white/90"
                       )}
                     >
-                      로그인
+                      {locale === 'ko' ? '로그인' : 'Login'}
                     </Button>
                   </SignInButton>
                 </SignedOut>
@@ -195,7 +242,7 @@ const Navbar = () => {
                   >
                     <UserButton.MenuItems>
                       <UserButton.Link
-                        label="내 정보 관리"
+                        label={locale === 'ko' ? '내 정보 관리' : 'My Profile'}
                         labelIcon={<User className="w-4 h-4" />}
                         href="/profile"
                       />

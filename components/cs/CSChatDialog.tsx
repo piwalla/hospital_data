@@ -10,8 +10,13 @@ import { useClerkSupabaseClient } from "@/lib/supabase/clerk-client";
 import { getOrCreateSession, getMessages, sendMessage, subscribeToMessages } from "@/lib/api/cs";
 import { CSMessage, CSSession } from "@/lib/types/cs";
 import { cn } from "@/lib/utils";
+import { FooterTranslation } from "@/lib/i18n/config";
 
-export default function CSChatDialog() {
+interface CSChatDialogProps {
+  t: FooterTranslation;
+}
+
+export default function CSChatDialog({ t }: CSChatDialogProps) {
   const { user } = useUser();
   const client = useClerkSupabaseClient();
   const [isOpen, setIsOpen] = useState(false);
@@ -89,7 +94,7 @@ export default function CSChatDialog() {
         }
     } catch(e) {
         console.error(e);
-        alert("메시지 전송 실패");
+        alert(t.csSendError);
     }
   };
 
@@ -108,14 +113,14 @@ export default function CSChatDialog() {
           role="button"
           tabIndex={0}
         >
-          1:1 문의하기
+          {t.csContact}
         </span>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[400px] h-[600px] flex flex-col p-0 overflow-hidden gap-0">
         <DialogHeader className="p-4 border-b bg-slate-50">
           <DialogTitle className="flex items-center gap-2 text-slate-800">
             <HeadphonesIcon className="w-5 h-5 text-indigo-600" />
-            1:1 고객센터 문의
+            {t.csTitle}
           </DialogTitle>
         </DialogHeader>
 
@@ -127,7 +132,7 @@ export default function CSChatDialog() {
           ) : messages.length === 0 ? (
              <div className="flex h-full flex-col items-center justify-center text-slate-400 gap-2">
                <MessageSquare className="w-12 h-12 opacity-20" />
-               <p className="text-sm">문의사항을 남겨주시면<br/>담당자가 답변해 드립니다.</p>
+               <p className="text-sm whitespace-pre-wrap text-center">{t.csEmpty}</p>
              </div>
           ) : (
              messages.map((msg) => (
@@ -158,7 +163,7 @@ export default function CSChatDialog() {
               value={inputValue} 
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="문의 내용을 입력하세요..."
+              placeholder={t.csPlaceholder}
               className="flex-1 bg-slate-50"
             />
             <Button onClick={handleSend} size="icon" className="shrink-0 bg-indigo-600 hover:bg-indigo-700">

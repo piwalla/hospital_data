@@ -16,7 +16,7 @@ export default function DisabilityGradeCard() {
   // If we already have a result (simulated local state for now)
   if (estimatedGrade) {
       return (
-        <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-[2.5rem] overflow-hidden transition-all hover:shadow-premium-hover relative p-1")}>
+        <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-none border-x-0 sm:border sm:rounded-3xl overflow-hidden transition-all hover:shadow-premium-hover relative p-1")}>
             <CardHeader className="pb-2 pt-6 px-6 sm:px-8">
                 <div className="flex justify-between items-center">
                     <CardTitle className="text-2xl font-bold flex items-center gap-3 text-slate-800 tracking-tight">
@@ -72,8 +72,8 @@ export default function DisabilityGradeCard() {
 
   // Initial State (No result yet)
   return (
-    <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-[2.5rem] overflow-hidden transition-all hover:shadow-premium-hover")}>
-      <CardHeader className="pt-8 px-8 text-center sm:text-left">
+    <Card className={cn("border-white/40 bg-white/80 backdrop-blur-md shadow-premium rounded-none border-x-0 sm:border sm:rounded-3xl overflow-hidden transition-all hover:shadow-premium-hover")}>
+      <CardHeader className="pt-6 sm:pt-8 px-6 sm:px-8 text-center sm:text-left">
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
              <Stethoscope className="w-6 h-6 text-emerald-500" />
@@ -88,7 +88,7 @@ export default function DisabilityGradeCard() {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="px-8 pb-8 pt-4">
+      <CardContent className="px-6 sm:px-8 pb-8 pt-4">
          <Dialog open={isSimulatorOpen} onOpenChange={setIsSimulatorOpen}>
             <DialogTrigger asChild>
                 <Button size="lg" className="w-full bg-slate-900 text-white hover:bg-black gap-2 shadow-premium rounded-[1.5rem] h-14 font-black transition-all">

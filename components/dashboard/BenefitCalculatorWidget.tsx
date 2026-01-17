@@ -65,10 +65,10 @@ export default function BenefitCalculatorWidget() {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-emerald-600" />
+            <Calculator className="w-5 h-5 text-primary" />
             급여 계산기
           </span>
-          <Link href="/calculator" className="text-sm text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+          <Link href="/calculator" className="text-sm text-primary hover:text-emerald-900 flex items-center gap-1">
             상세보기
             <ExternalLink className="w-4 h-4" />
           </Link>
@@ -110,12 +110,12 @@ export default function BenefitCalculatorWidget() {
           // Results Summary
           <div className="space-y-3">
             {/* Average Wage */}
-            <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+            <div className="p-3 bg-secondary rounded-lg border border-primary/20">
               <div className="flex items-center gap-2 mb-1">
-                <TrendingUp className="w-4 h-4 text-emerald-600" />
-                <p className="text-sm text-emerald-700">평균임금</p>
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <p className="text-sm text-primary">평균임금</p>
               </div>
-              <p className="text-xl font-bold text-emerald-900">{formatCurrency(averageWage)}/일</p>
+              <p className="text-xl font-bold text-primary">{formatCurrency(averageWage)}/일</p>
             </div>
 
             {/* Sick Leave */}

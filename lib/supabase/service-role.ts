@@ -35,3 +35,4 @@ export function getServiceRoleClient() {
     },
   });
 }
+export const createSupabaseAdminClient = getServiceRoleClient;

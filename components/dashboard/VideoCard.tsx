@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { PlayCircle, Target, Flame, Star, Lightbulb } from "lucide-react";
 import Image from "next/image";
 import { VideoData, getYoutubeThumbnail } from "@/lib/data/videos";
+import { Locale, dashboardTranslations } from "@/lib/i18n/config";
 
 interface ChecklistItem {
   id: string;
@@ -21,25 +23,53 @@ export default function VideoCard({ video, showPersonalizationBadge = false, che
   const [isPlaying, setIsPlaying] = useState(false);
   const thumbnailUrl = getYoutubeThumbnail(video.youtubeId, 'medium');
 
+  const [locale, setLocale] = useState<Locale>('ko');
+
+  useEffect(() => {
+    const savedLocale = localStorage.getItem('user_locale') as Locale;
+    if (savedLocale && dashboardTranslations[savedLocale]) {
+      setLocale(savedLocale);
+    }
+
+    const handleLocaleChange = () => {
+      const updatedLocale = localStorage.getItem('user_locale') as Locale;
+      if (updatedLocale && dashboardTranslations[updatedLocale]) {
+        setLocale(updatedLocale);
+      }
+    };
+
+    window.addEventListener('user_locale', handleLocaleChange);
+    window.addEventListener('localeChange', handleLocaleChange);
+    window.addEventListener('storage', handleLocaleChange);
+
+    return () => {
+      window.removeEventListener('user_locale', handleLocaleChange);
+      window.removeEventListener('localeChange', handleLocaleChange);
+      window.removeEventListener('storage', handleLocaleChange);
+    };
+  }, []);
+
+  const t = dashboardTranslations[locale]?.videoCard || dashboardTranslations['ko'].videoCard;
+
   // Local Badge Logic for Premium Icons
   const getBadgeContent = (badge?: 'critical' | 'recommended' | 'optional') => {
     switch (badge) {
       case 'critical':
         return {
           icon: <Flame className="w-3 h-3 text-red-600" fill="currentColor" />,
-          text: '도움 되는 영상',
+          text: t.badges.helpful,
           className: 'bg-red-50 text-red-700 border-red-100',
         };
       case 'recommended':
         return {
           icon: <Star className="w-3 h-3 text-yellow-500" fill="currentColor" />,
-          text: '강력 추천',
+          text: t.badges.recommended,
           className: 'bg-yellow-50 text-yellow-700 border-yellow-100',
         };
       case 'optional':
         return {
           icon: <Lightbulb className="w-3 h-3 text-slate-500" />,
-          text: '참고',
+          text: t.badges.reference,
           className: 'bg-slate-50 text-slate-600 border-slate-100',
         };
       default:
@@ -50,14 +80,14 @@ export default function VideoCard({ video, showPersonalizationBadge = false, che
   const badgeStyle = getBadgeContent(video.badge);
 
   return (
-    <div className="group block bg-white/80 backdrop-blur-md border border-white/40 shadow-premium rounded-[2.5rem] overflow-hidden hover:shadow-premium-hover transition-all duration-300 flex flex-col h-full relative">
+    <div className="group block bg-white/80 backdrop-blur-md border-y border-x-0 sm:border sm:border-white/40 shadow-premium rounded-none sm:rounded-3xl overflow-hidden hover:shadow-premium-hover transition-all duration-300 flex flex-col h-full relative">
       {/* 썸네일/플레이어 영역 */}
-      <div className="relative aspect-video bg-slate-100 flex-shrink-0 overflow-hidden m-1 rounded-[2rem]">
+      <div className="relative aspect-video bg-slate-100 flex-shrink-0 overflow-hidden m-1 rounded-2xl">
         {isPlaying ? (
           <iframe
             src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
             title={video.title}
-            className="absolute inset-0 w-full h-full rounded-[2rem]"
+            className="absolute inset-0 w-full h-full rounded-2xl"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
@@ -97,7 +127,7 @@ export default function VideoCard({ video, showPersonalizationBadge = false, che
             {/* 개인화 배지 */}
             {showPersonalizationBadge && (
               <div className="absolute top-3 left-3 bg-indigo-600/90 backdrop-blur-md text-white text-xs font-black px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 z-10 border border-white/20">
-                <Target className="w-3.5 h-3.5 text-indigo-200" /> <span>맞춤 추천</span>
+                <Target className="w-3.5 h-3.5 text-indigo-200" /> <span>{t.badges.personalized}</span>
               </div>
             )}
           </button>

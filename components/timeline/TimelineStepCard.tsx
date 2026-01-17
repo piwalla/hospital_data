@@ -1,6 +1,6 @@
 /**
  * @file TimelineStepCard.tsx
- * @description 타임라인 단계 카드 컴포넌트
+ * @description 타임라인 단계 카드 컴포넌트 (지역화 지원)
  */
 
 'use client';
@@ -10,37 +10,31 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { StageWithDetails } from '@/lib/types/timeline';
 import { cn } from '@/lib/utils';
+import { Locale, TimelineTranslation } from '@/lib/i18n/config';
 
 interface TimelineStepCardProps {
   stage: StageWithDetails;
   stepNumber: number;
   isCurrentStep?: boolean;
+  locale: Locale;
+  t: TimelineTranslation;
 }
 
-export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = false }: TimelineStepCardProps) {
+export default function TimelineStepCard({ 
+  stage, 
+  stepNumber, 
+  isCurrentStep = false,
+  locale,
+  t 
+}: TimelineStepCardProps) {
   const router = useRouter();
   
-  const title = 
-    stepNumber === 1
-      ? '산재 신청 이렇게 하세요'
-      : stepNumber === 2
-      ? '치료와 생활비 받으세요'
-      : stepNumber === 3
-      ? '후유증 보상금 받으세요'
-      : stepNumber === 4
-      ? '직장 복귀 또는 재취업 지원 받기'
-      : stage.title;
-
-  const description =
-    stepNumber === 1
-      ? '다쳤을 때 가장 먼저 해야 할 일! 산재 신청부터 승인까지 전 과정을 안내합니다.'
-      : stepNumber === 2
-      ? '병원비는 어떻게 내나요? 일 못 하는 동안 생활비(휴업급여)는 어떻게 받나요?'
-      : stepNumber === 3
-      ? '치료 끝났는데 몸이 예전 같지 않다면? 후유증 보상금(장해급여) 받는 방법을 알려드립니다.'
-      : stepNumber === 4
-      ? '다시 일하고 싶은데 어떻게 해야 하나요? 직업훈련 지원부터 재취업까지 도와드립니다.'
-      : stage.description;
+  // 번역된 데이터 우선 사용, 없으면 stage 데이터 사용
+  const stageKey = stepNumber as keyof typeof t.stages;
+  const translatedStage = t.stages[stageKey];
+  
+  const title = translatedStage?.title || stage.title;
+  const description = translatedStage?.description || stage.description;
 
   const handleTagClick = (e: React.MouseEvent, tab: string) => {
     e.preventDefault();
@@ -53,23 +47,16 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
       href={`/timeline/${stepNumber}`}
       prefetch={false}
       className="group relative flex w-full text-left"
-      aria-label={`${stage.step_number}단계: ${stage.title} 자세히 보기`}
+      aria-label={`${stage.step_number}단계: ${title} 자세히 보기`}
       aria-describedby={`step-${stage.step_number}-description`}
     >
-      {/* 
-        [Refined Layout Structure] 
-        Rail Column (Fixed Width) | Content Column (Flex 1)
-      */}
-      
-      {/* Removed: Timeline Rail Column - Now using arrows between cards */}
-
       {/* Content Card Column */}
       <div className={cn(
         "flex-1 min-w-0 relative",
-        "bg-white border border-gray-300/40", // Stronger static border
+        "bg-white border border-gray-300/40", 
         "rounded-[24px] overflow-hidden",
-        "shadow-[0_8px_30px_rgba(0,0,0,0.05)]", // More visible static shadow
-        "group-hover:shadow-[0_24px_48px_rgba(0,0,0,0.12)]", // Stronger hover lift
+        "shadow-[0_8px_30px_rgba(0,0,0,0.05)]", 
+        "group-hover:shadow-[0_24px_48px_rgba(0,0,0,0.12)]", 
         "group-hover:border-primary/40",
         "group-hover:-translate-y-1.5",
         "transition-all duration-300 ease-out",
@@ -90,7 +77,7 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
             <div 
               className={cn(
                 "flex items-center justify-center rounded-2xl shadow-sm transition-all duration-300 flex-shrink-0 font-display",
-                "w-10 h-10 text-lg sm:w-14 sm:h-14 sm:text-2xl", // Responsive size classes
+                "w-10 h-10 text-lg sm:w-14 sm:h-14 sm:text-2xl", 
                 isCurrentStep 
                   ? "bg-primary text-white shadow-md ring-4 ring-primary/10" 
                   : "bg-gray-100 text-gray-400 group-hover:bg-primary/10 group-hover:text-primary"
@@ -127,7 +114,7 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
           <div className="flex flex-wrap gap-2">
             {isCurrentStep && (
               <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-bold">
-                진행중
+                {t.status.inProgress}
               </span>
             )}
             
@@ -138,7 +125,7 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
                 onClick={(e) => handleTagClick(e, 'actions')}
                 className="inline-flex items-center px-3 py-1 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-900 text-xs font-semibold border border-gray-200 transition-colors cursor-pointer"
               >
-                할일 {stage.actionItems?.length || stage.actions?.length}
+                {t.tabs.actions} {stage.actionItems?.length || stage.actions?.length}
               </span>
             )}
             
@@ -148,7 +135,7 @@ export default function TimelineStepCard({ stage, stepNumber, isCurrentStep = fa
                 onClick={(e) => handleTagClick(e, 'documents')}
                 className="inline-flex items-center px-3 py-1 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-900 text-xs font-semibold border border-gray-200 transition-colors cursor-pointer"
               >
-                서류 {stage.documents.length}
+                {t.tabs.documents} {stage.documents.length}
               </span>
             )}
           </div>

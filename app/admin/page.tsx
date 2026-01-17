@@ -83,13 +83,14 @@ export default async function AdminDashboardPage() {
   
   // Convert to array and sort
   const featureData = Object.entries(featureCounts)
+    .filter(([name]) => actionMap[name]) // Filter out unknown actions (like user names)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5) // Top 5
     .map(([name, value], idx) => ({ 
-        name, 
+        name: actionMap[name], 
         value, 
         fill: ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ec4899"][idx % 5] 
-    }))
-    .sort((a,b) => b.value - a.value)
-    .slice(0, 5); // Top 5
+    }));
 
   // 3. Fetch Recent Users List (Re-use fetched users or fetch specific if needed order)
   // Since we fetched all users above (lightweight), we can just sort/slice here or fetch again for efficiency if list is huge.

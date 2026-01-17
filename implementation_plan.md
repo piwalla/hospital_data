@@ -1,105 +1,102 @@
-# Personal Dashboard & Calendar Implementation Plan
+# Calculator Localization Implementation Plan
 
-This plan details the steps to implement the "My Rehabilitation Journey" dashboard and the "Easy Calendar" feature as approved in the proposal.
-
-## User Review Required
-
-> [!IMPORTANT]
-> This implementation relies on **mock data** (`mock-admin-data.ts`) to simulate user login and persistence. In a real production environment, this would need to be replaced with a real database and authentication system (e.g., Supabase Auth, NextAuth).
+This plan details the steps to localize the Industrial Accident Compensation Calculator (`/calculator`).
 
 ## Proposed Changes
 
-### Data Layer
+### Localization Infrastructure
 
-#### [MODIFY] [mock-admin-data.ts](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/lib/mock-admin-data.ts)
+#### [MODIFY] [config.ts](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/lib/i18n/config.ts)
 
-- Extend `AdminUser` interface to include `calendar_events` and `completed_actions`.
-- Add `CalendarEvent` interface.
-- Populate `MOCK_USERS` with sample calendar data and actionable items for testing.
+- **Update `CalculatorTranslation` interface** with comprehensive keys:
+  ```typescript
+  interface CalculatorTranslation {
+    title: string;
+    description: string;
+    sections: {
+      wageInput: {
+        title: string;
+        desc: string;
+        labels: { m1: string; m2: string; m3: string };
+      };
+      ageCheck: { title: string; desc: string; realAge: string; note: string };
+      result: {
+        title: string;
+        averageWage: { title: string; btn: string };
+        sickLeave: { title: string; btn: string };
+        disability: { title: string; desc: string; btn: string };
+      };
+      footer: { title: string; desc: string };
+    };
+    buttons: {
+      calculate: string;
+      viewReport: string;
+      save: string;
+      saving: string;
+      backToDashboard: string;
+    };
+    units: { won: string; year: string; days: string };
+    alerts: {
+      calculateFirst: string;
+      inputRequired: string;
+      saveSuccess: string;
+      saveFail: string;
+    };
+    dialogs: {
+      averageWage: {
+        title: string;
+        calculated: string;
+        basis: string;
+        basisDesc: string;
+        note: string;
+      };
+      sickLeave: {
+        title: string;
+        expected: string;
+        perDay: string;
+        adjustDays: string;
+        specialCase: string;
+        specialCaseDesc: string;
+        calculation: string;
+      };
+      disability: {
+        title: string;
+        grade: string;
+        pensionOnly: string;
+        lumpOnly: string;
+        choice: string;
+        pension: string;
+        lump: string;
+        expectedPension: string;
+        expectedLump: string;
+      };
+    };
+  }
+  ```
+- **Update `calculatorTranslations` object**: Populate with translations for all 10 locales: `ko`, `en`, `zh`, `vi`, `th`, `uz`, `mn`, `id`, `ne`, `hi`.
+  - _Note_: Automated translation will be used for non-Korean/English languages initially.
 
-### UI Components (New 'dashboard' module)
+### Calculator Components
 
-#### [NEW] [components/dashboard/DashboardHeader.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/components/dashboard/DashboardHeader.tsx)
+#### [MODIFY] [CalculatorClient.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/app/calculator/CalculatorClient.tsx)
 
-- Displays user greeting and overall progress bar.
-- Shows "current step" clearly.
+- **Props**: No change needed (uses client hooks).
+- **Logic**:
+  - Determine `currentLocale` from localStorage or other mechanism (already partly implemented).
+  - Select translation object based on locale.
+  - Replace hardcoded Korean strings (Title, Descriptions, Inputs, Buttons) with `t.key`.
 
-#### [NEW] [components/dashboard/ActionChecklist.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/components/dashboard/ActionChecklist.tsx)
+#### [MODIFY] [DisabilityCalculator.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/components/calculator/DisabilityCalculator.tsx)
 
-- Fetches actions for the current step.
-- Render checkboxes.
-- Handles toggle logic (updating mock state).
-
-#### [NEW] [components/dashboard/EasyCalendarWidget.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/components/dashboard/EasyCalendarWidget.tsx)
-
-- **Calendar View**: Displays a simple month view with event dots (Hospital, Admin, Rehab).
-- **One-Click Log**: Buttons for "Visited Hospital Today", "Applied for Benefits Today".
-- **Event List**: Shows selected date's events.
-
-#### [NEW] [components/dashboard/CuratedContent.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/components/dashboard/CuratedContent.tsx)
-
-- Displays "Required Documents" for the current step.
-- Displays "Recommended Videos" (placeholder UI).
-- Displays "Step Warnings" (Tips).
-
-### Page Implementation
-
-#### [NEW] [app/dashboard/page.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/app/dashboard/page.tsx)
-
-- Assembles the above components.
-- Simulates fetching the "logged-in user" (hardcoded to 'user-1' or derived from a simple cookie/context for demo).
-
-### Navigation
-
-#### [MODIFY] [components/Navbar.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/components/Navbar.tsx)
-
-- Add a "나의 여정" (My Journey) link to the navigation bar.
-- Add a notification badge (optional, static for now).
-
-#### [MODIFY] [components/Navbar.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/components/Navbar.tsx)
-
-### Admin Monitoring
-
-#### [NEW] [app/admin/chatbot/stats/page.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/app/admin/chatbot/stats/page.tsx)
-
-- Implementation of a simple dashboard to view chatbot usage statistics.
-- Metrics: Total Questions, Unique Users, Daily Usage.
-
-- Implementation of a simple dashboard to view chatbot usage statistics.
-- Metrics: Total Questions, Unique Users, Daily Usage.
-
-### Real User Activity (MVP Monitoring)
-
-#### [MODIFY] [app/admin/users/page.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/app/admin/users/page.tsx)
-
-- Replace `MOCK_USERS` with real `supabase.from('users').select('*')`.
-- Display Name, Email (via Clerk), Joined Date.
-
-#### [MODIFY] [app/admin/page.tsx](file:///c:/Users/highs/OneDrive/Desktop/crusor/hospital_data/app/admin/page.tsx)
-
-- Connect "Total Users" and "Recent Users" to real DB.
-
-## Guest Chat Limit Implementation
-
-- [x] Update Landing Page CTA to point to `/chatbot-v2` with text "산재 AI 무료로 사용하기"
-- [x] Modify `app/chatbot-v2/page.tsx` (Guest Mode)
-  - [x] Implement `localStorage` message counter (Limit: 5)
-  - [x] Add Limit Reached Modal with Sign Up CTA
-- [x] Chatbot V2 Enhancements
-  - [x] Inject "Website Feature Guide" into System Prompt (`route.ts`)
-  - [x] Style internal markdown links as "Shortcut Buttons" (`RagChatbotV2.tsx`)
+- **Props**: Add `locale: Locale`.
+- **Logic**:
+  - Use `calculatorTranslations[locale]` to get text.
+  - Translate: "Grade 1-14", "Pension only", "Lump sum only", "Choice available", Disclaimer textual content.
 
 ## Verification Plan
 
-### Automated Tests
-
-- None planned for this prototype phase.
-
 ### Manual Verification
 
-1.  **Dashboard Access**: Click "나의 여정" in the header. Verify it loads `app/dashboard/page.tsx`.
-2.  **Data Rendering**: Confirm 'Hong Gil-dong' (user-1) sees 'Step 2' content.
-3.  **Checklist Interaction**: Click a todo item. Verify the checkbox toggles.
-4.  **Calendar Interaction**:
-    - Click "Today's Hospital Visit". Verify a dot appears on today's date in the calendar.
-    - Click a calendar date. Verify it shows events for that day.
+1.  **Language Switching**: Use the header language switcher to toggle between KO, EN, ZH.
+2.  **UI Check**: Verify `CalculatorClient` title, labels, and placeholders change.
+3.  **Result Check**: Perform a calculation and check the `DisabilityCalculator` result card text (payment types, grades).

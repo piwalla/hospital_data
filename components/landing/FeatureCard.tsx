@@ -4,6 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
+import { Locale } from '@/lib/i18n/config';
+
 interface FeatureCardProps {
   title: React.ReactNode;
   description: React.ReactNode;
@@ -13,6 +15,7 @@ interface FeatureCardProps {
   linkText: string;
   delay?: number;
   reversed?: boolean; // If true, image is on the left
+  locale?: Locale;
 }
 
 export default function FeatureCard({
@@ -21,9 +24,10 @@ export default function FeatureCard({
   imageSrc,
   imageAlt,
   linkHref,
-  // linkText, // Not used currently
+  linkText,
   delay = 0,
   reversed = false,
+  locale = 'ko',
 }: FeatureCardProps) {
   return (
     <motion.div
@@ -34,13 +38,13 @@ export default function FeatureCard({
       className={`flex flex-col ${reversed ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 lg:gap-24 items-center py-12 lg:py-20`}
     >
       {/* Content Side */}
-      <div className="flex-1 space-y-4 text-center lg:text-left">
-        <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
+      <div className="flex-1 space-y-6 text-center lg:text-left">
+        <h3 className="text-2xl lg:text-4xl font-bold text-gray-900 leading-tight">
           <Link href={linkHref} className="hover:text-primary transition-colors">
             {title}
           </Link>
         </h3>
-        <p className="text-gray-600 text-lg leading-relaxed">
+        <p className="text-gray-600 text-lg lg:text-2xl leading-relaxed">
           {description}
         </p>
       </div>

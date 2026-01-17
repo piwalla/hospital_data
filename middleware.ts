@@ -1,6 +1,20 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-export default clerkMiddleware();
+// Define protected routes (Dashboard-Centric Strategy)
+// Access to these routes requires authentication
+const isProtectedRoute = createRouteMatcher([
+  '/profile(.*)',
+  '/onboarding(.*)',
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtectedRoute(req)) {
+      const authObj = await auth();
+      if (!authObj.userId) {
+          return authObj.redirectToSignIn();
+      }
+  }
+});
 
 export const config = {
   matcher: [

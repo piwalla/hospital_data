@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { updatePost } from "@/lib/api/community-posts";
+import { updatePostAction } from "@/app/actions/community";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
 import { useClerkSupabaseClient } from "@/lib/supabase/clerk-client";
@@ -50,22 +50,19 @@ export default function EditPostForm({ post }: EditPostFormProps) {
 
     setLoading(true);
 
-    const { error } = await updatePost(client, post.id, {
-      title: title.trim(),
-      content: content.trim(),
-    });
-
-    setLoading(false);
-
-    if (error) {
-      alert('게시글 수정에 실패했습니다.');
+    try {
+      await updatePostAction(post.id, title.trim(), content.trim());
+      alert('수정되었습니다.');
+      router.push(`/community/post/${post.id}`);
+    } catch (error: any) {
+      alert('게시글 수정에 실패했습니다: ' + (error.message || '알 수 없는 오류'));
       console.error(error);
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    alert('수정되었습니다.');
-    router.push(`/community/post/${post.id}`);
   }
+
+
 
   if (!user) {
     return null; // or loading
